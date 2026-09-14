@@ -1,0 +1,228 @@
+{
+  "canvas": {
+    "width": 2400,
+    "height": 1350
+  },
+  "ground": "#F1F1EC",
+  "layers": [
+    {
+      "id": "01-ground",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": {
+        "type": "linear",
+        "angle": 108,
+        "stops": [
+          "#F6F6EE",
+          "#EDEDE0",
+          "#E4E4D4"
+        ]
+      }
+    },
+    {
+      "id": "02-band",
+      "shape": "rect",
+      "x": -192,
+      "y": 459.00000000000006,
+      "w": 2784,
+      "h": 540,
+      "paint": "#D8DCC4",
+      "effects": [
+        {
+          "type": "duotone",
+          "shadows": "#5C6438",
+          "midtones": "#9AA364",
+          "highlights": "#E9EBD8",
+          "strength": 0.9
+        },
+        {
+          "type": "halftone",
+          "size": 15,
+          "angle": 22,
+          "tone": "source",
+          "maxTone": 0.38,
+          "color": "#3A4028",
+          "respectAlpha": true
+        }
+      ]
+    },
+    {
+      "id": "03-subject",
+      "shape": "image",
+      "src": "D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/assets/haruka-figure.png",
+      "x": 1296,
+      "y": 54,
+      "w": 1008,
+      "h": 1269,
+      "fit": "contain",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "quality": "high",
+      "effects": [
+        {
+          "type": "duotone",
+          "shadows": "#2E3324",
+          "midtones": "#6E7742",
+          "highlights": "#EFEFE2",
+          "strength": 1,
+          "scope": {
+            "shape": "ellipse",
+            "x": 0.6,
+            "y": 0.03,
+            "w": 0.36,
+            "h": 0.5,
+            "paint": "#FFFFFF",
+            "invert": true
+          }
+        },
+        {
+          "type": "halftone",
+          "size": 12,
+          "angle": 22,
+          "tone": "source",
+          "maxTone": 0.34,
+          "color": "#3A4028",
+          "replace": true,
+          "respectAlpha": true,
+          "scope": {
+            "type": "ramp",
+            "angle": 90,
+            "stops": [
+              "#000000",
+              "#000000",
+              "#FFFFFF"
+            ],
+            "at": [
+              0,
+              0.05
+            ],
+            "size": [
+              1,
+              1.5
+            ]
+          }
+        },
+        {
+          "type": "dropShadow",
+          "angle": 135,
+          "distance": 20,
+          "size": 0,
+          "opacity": 0.85,
+          "color": "#83923A",
+          "scope": {
+            "shape": "ellipse",
+            "x": 0.6,
+            "y": 0.03,
+            "w": 0.36,
+            "h": 0.5,
+            "paint": "#FFFFFF",
+            "invert": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "04-rule-top",
+      "shape": "line",
+      "x1": 96,
+      "y1": 144,
+      "x2": 2304,
+      "y2": 144,
+      "stroke": "#3A4028",
+      "width": 1.5,
+      "opacity": 0.5
+    },
+    {
+      "id": "05-rule-bottom",
+      "shape": "line",
+      "x1": 96,
+      "y1": 1215.6,
+      "x2": 2304,
+      "y2": 1215.6,
+      "stroke": "#3A4028",
+      "width": 1.5,
+      "opacity": 0.5
+    },
+    {
+      "id": "06-title",
+      "shape": "text",
+      "x": 96,
+      "y": 486,
+      "w": 1104,
+      "text": "GINKGO",
+      "size": 214,
+      "font": "Grotesk",
+      "weight": 600,
+      "letterSpacing": -4,
+      "color": "#20241C",
+      "align": "left",
+      "wrap": false,
+      "effects": [
+        {
+          "type": "dropShadow",
+          "angle": 135,
+          "distance": 7,
+          "size": 0,
+          "opacity": 1,
+          "color": "#83923A"
+        },
+        {
+          "type": "halftone",
+          "size": 10,
+          "angle": 22,
+          "tone": "source",
+          "maxTone": 0.14,
+          "color": "#2A2E22",
+          "respectAlpha": true
+        }
+      ]
+    },
+    {
+      "id": "07-sub",
+      "shape": "text",
+      "x": 100,
+      "y": 694,
+      "w": 1008,
+      "text": "MUELSYSE · 银杏计划",
+      "size": 34,
+      "font": "SansSC",
+      "weight": 500,
+      "letterSpacing": 10,
+      "color": "#5C6438",
+      "align": "left",
+      "wrap": false
+    },
+    {
+      "id": "08-body",
+      "shape": "text",
+      "x": 96,
+      "y": 1042.8,
+      "w": 1008,
+      "text": "A study in accumulation — many faint marks, one focus, a grid that never announces itself.",
+      "size": 21,
+      "font": "SansSC",
+      "weight": 400,
+      "color": "#20241C",
+      "opacity": 0.72,
+      "align": "left",
+      "wrap": false
+    },
+    {
+      "id": "09-meta",
+      "shape": "text",
+      "x": 1984,
+      "y": 1249.2,
+      "w": 320,
+      "text": "GINKGO / PRESS / 2026",
+      "size": 16,
+      "font": "Mono",
+      "color": "#20241C",
+      "opacity": 0.5,
+      "align": "right",
+      "wrap": false
+    }
+  ]
+}

@@ -1,0 +1,201 @@
+{
+  "canvas": {
+    "width": 2400,
+    "height": 1350
+  },
+  "ground": "#F1F1EC",
+  "layers": [
+    {
+      "id": "01-ground",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": {
+        "type": "linear",
+        "angle": 108,
+        "stops": [
+          "#F4F4EA",
+          "#EDEDE0",
+          "#E7E7D8"
+        ]
+      }
+    },
+    {
+      "id": "02-band",
+      "shape": "rect",
+      "x": -192,
+      "y": 405,
+      "w": 2784,
+      "h": 567,
+      "paint": "#D8DCC4",
+      "opacity": 1,
+      "radius": 0,
+      "effects": [
+        {
+          "type": "duotone",
+          "shadows": "#5C6438",
+          "midtones": "#9AA364",
+          "highlights": "#E9EBD8",
+          "strength": 0.9
+        },
+        {
+          "type": "halftone",
+          "size": 14,
+          "angle": 22,
+          "tone": "source",
+          "maxTone": 0.42,
+          "color": "#3A4028",
+          "respectAlpha": true
+        },
+        {
+          "type": "grain",
+          "amount": 0.05,
+          "size": 1.4,
+          "monochrome": true
+        }
+      ]
+    },
+    {
+      "id": "03-subject",
+      "shape": "image",
+      "src": "D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/assets/haruka-figure.png",
+      "x": 1248,
+      "y": 81,
+      "w": 1056,
+      "h": 1242,
+      "fit": "contain",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "quality": "high",
+      "opacity": 1,
+      "effects": [
+        {
+          "type": "dropShadow",
+          "angle": 135,
+          "distance": 18,
+          "size": 0,
+          "opacity": 0.9,
+          "color": "#83923A"
+        },
+        {
+          "type": "duotone",
+          "shadows": "#2E3324",
+          "midtones": "#6E7742",
+          "highlights": "#EFEFE2",
+          "strength": 0.95
+        }
+      ]
+    },
+    {
+      "id": "04-rule-top",
+      "shape": "line",
+      "x1": 96,
+      "y1": 153.60000000000002,
+      "x2": 2304,
+      "y2": 153.60000000000002,
+      "stroke": "#3A4028",
+      "width": 1.5,
+      "opacity": 0.55,
+      "effects": []
+    },
+    {
+      "id": "05-rule-bottom",
+      "shape": "line",
+      "x1": 96,
+      "y1": 1215.6,
+      "x2": 2304,
+      "y2": 1215.6,
+      "stroke": "#3A4028",
+      "width": 1.5,
+      "opacity": 0.55,
+      "effects": []
+    },
+    {
+      "id": "06-title",
+      "shape": "text",
+      "x": 96,
+      "y": 459.00000000000006,
+      "w": 1104,
+      "text": "GINKGO",
+      "size": 214,
+      "font": "Grotesk",
+      "weight": 600,
+      "letterSpacing": -4,
+      "color": "#20241C",
+      "align": "left",
+      "wrap": false,
+      "effects": [
+        {
+          "type": "dropShadow",
+          "angle": 135,
+          "distance": 7,
+          "size": 0,
+          "opacity": 1,
+          "color": "#83923A"
+        }
+      ]
+    },
+    {
+      "id": "07-sub",
+      "shape": "text",
+      "x": 100,
+      "y": 667,
+      "w": 1008,
+      "text": "MUELSYSE · 银杏计划",
+      "size": 34,
+      "font": "SansSC",
+      "weight": 500,
+      "letterSpacing": 10,
+      "color": "#83923A",
+      "align": "left",
+      "wrap": false,
+      "effects": [
+        {
+          "type": "grain",
+          "amount": 0.05,
+          "size": 1.4,
+          "monochrome": true
+        }
+      ]
+    },
+    {
+      "id": "08-body",
+      "shape": "text",
+      "x": 96,
+      "y": 1042.8,
+      "w": 960,
+      "text": "A study in accumulation — many faint marks, one focus, a grid that never announces itself.",
+      "size": 21,
+      "font": "SansSC",
+      "weight": 400,
+      "color": "#20241C",
+      "opacity": 0.72,
+      "align": "left",
+      "wrap": false,
+      "effects": [
+        {
+          "type": "grain",
+          "amount": 0.05,
+          "size": 1.4,
+          "monochrome": true
+        }
+      ]
+    },
+    {
+      "id": "09-meta",
+      "shape": "text",
+      "x": 1984,
+      "y": 1249.2,
+      "w": 320,
+      "text": "KV / 2400×1350 / 2026",
+      "size": 16,
+      "font": "Mono",
+      "color": "#20241C",
+      "opacity": 0.5,
+      "align": "right",
+      "wrap": false
+    }
+  ]
+}

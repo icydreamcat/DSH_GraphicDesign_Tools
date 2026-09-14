@@ -1,0 +1,1578 @@
+{
+  "canvas": {
+    "width": 2400,
+    "height": 1350
+  },
+  "ground": "#F1F1EC",
+  "layers": [
+    {
+      "id": "L01-paper-tone",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": {
+        "type": "linear",
+        "angle": 115,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#F6F6F1"
+          },
+          {
+            "at": 0.55,
+            "color": "#F1F1EC"
+          },
+          {
+            "at": 1,
+            "color": "#E9E9E0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "L02-grid",
+      "shape": "group",
+      "opacity": 0.5,
+      "children": [
+        {
+          "id": "L02-grid-v0",
+          "shape": "line",
+          "x1": 104,
+          "y1": 104,
+          "x2": 104,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v1",
+          "shape": "line",
+          "x1": 241,
+          "y1": 104,
+          "x2": 241,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v2",
+          "shape": "line",
+          "x1": 378,
+          "y1": 104,
+          "x2": 378,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v3",
+          "shape": "line",
+          "x1": 515,
+          "y1": 104,
+          "x2": 515,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v4",
+          "shape": "line",
+          "x1": 652,
+          "y1": 104,
+          "x2": 652,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v5",
+          "shape": "line",
+          "x1": 789,
+          "y1": 104,
+          "x2": 789,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v6",
+          "shape": "line",
+          "x1": 926,
+          "y1": 104,
+          "x2": 926,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v7",
+          "shape": "line",
+          "x1": 1063,
+          "y1": 104,
+          "x2": 1063,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v8",
+          "shape": "line",
+          "x1": 1200,
+          "y1": 104,
+          "x2": 1200,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v9",
+          "shape": "line",
+          "x1": 1337,
+          "y1": 104,
+          "x2": 1337,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v10",
+          "shape": "line",
+          "x1": 1474,
+          "y1": 104,
+          "x2": 1474,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v11",
+          "shape": "line",
+          "x1": 1611,
+          "y1": 104,
+          "x2": 1611,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v12",
+          "shape": "line",
+          "x1": 1748,
+          "y1": 104,
+          "x2": 1748,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v13",
+          "shape": "line",
+          "x1": 1885,
+          "y1": 104,
+          "x2": 1885,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v14",
+          "shape": "line",
+          "x1": 2022,
+          "y1": 104,
+          "x2": 2022,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v15",
+          "shape": "line",
+          "x1": 2159,
+          "y1": 104,
+          "x2": 2159,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-v16",
+          "shape": "line",
+          "x1": 2296,
+          "y1": 104,
+          "x2": 2296,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h0",
+          "shape": "line",
+          "x1": 104,
+          "y1": 104,
+          "x2": 2296,
+          "y2": 104,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h1",
+          "shape": "line",
+          "x1": 104,
+          "y1": 246.75,
+          "x2": 2296,
+          "y2": 246.75,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h2",
+          "shape": "line",
+          "x1": 104,
+          "y1": 389.5,
+          "x2": 2296,
+          "y2": 389.5,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h3",
+          "shape": "line",
+          "x1": 104,
+          "y1": 532.25,
+          "x2": 2296,
+          "y2": 532.25,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h4",
+          "shape": "line",
+          "x1": 104,
+          "y1": 675,
+          "x2": 2296,
+          "y2": 675,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h5",
+          "shape": "line",
+          "x1": 104,
+          "y1": 817.75,
+          "x2": 2296,
+          "y2": 817.75,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h6",
+          "shape": "line",
+          "x1": 104,
+          "y1": 960.5,
+          "x2": 2296,
+          "y2": 960.5,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h7",
+          "shape": "line",
+          "x1": 104,
+          "y1": 1103.25,
+          "x2": 2296,
+          "y2": 1103.25,
+          "width": 1,
+          "paint": "#A8AD93"
+        },
+        {
+          "id": "L02-grid-h8",
+          "shape": "line",
+          "x1": 104,
+          "y1": 1246,
+          "x2": 2296,
+          "y2": 1246,
+          "width": 1,
+          "paint": "#A8AD93"
+        }
+      ],
+      "mask": {
+        "shapes": [
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "paint": {
+              "type": "fade",
+              "color": "#FFFFFF",
+              "from": 1,
+              "to": 0,
+              "angle": 0,
+              "gamma": 0.85
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "L03-ticks",
+      "shape": "group",
+      "opacity": 0.45,
+      "children": [
+        {
+          "id": "L03-tick-t0",
+          "shape": "line",
+          "x1": 104,
+          "y1": 88,
+          "x2": 104,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b0",
+          "shape": "line",
+          "x1": 104,
+          "y1": 1247,
+          "x2": 104,
+          "y2": 1262,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t1",
+          "shape": "line",
+          "x1": 213.6,
+          "y1": 95,
+          "x2": 213.6,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b1",
+          "shape": "line",
+          "x1": 213.6,
+          "y1": 1247,
+          "x2": 213.6,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t2",
+          "shape": "line",
+          "x1": 323.2,
+          "y1": 95,
+          "x2": 323.2,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b2",
+          "shape": "line",
+          "x1": 323.2,
+          "y1": 1247,
+          "x2": 323.2,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t3",
+          "shape": "line",
+          "x1": 432.8,
+          "y1": 95,
+          "x2": 432.8,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b3",
+          "shape": "line",
+          "x1": 432.8,
+          "y1": 1247,
+          "x2": 432.8,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t4",
+          "shape": "line",
+          "x1": 542.4,
+          "y1": 95,
+          "x2": 542.4,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b4",
+          "shape": "line",
+          "x1": 542.4,
+          "y1": 1247,
+          "x2": 542.4,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t5",
+          "shape": "line",
+          "x1": 652,
+          "y1": 88,
+          "x2": 652,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b5",
+          "shape": "line",
+          "x1": 652,
+          "y1": 1247,
+          "x2": 652,
+          "y2": 1262,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t6",
+          "shape": "line",
+          "x1": 761.6,
+          "y1": 95,
+          "x2": 761.6,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b6",
+          "shape": "line",
+          "x1": 761.6,
+          "y1": 1247,
+          "x2": 761.6,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t7",
+          "shape": "line",
+          "x1": 871.2,
+          "y1": 95,
+          "x2": 871.2,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b7",
+          "shape": "line",
+          "x1": 871.2,
+          "y1": 1247,
+          "x2": 871.2,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t8",
+          "shape": "line",
+          "x1": 980.8,
+          "y1": 95,
+          "x2": 980.8,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b8",
+          "shape": "line",
+          "x1": 980.8,
+          "y1": 1247,
+          "x2": 980.8,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t9",
+          "shape": "line",
+          "x1": 1090.4,
+          "y1": 95,
+          "x2": 1090.4,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b9",
+          "shape": "line",
+          "x1": 1090.4,
+          "y1": 1247,
+          "x2": 1090.4,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t10",
+          "shape": "line",
+          "x1": 1200,
+          "y1": 88,
+          "x2": 1200,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b10",
+          "shape": "line",
+          "x1": 1200,
+          "y1": 1247,
+          "x2": 1200,
+          "y2": 1262,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t11",
+          "shape": "line",
+          "x1": 1309.6,
+          "y1": 95,
+          "x2": 1309.6,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b11",
+          "shape": "line",
+          "x1": 1309.6,
+          "y1": 1247,
+          "x2": 1309.6,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t12",
+          "shape": "line",
+          "x1": 1419.2,
+          "y1": 95,
+          "x2": 1419.2,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b12",
+          "shape": "line",
+          "x1": 1419.2,
+          "y1": 1247,
+          "x2": 1419.2,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t13",
+          "shape": "line",
+          "x1": 1528.8,
+          "y1": 95,
+          "x2": 1528.8,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b13",
+          "shape": "line",
+          "x1": 1528.8,
+          "y1": 1247,
+          "x2": 1528.8,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t14",
+          "shape": "line",
+          "x1": 1638.4,
+          "y1": 95,
+          "x2": 1638.4,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b14",
+          "shape": "line",
+          "x1": 1638.4,
+          "y1": 1247,
+          "x2": 1638.4,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t15",
+          "shape": "line",
+          "x1": 1748,
+          "y1": 88,
+          "x2": 1748,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b15",
+          "shape": "line",
+          "x1": 1748,
+          "y1": 1247,
+          "x2": 1748,
+          "y2": 1262,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t16",
+          "shape": "line",
+          "x1": 1857.6,
+          "y1": 95,
+          "x2": 1857.6,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b16",
+          "shape": "line",
+          "x1": 1857.6,
+          "y1": 1247,
+          "x2": 1857.6,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t17",
+          "shape": "line",
+          "x1": 1967.2,
+          "y1": 95,
+          "x2": 1967.2,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b17",
+          "shape": "line",
+          "x1": 1967.2,
+          "y1": 1247,
+          "x2": 1967.2,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t18",
+          "shape": "line",
+          "x1": 2076.8,
+          "y1": 95,
+          "x2": 2076.8,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b18",
+          "shape": "line",
+          "x1": 2076.8,
+          "y1": 1247,
+          "x2": 2076.8,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t19",
+          "shape": "line",
+          "x1": 2186.4,
+          "y1": 95,
+          "x2": 2186.4,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b19",
+          "shape": "line",
+          "x1": 2186.4,
+          "y1": 1247,
+          "x2": 2186.4,
+          "y2": 1255,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-t20",
+          "shape": "line",
+          "x1": 2296,
+          "y1": 88,
+          "x2": 2296,
+          "y2": 103,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L03-tick-b20",
+          "shape": "line",
+          "x1": 2296,
+          "y1": 1247,
+          "x2": 2296,
+          "y2": 1262,
+          "width": 1,
+          "paint": "#4C5526"
+        }
+      ]
+    },
+    {
+      "id": "L04-wedge",
+      "shape": "polygon",
+      "points": [
+        [
+          0.052,
+          0.3
+        ],
+        [
+          0.335,
+          0.3
+        ],
+        [
+          0.276,
+          0.735
+        ],
+        [
+          0.052,
+          0.735
+        ]
+      ],
+      "paint": {
+        "type": "linear",
+        "angle": 70,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#C2C89A",
+            "alpha": 0.55
+          },
+          {
+            "at": 1,
+            "color": "#83923A",
+            "alpha": 0.3
+          }
+        ]
+      },
+      "opacity": 0.42
+    },
+    {
+      "id": "L04-plane-small",
+      "shape": "polygon",
+      "points": [
+        [
+          0.352,
+          0.205
+        ],
+        [
+          0.6,
+          0.205
+        ],
+        [
+          0.545,
+          0.545
+        ],
+        [
+          0.352,
+          0.545
+        ]
+      ],
+      "paint": {
+        "type": "linear",
+        "angle": 100,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#C2C89A",
+            "alpha": 0.42
+          },
+          {
+            "at": 1,
+            "color": "#E4E8C8",
+            "alpha": 0.16
+          }
+        ]
+      },
+      "opacity": 0.5
+    },
+    {
+      "id": "L05-subject",
+      "shape": "image",
+      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\yao-cutout.png",
+      "x": 0.545,
+      "y": 0.085,
+      "w": 0.395,
+      "h": 0.7,
+      "fit": "contain",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "quality": "high",
+      "effects": [
+        {
+          "type": "duotone",
+          "shadows": "#2C3123",
+          "midtones": "#6E7458",
+          "highlights": "#EFEFE4",
+          "strength": 0.82
+        }
+      ],
+      "mask": {
+        "shapes": [
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "paint": {
+              "type": "linear",
+              "angle": 90,
+              "stops": [
+                {
+                  "at": 0,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.55,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.78,
+                  "color": "#FFFFFF",
+                  "alpha": 0.55
+                },
+                {
+                  "at": 0.94,
+                  "color": "#FFFFFF",
+                  "alpha": 0.12
+                },
+                {
+                  "at": 1,
+                  "color": "#FFFFFF",
+                  "alpha": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "L06-subject-screen",
+      "shape": "image",
+      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\yao-cutout.png",
+      "x": 0.545,
+      "y": 0.085,
+      "w": 0.395,
+      "h": 0.7,
+      "fit": "contain",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "quality": "high",
+      "blend": "multiply",
+      "opacity": 0.3,
+      "tone": [
+        {
+          "op": "halftone",
+          "cell": 13,
+          "angle": 45,
+          "color": "#3F4A20",
+          "alpha": 1,
+          "maxTone": 0.55,
+          "tone": "gradient",
+          "toneAngle": 90,
+          "coverage": [
+            {
+              "at": 0,
+              "value": 1
+            },
+            {
+              "at": 0.55,
+              "value": 0.85
+            },
+            {
+              "at": 1,
+              "value": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L07a-hero-cjk",
+      "shape": "text",
+      "text": "美术视觉语言",
+      "font": {
+        "family": [
+          "SansSC"
+        ],
+        "size": 148,
+        "weight": 700,
+        "tracking": -0.025
+      },
+      "color": "#23261C",
+      "x": 0.055,
+      "y": 0.245,
+      "w": 0.475,
+      "lineHeight": 1.04,
+      "fit": true
+    },
+    {
+      "id": "L07b-hero-latin",
+      "shape": "text",
+      "text": "ART & VISUAL LANGUAGE",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 30,
+        "weight": 500,
+        "width": 88,
+        "tracking": 0.3
+      },
+      "color": "#4C5526",
+      "x": 0.0565,
+      "y": 0.415,
+      "w": 0.4,
+      "wrap": false
+    },
+    {
+      "id": "L07c-rule",
+      "shape": "line",
+      "x1": 0.0565,
+      "y1": 0.452,
+      "x2": 0.42,
+      "y2": 0.452,
+      "width": 1,
+      "paint": "#4C5526",
+      "opacity": 0.55
+    },
+    {
+      "id": "L07d-kicker",
+      "shape": "text",
+      "text": "ARKNIGHTS / VISUAL SYSTEM",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 15,
+        "weight": 400,
+        "width": 84,
+        "tracking": 0.36
+      },
+      "color": "#8A8D80",
+      "x": 0.0565,
+      "y": 0.196,
+      "w": 0.35,
+      "wrap": false
+    },
+    {
+      "id": "L07e-index",
+      "shape": "text",
+      "text": "09",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 13,
+        "weight": 600,
+        "width": 85,
+        "tracking": 0.1
+      },
+      "color": "#83923A",
+      "x": 0.0565,
+      "y": 0.166,
+      "w": 0.1,
+      "wrap": false
+    },
+    {
+      "id": "L07f-name",
+      "shape": "text",
+      "text": "MuelSyse",
+      "font": {
+        "family": [
+          "SerifSC"
+        ],
+        "size": 62,
+        "weight": 400,
+        "tracking": -0.005
+      },
+      "color": "#23261C",
+      "x": 0.055,
+      "y": 0.615,
+      "w": 0.3,
+      "wrap": false
+    },
+    {
+      "id": "L07g-class",
+      "shape": "text",
+      "text": "VANGUARD",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 16,
+        "weight": 400,
+        "width": 82,
+        "tracking": 0.4
+      },
+      "color": "#4C5526",
+      "x": 0.0565,
+      "y": 0.708,
+      "w": 0.2,
+      "wrap": false
+    },
+    {
+      "id": "L07h-caption",
+      "shape": "text",
+      "text": "网格与尺度级数决定版面的秩序。秩序不是限制，是让每一条信息都能被读到的前提。\nA grid and a scale ladder decide the order of a page. That order is not a constraint — it is the precondition for every item being read at all.",
+      "font": {
+        "family": [
+          "SansSC"
+        ],
+        "size": 14,
+        "weight": 300,
+        "lineHeight": 1.72
+      },
+      "color": "#6A6E60",
+      "x": 0.0565,
+      "y": 0.775,
+      "w": 0.235
+    },
+    {
+      "id": "L07i-footer",
+      "shape": "text",
+      "text": "ARK-VIS-003   ·   LAYER 09   ·   2400 × 1350",
+      "font": {
+        "family": [
+          "Mono"
+        ],
+        "size": 12,
+        "weight": 400,
+        "tracking": 0.12
+      },
+      "color": "#8A8D80",
+      "x": 0.0565,
+      "y": 0.925,
+      "w": 0.36,
+      "wrap": false
+    },
+    {
+      "id": "L07j-right-caption",
+      "shape": "text",
+      "text": "ORIGINIUM ARTS / HYDRO CONTROL / RANGE 3.2",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 12,
+        "weight": 400,
+        "width": 84,
+        "tracking": 0.22
+      },
+      "color": "#8A8D80",
+      "x": 0.505,
+      "y": 0.852,
+      "w": 0.415,
+      "align": "right",
+      "wrap": false
+    },
+    {
+      "id": "L07k-spine",
+      "shape": "text",
+      "text": "BEYOND THE TIMELINE",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 11,
+        "weight": 400,
+        "width": 82,
+        "tracking": 0.3
+      },
+      "color": "#4C5526",
+      "x": 0.9635,
+      "y": 0.175,
+      "vertical": true,
+      "opacity": 0.8
+    },
+    {
+      "id": "L07l-arc",
+      "shape": "text",
+      "text": "ESCAPLATOR IS HERE FOR EVERYONE",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 12,
+        "weight": 500,
+        "width": 84,
+        "tracking": 0.26
+      },
+      "color": "#83923A",
+      "path": {
+        "cx": 0.775,
+        "cy": 0.3,
+        "r": 300,
+        "startAngle": -1.5707963267948966
+      },
+      "opacity": 0.75
+    },
+    {
+      "id": "L08-micromarks",
+      "shape": "group",
+      "opacity": 0.62,
+      "children": [
+        {
+          "id": "L08-cross-tl-h",
+          "shape": "line",
+          "x1": 0.036,
+          "y1": 0.077,
+          "x2": 0.051,
+          "y2": 0.077,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-tl-v",
+          "shape": "line",
+          "x1": 0.0435,
+          "y1": 0.0637,
+          "x2": 0.0435,
+          "y2": 0.09029999999999999,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-tr-h",
+          "shape": "line",
+          "x1": 0.9490000000000001,
+          "y1": 0.077,
+          "x2": 0.964,
+          "y2": 0.077,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-tr-v",
+          "shape": "line",
+          "x1": 0.9565,
+          "y1": 0.0637,
+          "x2": 0.9565,
+          "y2": 0.09029999999999999,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-bl-h",
+          "shape": "line",
+          "x1": 0.036,
+          "y1": 0.923,
+          "x2": 0.051,
+          "y2": 0.923,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-bl-v",
+          "shape": "line",
+          "x1": 0.0435,
+          "y1": 0.9097000000000001,
+          "x2": 0.0435,
+          "y2": 0.9363,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-br-h",
+          "shape": "line",
+          "x1": 0.9490000000000001,
+          "y1": 0.923,
+          "x2": 0.964,
+          "y2": 0.923,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-cross-br-v",
+          "shape": "line",
+          "x1": 0.9565,
+          "y1": 0.9097000000000001,
+          "x2": 0.9565,
+          "y2": 0.9363,
+          "width": 1,
+          "paint": "#4C5526"
+        },
+        {
+          "id": "L08-sq0",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.175,
+          "w": 7,
+          "h": 7,
+          "paint": "#4C5526",
+          "opacity": 0.22
+        },
+        {
+          "id": "L08-sq1",
+          "shape": "rect",
+          "x": 0.442,
+          "y": 0.175,
+          "w": 5,
+          "h": 5,
+          "paint": "#83923A",
+          "opacity": 0.14
+        },
+        {
+          "id": "L08-sq2",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.205,
+          "w": 5,
+          "h": 5,
+          "paint": "#83923A",
+          "opacity": 0.14
+        },
+        {
+          "id": "L08-sq3",
+          "shape": "rect",
+          "x": 0.442,
+          "y": 0.205,
+          "w": 7,
+          "h": 7,
+          "paint": "#4C5526",
+          "opacity": 0.22
+        },
+        {
+          "id": "L08-sq4",
+          "shape": "rect",
+          "x": 0.469,
+          "y": 0.175,
+          "w": 4,
+          "h": 4,
+          "paint": "#83923A",
+          "opacity": 0.14
+        },
+        {
+          "id": "L08-sq5",
+          "shape": "rect",
+          "x": 0.469,
+          "y": 0.205,
+          "w": 4,
+          "h": 4,
+          "paint": "#83923A",
+          "opacity": 0.14
+        },
+        {
+          "id": "L08-sq6",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.235,
+          "w": 4,
+          "h": 4,
+          "paint": "#4C5526",
+          "opacity": 0.22
+        },
+        {
+          "id": "L08-sq7",
+          "shape": "rect",
+          "x": 0.442,
+          "y": 0.235,
+          "w": 3,
+          "h": 3,
+          "paint": "#83923A",
+          "opacity": 0.14
+        },
+        {
+          "id": "L08-bar0",
+          "shape": "rect",
+          "x": 0.615,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#23261C",
+          "opacity": 0.3
+        },
+        {
+          "id": "L08-bar1",
+          "shape": "rect",
+          "x": 0.6305,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#23261C",
+          "opacity": 0.32999999999999996
+        },
+        {
+          "id": "L08-bar2",
+          "shape": "rect",
+          "x": 0.646,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#23261C",
+          "opacity": 0.36
+        },
+        {
+          "id": "L08-bar3",
+          "shape": "rect",
+          "x": 0.6615,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#83923A",
+          "opacity": 0.39
+        },
+        {
+          "id": "L08-bar4",
+          "shape": "rect",
+          "x": 0.677,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#83923A",
+          "opacity": 0.42
+        },
+        {
+          "id": "L08-bar5",
+          "shape": "rect",
+          "x": 0.6925,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#83923A",
+          "opacity": 0.44999999999999996
+        },
+        {
+          "id": "L08-bar6",
+          "shape": "rect",
+          "x": 0.708,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#C2C89A",
+          "opacity": 0.48
+        },
+        {
+          "id": "L08-bar7",
+          "shape": "rect",
+          "x": 0.7235,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#C2C89A",
+          "opacity": 0.51
+        },
+        {
+          "id": "L08-bar8",
+          "shape": "rect",
+          "x": 0.739,
+          "y": 0.148,
+          "w": 0.0105,
+          "h": 0.0133,
+          "paint": "#C2C89A",
+          "opacity": 0.54
+        },
+        {
+          "id": "L08-tagbox0",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.6,
+          "w": 18,
+          "h": 18,
+          "stroke": {
+            "color": "#4C5526",
+            "width": 1
+          },
+          "paint": "none",
+          "opacity": 0.28
+        },
+        {
+          "id": "L08-taglabel0",
+          "shape": "text",
+          "text": "I",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 11,
+            "weight": 600,
+            "width": 85,
+            "tracking": 0.05
+          },
+          "color": "#4C5526",
+          "x": 6.415,
+          "y": 4.1,
+          "w": 20,
+          "wrap": false,
+          "opacity": 0.55
+        },
+        {
+          "id": "L08-tagbox1",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.665,
+          "w": 18,
+          "h": 18,
+          "stroke": {
+            "color": "#4C5526",
+            "width": 1
+          },
+          "paint": "none",
+          "opacity": 0.28
+        },
+        {
+          "id": "L08-taglabel1",
+          "shape": "text",
+          "text": "II",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 11,
+            "weight": 600,
+            "width": 85,
+            "tracking": 0.05
+          },
+          "color": "#4C5526",
+          "x": 6.415,
+          "y": 4.165,
+          "w": 20,
+          "wrap": false,
+          "opacity": 0.55
+        },
+        {
+          "id": "L08-tagbox2",
+          "shape": "rect",
+          "x": 0.415,
+          "y": 0.73,
+          "w": 18,
+          "h": 18,
+          "stroke": {
+            "color": "#4C5526",
+            "width": 1
+          },
+          "paint": "none",
+          "opacity": 0.28
+        },
+        {
+          "id": "L08-taglabel2",
+          "shape": "text",
+          "text": "III",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 11,
+            "weight": 600,
+            "width": 85,
+            "tracking": 0.05
+          },
+          "color": "#4C5526",
+          "x": 6.415,
+          "y": 4.23,
+          "w": 20,
+          "wrap": false,
+          "opacity": 0.55
+        },
+        {
+          "id": "L08-coord",
+          "shape": "text",
+          "text": "N° E 06",
+          "font": {
+            "family": [
+              "Mono"
+            ],
+            "size": 10,
+            "weight": 400,
+            "tracking": 0.1
+          },
+          "color": "#8A8D80",
+          "x": 0.415,
+          "y": 0.128,
+          "w": 0.1,
+          "wrap": false,
+          "opacity": 0.7
+        }
+      ]
+    },
+    {
+      "id": "L09-grain",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": "#808080",
+      "effects": [
+        {
+          "type": "grain",
+          "amount": 0.022,
+          "mono": true,
+          "seed": 20260911
+        }
+      ],
+      "opacity": 0.5,
+      "blend": "overlay"
+    },
+    {
+      "kind": "adjustment",
+      "id": "L10-tone",
+      "ops": [
+        {
+          "op": "hueSaturation",
+          "saturation": -0.16
+        },
+        {
+          "op": "curves",
+          "rgb": [
+            [
+              0,
+              12
+            ],
+            [
+              64,
+              70
+            ],
+            [
+              160,
+              166
+            ],
+            [
+              255,
+              250
+            ]
+          ]
+        }
+      ],
+      "opacity": 0.85
+    }
+  ]
+}

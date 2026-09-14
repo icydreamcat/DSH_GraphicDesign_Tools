@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# What is versioned here, and what is not.
+#
+# The repository is the SOURCE of three things — the agent preset, the engine it
+# drives, and the two documents that explain both — plus a small curated set of
+# examples. Everything else is either a dependency, a build artifact, or the
+# harness's own directory. See REPO-LAYOUT.md for the full map.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── dependencies ─────────────────────────────────────────────────────────────
+# Reproduce with `npm install` in engine/. @napi-rs/canvas ships per-platform
+# native binaries (a 27 MB skia build), so a committed copy is both large and
+# wrong on any machine that is not this one.
+engine/node_modules/
+node_modules/
+
+# ── build artifacts ──────────────────────────────────────────────────────────
+# engine/out/ holds 42 files and about 46 MB of renders, measurement reports and
+# PSDs that are rewritten on every iteration. They regenerate in about a second
+# each from the scenes committed beside them, which is the definition of
+# something that does not belong in a commit.
+#
+# The curated subset that IS versioned lives in examples/ — excluded from the
+# rule below on purpose, because a design engine with no picture in its
+# repository has to be taken on faith. `node make-examples.mjs` promotes them.
+engine/out/
+!examples/
+
+# Photoshop bridge logs, written into the engine directory by jsx/psx.ps1.
+engine/.probe/
+.probe/
+
+# ── editor and scratch ───────────────────────────────────────────────────────
+# No leading slash and no trailing slash: `engine/scenes/.idea/` is nested, and a
+# `.idea/` pattern anchored at the root missed it. The JetBrains directory was
+# sitting in the tree untracked-but-unignored until this was fixed.
+.idea/
+.vscode/
+*.bak
+*.tmp
+*.log
+
+# ── the harness home ─────────────────────────────────────────────────────────
+# `design/` above is the canonical preset source. `node deploy-preset.mjs`
+# INSTALLS it into %USERPROFILE%\.dsh\.agent-presets\design — that directory is a
+# deploy target, and nothing under the harness home is versioned here. The two
+# are kept in step by running the script, never by editing both.

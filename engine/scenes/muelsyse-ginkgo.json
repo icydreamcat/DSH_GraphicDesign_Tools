@@ -1,0 +1,1363 @@
+{
+  "canvas": {
+    "width": 2560,
+    "height": 1219
+  },
+  "ground": "#FBFBF6",
+  "allow": {
+    "contrast.invisibleText": "knocked-out paper-white tile letters sit on a solid olive tile (2.45:1 measured via color.mjs, not the declared paper ground)"
+  },
+  "layers": [
+    {
+      "id": "01-ground",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": {
+        "type": "linear",
+        "angle": 100,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#FDFDF9"
+          },
+          {
+            "at": 0.5,
+            "color": "#FBFBF6"
+          },
+          {
+            "at": 1,
+            "color": "#F4F4E9"
+          }
+        ]
+      }
+    },
+    {
+      "id": "02-ghost",
+      "shape": "image",
+      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\muelsyse-raw.webp",
+      "x": 0,
+      "y": 152,
+      "w": 1,
+      "h": 902,
+      "fit": "cover",
+      "anchorX": 0.5,
+      "anchorY": 0.55,
+      "quality": "high",
+      "opacity": 0.34,
+      "effects": [
+        {
+          "type": "blur",
+          "radius": 22
+        },
+        {
+          "type": "duotone",
+          "shadows": "#666C42",
+          "midtones": "#A8AF6F",
+          "highlights": "#F6F6EA",
+          "strength": 0.92
+        }
+      ]
+    },
+    {
+      "id": "03-left-panel",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1080,
+      "h": 1219,
+      "paint": {
+        "type": "linear",
+        "angle": 0,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#FDFDF9",
+            "alpha": 0.975
+          },
+          {
+            "at": 0.78,
+            "color": "#FAFAF2",
+            "alpha": 0.96
+          },
+          {
+            "at": 0.92,
+            "color": "#F4F4E6",
+            "alpha": 0.9
+          },
+          {
+            "at": 1,
+            "color": "#F0F1E0",
+            "alpha": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "id": "03-left-plane-b",
+      "shape": "rect",
+      "x": 258,
+      "y": 0,
+      "w": 822,
+      "h": 0.55,
+      "paint": {
+        "type": "linear",
+        "angle": 118,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#FCFCF7",
+            "alpha": 0.92
+          },
+          {
+            "at": 1,
+            "color": "#F1F2E4",
+            "alpha": 0.55
+          }
+        ]
+      }
+    },
+    {
+      "id": "03-right-ground",
+      "shape": "rect",
+      "x": 1600,
+      "y": 0,
+      "w": 960,
+      "h": 1219,
+      "paint": {
+        "type": "linear",
+        "angle": 180,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#FBFAF2",
+            "alpha": 0.1
+          },
+          {
+            "at": 0.32,
+            "color": "#FAFAF0",
+            "alpha": 0.3
+          },
+          {
+            "at": 0.44,
+            "color": "#F9F9EE",
+            "alpha": 0.7
+          },
+          {
+            "at": 0.72,
+            "color": "#F8F8EC",
+            "alpha": 0.76
+          },
+          {
+            "at": 1,
+            "color": "#F5F6E8",
+            "alpha": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "id": "04-plate",
+      "shape": "image",
+      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\muelsyse-raw.webp",
+      "x": 1140,
+      "y": 230,
+      "w": 642,
+      "h": 906,
+      "fit": "stretch",
+      "quality": "high",
+      "mask": {
+        "shapes": [
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "blend": "multiply",
+            "paint": {
+              "type": "linear",
+              "angle": 90,
+              "stops": [
+                {
+                  "at": 0,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.66,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.78,
+                  "color": "#FFFFFF",
+                  "alpha": 0.58
+                },
+                {
+                  "at": 0.9,
+                  "color": "#FFFFFF",
+                  "alpha": 0.2
+                },
+                {
+                  "at": 1,
+                  "color": "#FFFFFF",
+                  "alpha": 0
+                }
+              ]
+            }
+          },
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "blend": "multiply",
+            "paint": {
+              "type": "linear",
+              "angle": 270,
+              "stops": [
+                {
+                  "at": 0,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.68,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.84,
+                  "color": "#FFFFFF",
+                  "alpha": 0.5
+                },
+                {
+                  "at": 0.95,
+                  "color": "#FFFFFF",
+                  "alpha": 0.1
+                },
+                {
+                  "at": 1,
+                  "color": "#FFFFFF",
+                  "alpha": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "05-dot-screen",
+      "shape": "rect",
+      "x": 1160,
+      "y": 152,
+      "w": 1400,
+      "h": 858,
+      "paint": "#7E8446",
+      "opacity": 0.6,
+      "blend": "multiply",
+      "effects": [
+        {
+          "type": "halftone",
+          "replace": true,
+          "cell": 5.5,
+          "angle": 45,
+          "color": "#7E8446",
+          "alpha": 0.6,
+          "maxTone": 0.42,
+          "invert": true,
+          "tone": "source",
+          "toneAngle": 90,
+          "coverage": [
+            {
+              "at": 0,
+              "value": 0
+            },
+            {
+              "at": 0.12,
+              "value": 0.85
+            },
+            {
+              "at": 0.5,
+              "value": 1
+            },
+            {
+              "at": 0.84,
+              "value": 0.45
+            },
+            {
+              "at": 1,
+              "value": 0
+            }
+          ],
+          "rampOrigin": [
+            1160,
+            152
+          ],
+          "rampSize": [
+            1400,
+            858
+          ]
+        }
+      ]
+    },
+    {
+      "id": "05-band-top",
+      "shape": "line",
+      "x1": 0,
+      "y1": 152,
+      "x2": 2560,
+      "y2": 152,
+      "width": 1,
+      "paint": "#9CA25C",
+      "opacity": 0.5
+    },
+    {
+      "id": "05-band-bottom",
+      "shape": "line",
+      "x1": 0,
+      "y1": 1054,
+      "x2": 2560,
+      "y2": 1054,
+      "width": 1,
+      "paint": "#9CA25C",
+      "opacity": 0.5
+    },
+    {
+      "id": "06-seam",
+      "shape": "rect",
+      "x": 2178,
+      "y": 0,
+      "w": 44,
+      "h": 1,
+      "paint": {
+        "type": "linear",
+        "angle": 0,
+        "stops": [
+          {
+            "at": 0,
+            "color": "#F6F6EE"
+          },
+          {
+            "at": 0.5,
+            "color": "#FDFDF8"
+          },
+          {
+            "at": 1,
+            "color": "#F3F3E8"
+          }
+        ]
+      },
+      "opacity": 0.99
+    },
+    {
+      "id": "06-seam-hairline",
+      "shape": "line",
+      "x1": 2222,
+      "y1": 0,
+      "x2": 2222,
+      "y2": 1219,
+      "width": 1,
+      "paint": "#DCDEC6",
+      "opacity": 0.8
+    },
+    {
+      "id": "06-seam-b",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 13,
+      "h": 0.66,
+      "paint": "#FBFBF3",
+      "opacity": 0.95
+    },
+    {
+      "id": "07-rules",
+      "shape": "group",
+      "opacity": 0.4,
+      "children": [
+        {
+          "id": "07-rule-0",
+          "shape": "line",
+          "x1": 132,
+          "y1": 132,
+          "x2": 2428,
+          "y2": 132,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-1",
+          "shape": "line",
+          "x1": 132,
+          "y1": 238.11111111111111,
+          "x2": 2428,
+          "y2": 238.11111111111111,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-2",
+          "shape": "line",
+          "x1": 132,
+          "y1": 344.22222222222223,
+          "x2": 2428,
+          "y2": 344.22222222222223,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-3",
+          "shape": "line",
+          "x1": 132,
+          "y1": 450.33333333333337,
+          "x2": 2428,
+          "y2": 450.33333333333337,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-4",
+          "shape": "line",
+          "x1": 132,
+          "y1": 556.4444444444445,
+          "x2": 2428,
+          "y2": 556.4444444444445,
+          "width": 2,
+          "paint": "#9CA25C"
+        },
+        {
+          "id": "07-rule-5",
+          "shape": "line",
+          "x1": 132,
+          "y1": 662.5555555555555,
+          "x2": 2428,
+          "y2": 662.5555555555555,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-6",
+          "shape": "line",
+          "x1": 132,
+          "y1": 768.6666666666667,
+          "x2": 2428,
+          "y2": 768.6666666666667,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-7",
+          "shape": "line",
+          "x1": 132,
+          "y1": 874.7777777777778,
+          "x2": 2428,
+          "y2": 874.7777777777778,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-8",
+          "shape": "line",
+          "x1": 132,
+          "y1": 980.8888888888889,
+          "x2": 2428,
+          "y2": 980.8888888888889,
+          "width": 1,
+          "paint": "#C6CAA8"
+        },
+        {
+          "id": "07-rule-9",
+          "shape": "line",
+          "x1": 132,
+          "y1": 1087,
+          "x2": 2428,
+          "y2": 1087,
+          "width": 1,
+          "paint": "#C6CAA8"
+        }
+      ],
+      "mask": {
+        "shapes": [
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "paint": {
+              "type": "fade",
+              "color": "#FFFFFF",
+              "from": 1,
+              "to": 0.1,
+              "angle": 0,
+              "gamma": 0.7
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "08-maple",
+      "shape": "image",
+      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\maple-olive.png",
+      "x": -46,
+      "y": 336,
+      "w": 856,
+      "h": 808,
+      "fit": "stretch",
+      "quality": "high",
+      "opacity": 1,
+      "effects": [
+        {
+          "type": "emboss",
+          "radius": 2,
+          "amount": 0.16,
+          "angle": 135
+        },
+        {
+          "type": "halftone",
+          "cell": 6.2,
+          "angle": 15,
+          "color": "#6E7A38",
+          "alpha": 0.5,
+          "maxTone": 0.3,
+          "tone": "source",
+          "toneAngle": 90,
+          "invert": true,
+          "coverage": [
+            {
+              "at": 0,
+              "value": 0.35
+            },
+            {
+              "at": 0.5,
+              "value": 1
+            },
+            {
+              "at": 0.85,
+              "value": 0.6
+            },
+            {
+              "at": 1,
+              "value": 0.25
+            }
+          ],
+          "rampOrigin": [
+            0,
+            0
+          ],
+          "rampSize": [
+            856,
+            808
+          ]
+        }
+      ],
+      "mask": {
+        "shapes": [
+          {
+            "shape": "rect",
+            "x": 0,
+            "y": 0,
+            "w": 1,
+            "h": 1,
+            "paint": {
+              "type": "linear",
+              "angle": 90,
+              "stops": [
+                {
+                  "at": 0,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.62,
+                  "color": "#FFFFFF"
+                },
+                {
+                  "at": 0.82,
+                  "color": "#FFFFFF",
+                  "alpha": 0.45
+                },
+                {
+                  "at": 0.95,
+                  "color": "#FFFFFF",
+                  "alpha": 0.08
+                },
+                {
+                  "at": 1,
+                  "color": "#FFFFFF",
+                  "alpha": 0
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "09-mark",
+      "shape": "path",
+      "d": "M2306 810 C2320.9 797.2 2351.6 726.8 2338.7 682 C2329.8 661.2 2312 650 2306 650 C2300 650 2282.2 661.2 2273.3 682 C2260.4 726.8 2291.1 797.2 2306 810 Z M2306 810 C2324.5 816.5 2400.9 807.9 2433.2 774.4 C2446.8 756.2 2447.5 735.2 2444.6 730 C2441.6 724.8 2423 715 2400.5 717.6 C2355.2 728.9 2309.6 790.7 2306 810 Z M2306 810 C2309.6 829.3 2355.2 891.1 2400.5 902.4 C2423 905 2441.6 895.2 2444.6 890 C2447.5 884.8 2446.8 863.8 2433.2 845.6 C2400.9 812.1 2324.5 803.5 2306 810 Z M2306 810 C2291.1 822.8 2260.4 893.2 2273.3 938 C2282.2 958.8 2300 970 2306 970 C2312 970 2329.8 958.8 2338.7 938 C2351.6 893.2 2320.9 822.8 2306 810 Z M2306 810 C2287.5 803.5 2211.1 812.1 2178.8 845.6 C2165.2 863.8 2164.5 884.8 2167.4 890 C2170.4 895.2 2189 905 2211.5 902.4 C2256.8 891.1 2302.4 829.3 2306 810 Z M2306 810 C2302.4 790.7 2256.8 728.9 2211.5 717.6 C2189 715 2170.4 724.8 2167.4 730 C2164.5 735.2 2165.2 756.2 2178.8 774.4 C2211.1 807.9 2287.5 816.5 2306 810 Z",
+      "paint": "#A4B45D",
+      "opacity": 0.92,
+      "effects": [
+        {
+          "type": "innerShadow",
+          "blur": 9,
+          "offset": [
+            6,
+            6
+          ],
+          "opacity": 0.72,
+          "color": "#41401F"
+        },
+        {
+          "type": "emboss",
+          "radius": 3,
+          "amount": 0.26,
+          "angle": 135
+        }
+      ]
+    },
+    {
+      "id": "09-mark-age",
+      "shape": "path",
+      "d": "M2306 810 C2320.9 797.2 2351.6 726.8 2338.7 682 C2329.8 661.2 2312 650 2306 650 C2300 650 2282.2 661.2 2273.3 682 C2260.4 726.8 2291.1 797.2 2306 810 Z M2306 810 C2324.5 816.5 2400.9 807.9 2433.2 774.4 C2446.8 756.2 2447.5 735.2 2444.6 730 C2441.6 724.8 2423 715 2400.5 717.6 C2355.2 728.9 2309.6 790.7 2306 810 Z M2306 810 C2309.6 829.3 2355.2 891.1 2400.5 902.4 C2423 905 2441.6 895.2 2444.6 890 C2447.5 884.8 2446.8 863.8 2433.2 845.6 C2400.9 812.1 2324.5 803.5 2306 810 Z M2306 810 C2291.1 822.8 2260.4 893.2 2273.3 938 C2282.2 958.8 2300 970 2306 970 C2312 970 2329.8 958.8 2338.7 938 C2351.6 893.2 2320.9 822.8 2306 810 Z M2306 810 C2287.5 803.5 2211.1 812.1 2178.8 845.6 C2165.2 863.8 2164.5 884.8 2167.4 890 C2170.4 895.2 2189 905 2211.5 902.4 C2256.8 891.1 2302.4 829.3 2306 810 Z M2306 810 C2302.4 790.7 2256.8 728.9 2211.5 717.6 C2189 715 2170.4 724.8 2167.4 730 C2164.5 735.2 2165.2 756.2 2178.8 774.4 C2211.1 807.9 2287.5 816.5 2306 810 Z",
+      "paint": "#828E3E",
+      "opacity": 0.3,
+      "blend": "multiply",
+      "effects": [
+        {
+          "type": "grain",
+          "amount": 0.42,
+          "mono": true,
+          "seed": 771
+        }
+      ]
+    },
+    {
+      "id": "09-mark-ring",
+      "shape": "ellipse",
+      "x": 2102,
+      "y": 606,
+      "w": 408,
+      "h": 408,
+      "paint": "none",
+      "stroke": {
+        "color": "#A4B45D",
+        "width": 1
+      },
+      "opacity": 0.45
+    },
+    {
+      "id": "09-mark-ring-outer",
+      "shape": "ellipse",
+      "x": 2040,
+      "y": 544,
+      "w": 532,
+      "h": 532,
+      "paint": "none",
+      "stroke": {
+        "color": "#A4B45D",
+        "width": 1
+      },
+      "opacity": 0.26
+    },
+    {
+      "id": "10-wordmark",
+      "shape": "text",
+      "text": "GINKGO",
+      "font": {
+        "family": [
+          "Antiqua"
+        ],
+        "size": 218,
+        "weight": 700,
+        "tracking": -0.012
+      },
+      "color": "#A4B45D",
+      "x": 1660,
+      "y": 196,
+      "w": 900,
+      "wrap": false,
+      "effects": [
+        {
+          "type": "shadow",
+          "dx": 7,
+          "dy": 6,
+          "blur": 3,
+          "color": "#6E7A38",
+          "opacity": 0.34
+        },
+        {
+          "type": "grain",
+          "amount": 0.26,
+          "mono": true,
+          "seed": 20260914
+        }
+      ]
+    },
+    {
+      "id": "10b-wordmark-contour",
+      "shape": "text",
+      "text": "GINKGO",
+      "font": {
+        "family": [
+          "Antiqua"
+        ],
+        "size": 375,
+        "weight": 700,
+        "tracking": -0.012
+      },
+      "color": "#A4B45D",
+      "x": 1080,
+      "y": 486,
+      "w": 1600,
+      "wrap": false,
+      "opacity": 0.5,
+      "effects": [
+        {
+          "type": "outline",
+          "width": 2,
+          "color": "#7E8A3C",
+          "keepFill": false
+        },
+        {
+          "type": "grain",
+          "amount": 0.2,
+          "mono": true,
+          "seed": 5150
+        }
+      ]
+    },
+    {
+      "id": "11-kicker",
+      "shape": "text",
+      "text": "GINKGO BILOBA  ·  AUTUMN  ·  (★) 01",
+      "font": {
+        "family": [
+          "Mono",
+          "MonoTech"
+        ],
+        "size": 19,
+        "weight": 400,
+        "tracking": 0.3
+      },
+      "color": "#6E7439",
+      "x": 166,
+      "y": 106,
+      "w": 700,
+      "wrap": false
+    },
+    {
+      "id": "11-display-cjk",
+      "shape": "text",
+      "text": "缪尔赛思",
+      "font": {
+        "family": [
+          "AntiqueDisplay",
+          "SerifSC"
+        ],
+        "size": 140,
+        "weight": 500,
+        "tracking": 0.02
+      },
+      "color": "#4E5427",
+      "x": 166,
+      "y": 166,
+      "w": 900,
+      "wrap": false
+    },
+    {
+      "id": "11-name-latin",
+      "shape": "text",
+      "text": "MUELSYSE",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 96,
+        "weight": 600,
+        "width": 88,
+        "tracking": 0.015
+      },
+      "color": "#4E5427",
+      "x": 166,
+      "y": 350,
+      "w": 1000,
+      "wrap": false
+    },
+    {
+      "id": "11-rule",
+      "shape": "line",
+      "x1": 166,
+      "y1": 506,
+      "x2": 906,
+      "y2": 506,
+      "width": 1,
+      "paint": "#9CA25C",
+      "opacity": 0.55
+    },
+    {
+      "id": "11-class",
+      "shape": "text",
+      "text": "VANGUARD  /  PIONEER",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 25,
+        "weight": 400,
+        "width": 82,
+        "tracking": 0.28
+      },
+      "color": "#6E7439",
+      "x": 167,
+      "y": 538,
+      "w": 900,
+      "wrap": false
+    },
+    {
+      "id": "11-footer",
+      "shape": "text",
+      "text": "MUELSYSE-01  ·  LAYER 21  ·  2560 × 1219",
+      "font": {
+        "family": [
+          "Mono",
+          "MonoTech"
+        ],
+        "size": 16,
+        "weight": 400,
+        "tracking": 0.14
+      },
+      "color": "#8A8D80",
+      "x": 166,
+      "y": 1108,
+      "w": 900,
+      "wrap": false
+    },
+    {
+      "id": "11-caption-cjk",
+      "shape": "text",
+      "text": "银杏  ·  秋  ·  时序之外",
+      "font": {
+        "family": [
+          "SansSC"
+        ],
+        "size": 19,
+        "weight": 300,
+        "tracking": 0.18
+      },
+      "color": "#6E7439",
+      "x": 176,
+      "y": 1136,
+      "w": 500,
+      "wrap": false
+    },
+    {
+      "id": "11-acid",
+      "shape": "rect",
+      "x": 1052,
+      "y": 236,
+      "w": 44,
+      "h": 44,
+      "paint": "#F4FB2A",
+      "opacity": 0.95
+    },
+    {
+      "id": "11-tagline",
+      "shape": "text",
+      "text": "Beyond the seasons",
+      "font": {
+        "family": [
+          "JournalItalic"
+        ],
+        "size": 34,
+        "tracking": 0.01
+      },
+      "color": "#A4B45D",
+      "x": 1890,
+      "y": 1006,
+      "w": 380,
+      "wrap": false
+    },
+    {
+      "id": "11-support",
+      "shape": "text",
+      "text": "THE LEAF FALLS. THE WATER REMEMBERS.",
+      "font": {
+        "family": [
+          "NeueLight"
+        ],
+        "size": 21,
+        "weight": 300,
+        "tracking": 0.18
+      },
+      "color": "#6E7439",
+      "x": 1832,
+      "y": 1058,
+      "w": 400,
+      "wrap": false
+    },
+    {
+      "id": "11-mark-code",
+      "shape": "text",
+      "text": "GINKGO · LEAF 01",
+      "font": {
+        "family": [
+          "Mono",
+          "MonoTech"
+        ],
+        "size": 16,
+        "weight": 400,
+        "tracking": 0.2
+      },
+      "color": "#6E7439",
+      "x": 1990,
+      "y": 1104,
+      "w": 300,
+      "wrap": false,
+      "opacity": 0.9
+    },
+    {
+      "id": "11-spine",
+      "shape": "text",
+      "text": "BEYOND THE SEASONS",
+      "font": {
+        "family": [
+          "Grotesk"
+        ],
+        "size": 19,
+        "weight": 400,
+        "width": 82,
+        "tracking": 0.3
+      },
+      "color": "#6E7439",
+      "x": 2478,
+      "y": 430,
+      "vertical": true,
+      "opacity": 0.85
+    },
+    {
+      "id": "13-grain",
+      "shape": "rect",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 1,
+      "paint": "#808080",
+      "opacity": 0.36,
+      "blend": "overlay",
+      "effects": [
+        {
+          "type": "grain",
+          "amount": 0.05,
+          "mono": true,
+          "seed": 20260914
+        }
+      ]
+    },
+    {
+      "kind": "adjustment",
+      "id": "14-tone",
+      "ops": [
+        {
+          "op": "curves",
+          "rgb": [
+            [
+              0,
+              13
+            ],
+            [
+              56,
+              58
+            ],
+            [
+              150,
+              152
+            ],
+            [
+              228,
+              236
+            ],
+            [
+              255,
+              250
+            ]
+          ]
+        },
+        {
+          "op": "hueSaturation",
+          "saturation": 0.12
+        }
+      ],
+      "opacity": 0.9
+    },
+    {
+      "id": "15-detail",
+      "shape": "group",
+      "opacity": 0.8,
+      "children": [
+        {
+          "id": "13a-mk-type-tl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "x": 578,
+          "y": 339,
+          "w": 30,
+          "h": 30,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.52,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-type-tr",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "x": 578,
+          "y": 339,
+          "w": 30,
+          "h": 30,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.52,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-type-bl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "x": 578,
+          "y": 339,
+          "w": 30,
+          "h": 30,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.52,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-type-br",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "x": 578,
+          "y": 339,
+          "w": 30,
+          "h": 30,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.52,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-tl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1447,
+          "y": 670,
+          "w": 28,
+          "h": 27,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.36,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-tr",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1447,
+          "y": 670,
+          "w": 28,
+          "h": 27,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.36,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-bl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1447,
+          "y": 670,
+          "w": 28,
+          "h": 27,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.36,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-br",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1447,
+          "y": 670,
+          "w": 28,
+          "h": 27,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.36,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-tm",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1451,
+          "y": 673,
+          "w": 20,
+          "h": 20,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.22,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-bm",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1451,
+          "y": 673,
+          "w": 20,
+          "h": 20,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.22,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-lm",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1086,
+          "y": 673,
+          "w": 20,
+          "h": 20,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.22,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-band-rm",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "x": 1816,
+          "y": 673,
+          "w": 20,
+          "h": 20,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.22,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-right-tl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "x": 2085,
+          "y": 619,
+          "w": 26,
+          "h": 12,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.26,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-right-tr",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "x": 2085,
+          "y": 619,
+          "w": 26,
+          "h": 12,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.26,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-right-bl",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "x": 2085,
+          "y": 619,
+          "w": 26,
+          "h": 12,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.26,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-mk-right-br",
+          "shape": "image",
+          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "x": 2085,
+          "y": 619,
+          "w": 26,
+          "h": 12,
+          "fit": "stretch",
+          "quality": "high",
+          "opacity": 0.26,
+          "anchorY": 0.5
+        },
+        {
+          "id": "13a-dir-1",
+          "shape": "path",
+          "d": "M636 470 L1096 470 M1096 470 L1080 477 M1096 470 L1080 463",
+          "paint": "none",
+          "stroke": {
+            "color": "#9CA25C",
+            "width": 1.2
+          },
+          "opacity": 0.34
+        },
+        {
+          "id": "13a-dir-2",
+          "shape": "path",
+          "d": "M1858 1092 L2120 1092 M2120 1092 L2100 1101 M2120 1092 L2100 1083",
+          "paint": "none",
+          "stroke": {
+            "color": "#9CA25C",
+            "width": 1.4
+          },
+          "opacity": 0.4
+        },
+        {
+          "id": "13a-dir-3",
+          "shape": "path",
+          "d": "M250 312 L250 436 M250 436 L242 418 M250 436 L258 418",
+          "paint": "none",
+          "stroke": {
+            "color": "#9CA25C",
+            "width": 1.6
+          },
+          "opacity": 0.44
+        },
+        {
+          "id": "13-frame-left",
+          "shape": "path",
+          "d": "M700 720 L700 690 L730 690 M1050 690 L1080 690 L1080 720 M1080 922 L1080 952 L1050 952 M730 952 L700 952 L700 922",
+          "paint": "none",
+          "stroke": {
+            "color": "#9CA25C",
+            "width": 1.6
+          },
+          "opacity": 0.5
+        },
+        {
+          "id": "13-frame-left-tie",
+          "shape": "line",
+          "x1": 700,
+          "y1": 690,
+          "x2": 700,
+          "y2": 640,
+          "width": 1,
+          "paint": "#9CA25C",
+          "opacity": 0.4
+        },
+        {
+          "id": "13-frame-right",
+          "shape": "path",
+          "d": "M1900 1104 L1900 1080 L1924 1080 M2176 1080 L2200 1080 L2200 1104 M2200 1152 L2200 1176 L2176 1176 M1924 1176 L1900 1176 L1900 1152",
+          "paint": "none",
+          "stroke": {
+            "color": "#9CA25C",
+            "width": 1.4
+          },
+          "opacity": 0.42
+        },
+        {
+          "id": "13-tile-0-box",
+          "shape": "rect",
+          "x": 700,
+          "y": 1070,
+          "w": 52,
+          "h": 52,
+          "paint": "#A1A76B",
+          "fillOpacity": 1
+        },
+        {
+          "id": "13-tile-0-glyph",
+          "shape": "text",
+          "text": "E",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 29,
+            "weight": 600,
+            "width": 92
+          },
+          "color": "#FBFBF6",
+          "x": 713.5,
+          "y": 1077.8,
+          "w": 52,
+          "wrap": false
+        },
+        {
+          "id": "13-tile-1-box",
+          "shape": "rect",
+          "x": 754,
+          "y": 1070,
+          "w": 52,
+          "h": 52,
+          "paint": "#A1A76B",
+          "fillOpacity": 1
+        },
+        {
+          "id": "13-tile-1-glyph",
+          "shape": "text",
+          "text": "C",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 29,
+            "weight": 600,
+            "width": 92
+          },
+          "color": "#FBFBF6",
+          "x": 767.5,
+          "y": 1077.8,
+          "w": 52,
+          "wrap": false
+        },
+        {
+          "id": "13-tile-2-box",
+          "shape": "rect",
+          "x": 808,
+          "y": 1070,
+          "w": 52,
+          "h": 52,
+          "paint": "#A1A76B",
+          "fillOpacity": 1
+        },
+        {
+          "id": "13-tile-2-glyph",
+          "shape": "text",
+          "text": "O",
+          "font": {
+            "family": [
+              "Grotesk"
+            ],
+            "size": 29,
+            "weight": 600,
+            "width": 92
+          },
+          "color": "#FBFBF6",
+          "x": 821.5,
+          "y": 1077.8,
+          "w": 52,
+          "wrap": false
+        }
+      ]
+    }
+  ]
+}
