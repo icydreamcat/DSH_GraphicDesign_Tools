@@ -25,15 +25,16 @@
  * A mount check cannot catch either: `register()` accepts almost anything, and
  * the failure surfaces when the provider validates the request.
  */
-import { readFileSync, readdirSync } from 'node:fs'
+import { readdirSync } from 'node:fs'
+import { dshToolsUrl, presetDir, engineDir, declaredToolModule } from './_preset-locate.mjs'
 
-const DSH_TOOLS = 'file:///C:/Users/iced%27re%27a%27m/AppData/Roaming/npm/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-tools/lib/index.js'
-const PRESET_DIR = "C:/Users/iced're'a'm/.dsh/.agent-presets/design"
+// Both of these used to be absolute paths containing this machine's username, which
+// made this suite unrunnable anywhere else. See _preset-locate.mjs.
+const DSH_TOOLS = dshToolsUrl()
+const PRESET_DIR = presetDir()
+const ENGINE_DIR = engineDir()
 
-const yaml = readFileSync(`${PRESET_DIR}/agent.cordis.yml`, 'utf8')
-const declared = /- id: design-tools\s*\n\s*name:\s*\.\/([^\s]+)/.exec(yaml)
-if (declared === null) throw new Error('could not find the design-tools row in agent.cordis.yml')
-const TOOL_FILE = declared[1]
+const TOOL_FILE = declaredToolModule(PRESET_DIR)
 console.log(`tool plugin (declared by the composition): ${TOOL_FILE}`)
 
 const siblings = readdirSync(PRESET_DIR).filter((f) => /^design-tools.*\.mjs$/.test(f))
@@ -58,9 +59,9 @@ const strictCtx = {
     },
   },
 }
-const plugin = await import(`file:///${PRESET_DIR}/${TOOL_FILE}`)
+const plugin = await import(new URL(TOOL_FILE, new URL(`file:///${PRESET_DIR}/`)).href)
 if (typeof plugin.apply !== 'function') throw new Error(`${TOOL_FILE}: apply is not exported`)
-plugin.apply(strictCtx, { engineDir: 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine' })
+plugin.apply(strictCtx, { engineDir: ENGINE_DIR })
 
 console.log(`tools registered: ${registered.length}`)
 let failed = 0

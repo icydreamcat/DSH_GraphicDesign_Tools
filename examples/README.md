@@ -12,32 +12,29 @@ because a rendering engine with no picture in its repository has to be taken on 
 
 ## Reproducibility, stated honestly
 
-`poster-e-tooled.png` and `effect-sheet.png` are each one `design render` away from a scene
-that is committed beside them. Nothing was touched up in an editor: the engine writes the
-PNG and its measurement report in the same pass.
+**These images are artifacts, not a build target.** They were rendered on the machine this
+project was written on, from scenes that reference source material by ABSOLUTE path — and
+that source material (`engine/assets/`, `engine/refs/`) is deliberately **not** in this
+repository. Character art and reference posters are inputs for that machine's work, not
+part of the toolchain. A fresh clone is meant to make its own work, so what it gets is the
+engine, the tools and the preset.
 
-```powershell
-cd engine
+The consequence, without hedging:
 
-# the full-size poster
-node bin/design.mjs render scenes/poster-e-tooled.json --out out --name poster-e-tooled
+| On a fresh clone | Works? |
+|---|---|
+| the engine, the 25 session tools, the 8 preset tools | ✅ |
+| all 13 test suites (`node test/run-all.mjs`) | ✅ fully — they were made self-contained on purpose |
+| rendering `engine/scenes/*.json` | ❌ their absolute `src` paths and their files are absent |
+| regenerating the images below | ❌ same reason |
 
-# the effect sheet
-node bin/design.mjs render scenes/effect-sheet.json --out out --name effect-sheet
+That is the line that was drawn. The suites were rewritten to hold it: none of them loads
+anything from `engine/assets/` any more, and none hard-codes a per-machine path, so a clone
+can verify the toolchain before using it — which is the point of shipping it.
 
-# copy the curated set into this directory
-cd ..
-node make-examples.mjs
-```
-
-`node make-examples.mjs --check` reports what it would copy without writing.
-
-**The comparison sheet is the exception.** All six source scenes are committed
-(`scenes/poster-{a-flat,b-soft,c-press,d-light,e-tooled}.json` and `scenes/press-scoped.json`)
-and each renders in about a second, but the script that composed the six into one annotated
-sheet was written inline in the session that produced it and was never kept. Committing the
-image is therefore the only record of the comparison; the six panels are reproducible, the
-arrangement is not. Writing that script properly is an open item.
+To render something of your own, write a scene that uses your own images (a **relative**
+path resolves against the scene file's directory, which is the portable form) or that uses
+no images at all: `rect` / `ellipse` / `polygon` / `path` / `text` need nothing external.
 
 ## A caveat worth keeping
 
@@ -46,4 +43,3 @@ text overflowed, no font fell back silently. That is not a claim that the design
 `verification` still reports design-level notes (for `poster-a-flat` it flags
 `density.everythingHeavy`), and the engine's own documentation is explicit that a clean
 report is not a finished design. Judge the images.
-

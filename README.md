@@ -104,7 +104,22 @@ path / text / image / group / adjustment）。长度 ≤1 是画布比例，>1 �
 
 ## 状态
 
-引擎 13 套测试全绿；preset 挂载通过。**尚未在真实会话中运行过**——`design` preset
-从未被任何一次会话选中，`design_render` 也从未被真正调用过。挂载、schema、引擎三条
-都有验证，「模型能调得动这 8 个工具」还缺一次真实运行。已知缺口完整清单见
-[`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。
+引擎 13 套测试全绿（`node test/run-all.mjs`，exit 0）；preset 挂载通过。
+**尚未在真实会话中运行过**——`design` preset 从未被任何一次会话选中，`design_render`
+也从未被真正调用过。挂载、schema、引擎三条都有验证，「模型能调得动这 8 个工具」还缺
+一次真实运行。
+
+### 关于「克隆下来能做什么」
+
+这个仓库交付的是**工具链**，不是这台机器的旧成品。所以：
+
+- ✅ 引擎、25 个会话工具、8 个 preset 工具、**全部 13 套测试**——开箱可用；
+- ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材
+  （`engine/assets/`、`engine/refs/`）是本机专用的输入，刻意未纳入版本控制，
+  且场景里的 `src` 是绝对路径。
+
+测试套件已专门改成自给自足（不再加载 `engine/assets/`，也不再写死任何
+per-machine 路径），所以克隆的人可以**先验证工具链，再用它做自己的东西**。
+细节见 [`examples/README.md`](examples/README.md) 与 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §三。
+
+已知缺口完整清单见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。

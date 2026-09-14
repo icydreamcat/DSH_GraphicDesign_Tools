@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Register the design tools through a registry that validates EXACTLY like DSH's,
  * to find a fault the fake registry cannot see.
  *
@@ -23,19 +23,19 @@
  * first tool whose API-facing schema is not a valid object. If the fault is
  * visible at all in-process, this finds it.
  */
-import { readFileSync, readdirSync } from 'node:fs'
+import { dshToolsUrl, presetDir, engineDir, declaredToolModule, toolModuleSiblings } from './_preset-locate.mjs'
 
-const DSH_TOOLS = 'file:///C:/Users/iced%27re%27a%27m/AppData/Roaming/npm/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-tools/lib/index.js'
-const PRESET_DIR = "C:/Users/iced're'a'm/.dsh/.agent-presets/design"
+// Both of these used to be absolute paths containing this machine's username, which
+// made this suite unrunnable anywhere else. See _preset-locate.mjs.
+const DSH_TOOLS = dshToolsUrl()
+const PRESET_DIR = presetDir()
+const ENGINE_DIR = engineDir()
 
 const { assertSupportedJsonSchema, validateJsonSchemaValue } = await import(DSH_TOOLS)
 
-const yaml = readFileSync(`${PRESET_DIR}/agent.cordis.yml`, 'utf8')
-const m = /- id: design-tools\s*\n\s*name:\s*\.\/([^\s]+)/.exec(yaml)
-if (m === null) throw new Error('cannot find the design-tools row')
-const moduleName = m[1]
+const moduleName = declaredToolModule(PRESET_DIR)
 console.log(`module: ${moduleName}`)
-console.log(`siblings: ${readdirSync(PRESET_DIR).filter((f) => /^design-tools.*\.mjs$/.test(f)).join(', ')}`)
+console.log(`siblings: ${toolModuleSiblings(PRESET_DIR).join(', ')}`)
 
 /** A registry stub that enforces the same gate DSH's register() does. */
 const registered = []
@@ -56,8 +56,8 @@ const strictCtx = {
   },
 }
 
-const plugin = await import(`file:///${PRESET_DIR}/${moduleName}`)
-plugin.apply(strictCtx, { engineDir: 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine' })
+const plugin = await import(new URL(moduleName, new URL(`file:///${PRESET_DIR}/`)).href)
+plugin.apply(strictCtx, { engineDir: ENGINE_DIR })
 console.log(`registered through the strict gate: ${registered.length}`)
 
 /** Project exactly as the provider adapter does: { type, function: { name, description, parameters } }. */

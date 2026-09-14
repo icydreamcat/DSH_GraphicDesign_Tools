@@ -37,8 +37,10 @@ const SUITES = [
 ]
 
 // Refuse to run a suite that exists on disk but is missing from the list above, so a
-// new test file cannot be silently left out of the gate.
-const present = readdirSync(here).filter((f) => f.endsWith('.mjs') && f !== 'run-all.mjs')
+// new test file cannot be silently left out of the gate. A file whose name starts with
+// `_` is a HELPER (a shared locator, a fixture), not a suite — the prefix is how you
+// mark it as one, and it is why `_preset-locate.mjs` is not an error here.
+const present = readdirSync(here).filter((f) => f.endsWith('.mjs') && f !== 'run-all.mjs' && !f.startsWith('_'))
 const missing = present.filter((f) => !SUITES.includes(f))
 if (missing.length > 0) {
   console.error(`run-all: these suites exist but are not in the list: ${missing.join(', ')}`)

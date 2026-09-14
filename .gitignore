@@ -7,6 +7,22 @@
 # harness's own directory. See REPO-LAYOUT.md for the full map.
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ── bulk material that only THIS machine needs ───────────────────────────────
+# `engine/assets/` (17 files, 5.9 MB) and `engine/refs/` (3 files, 3.5 MB) are INPUT
+# material for scenes authored on this machine — game character art, processed
+# cut-outs, reference posters. They are not part of the toolchain: a fresh clone is
+# meant to make its OWN work, not to rebuild this machine's posters.
+#
+# Consequence, stated plainly so nobody is surprised: the scenes under
+# `engine/scenes/` reference these files by ABSOLUTE path, so a fresh clone cannot
+# render them, and `examples/` cannot be regenerated from source. The engine, the 25
+# session tools, the preset and all 13 test suites work without them — that is the
+# line that was drawn, and the test suites were made self-contained to hold it.
+#
+# Untracked means untracked, not deleted: this machine keeps its copies on disk.
+engine/assets/
+engine/refs/
+
 # ── dependencies ─────────────────────────────────────────────────────────────
 # Reproduce with `npm install` in engine/. @napi-rs/canvas ships per-platform
 # native binaries (a 27 MB skia build), so a committed copy is both large and

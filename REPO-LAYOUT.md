@@ -53,8 +53,6 @@
 | `engine/test/` | 14 | 169 KB | 13 套测试 + `run-all.mjs`。见 §六 |
 | `engine/jsx/` | 5 | 36 KB | Photoshop 桥：`psx.ps1` + 4 个 JSX 探针 |
 | `engine/scenes/` | 28 | 447 KB | 场景 JSON（**设计的源码**）+ 生成它们的 `build-*.mjs` + 决策笔记 `*.md` |
-| `engine/assets/` | 17 | 5.9 MB | 源素材：立绘、处理后素材、`icons/` 11 个标记 |
-| `engine/refs/` | 3 | 3.6 MB | 参考图（规格提取的输入） |
 | `engine/package.json` · `package-lock.json` | 2 | — | 依赖声明。只依赖 `@napi-rs/canvas` |
 
 ### 3.2 不进仓库的部分
@@ -63,6 +61,28 @@
 |---|---|---|
 | `engine/node_modules/` | 37.5 MB | `@napi-rs/canvas` 带平台原生二进制（27 MB skia），提交了在别的机器上就是错的。`npm install` 重现。 |
 | `engine/out/` | 46.8 MB | 42 个构建产物，每轮迭代都重写；每个约 1 秒即可从旁边的 scene 重出。 |
+| **`engine/assets/`** | 5.9 MB | **本机专用的输入素材**：游戏立绘、处理后素材、`icons/` 标记。不是工具链的一部分——克隆的人是要做**自己的**东西，不是重出这台机器的海报。 |
+| **`engine/refs/`** | 3.5 MB | 同上：参考图是 `design_analyze` 的输入，属于那台机器的工作资料。 |
+
+> **这条边界划在哪，和它的代价**（`engine/assets/` `engine/refs/` 于本次取消跟踪，
+> 文件仍留在本地磁盘）：
+>
+> | 新克隆的人 | 能用吗 |
+> |---|---|
+> | 引擎、25 个会话工具、8 个 preset 工具 | ✅ |
+> | 全部 13 套测试（`node test/run-all.mjs`） | ✅ **完整可用**——为此专门把测试改成自给自足 |
+> | 渲染 `engine/scenes/*.json` | ❌ 它们的 `src` 是绝对路径，素材也不在 |
+> | 重出 `examples/` 里的图 | ❌ 同上 |
+>
+> **测试自给自足是这次的关键改动**，因为原来的套件机器绑死：
+> `scope-regions.mjs` 用绝对路径加载 `assets/haruka-figure.png`；
+> `tool-schemas.mjs` / `tool-registry-gate.mjs` 把**用户名**写死在路径里
+> （`C:/Users/iced're'a'm/...`），而且指向的是**部署副本**而不是仓库源。
+> 结果是：除了原作者这台机器，**任何人在任何地方都跑不了这套测试**。
+> 现在改为运行时解析（`engine/test/_preset-locate.mjs`），并支持
+> `DSH_TOOLS_DIR` / `DSH_PRESET_DIR` 覆盖。
+>
+> 结论：新克隆的人拿到的是一个**能验证、能开工**的工具链，而不是一份无法复现的旧成品。
 
 ### 3.3 工具 ↔ Agent 的连接点
 

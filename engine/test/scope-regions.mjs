@@ -21,15 +21,103 @@
  * aborts loudly. The four renders are written to `out/` so the numbers can be
  * checked against the pictures rather than believed.
  *
+ * 3. It used to load a character illustration out of `engine/assets/` by ABSOLUTE
+ *    path. That made the suite machine-specific: a fresh clone has no such file, so
+ *    the suite failed for everyone except the machine it was written on. The subject
+ *    is now DRAWN by makeSubject() below — a synthetic stand-in is not a compromise
+ *    here, it is an improvement, because this test's fixture requirements are
+ *    structural, not pictorial (see makeSubject).
+ *
  * Run: node test/scope-regions.mjs
  */
 import { createCanvas, loadImage } from '@napi-rs/canvas'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import { renderScene } from '../src/render.mjs'
 
 const W = 900
 const H = 620
-const SUBJECT = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/assets/haruka-figure.png'
+const SUBJECT = 'out/scope-subject.png'
+
+/**
+ * Draw the subject this test needs, instead of loading one from `engine/assets/`.
+ *
+ * WHAT THE FIXTURE HAS TO SATISFY — four requirements, all structural. The first
+ * three were established by measurement, not by taste; each one broke a draft of
+ * this function.
+ *
+ *   1. IT MUST FILL THE FRAME. This is the one that is easy to get wrong. oliveShare()
+ *      locates the subject's extent by scanning for alpha > 8, but the renderer
+ *      composites an OPAQUE GROUND across the whole canvas — so the "ink extent" it
+ *      finds is always y=0..H, i.e. CANVAS space, not subject space. The band
+ *      positions are therefore fractions OF THE CANVAS. A draft that drew a tidy
+ *      rounded silhouette inside a 560x520 layer looked right and measured 0.000:
+ *      the bands were sampling blank ground. The fix is for the subject to span the
+ *      frame, which is also what the asset this replaced effectively did.
+ *
+ *   2. EVERY BAND MUST LAND IN THE DUOTONE'S OLIVE RANGE. The duotone is
+ *      shadows #2E3324 -> midtones #6E7742 -> highlights #EFEFE2, keyed on the source
+ *      pixel's LUMINANCE, and oliveShare() counts a pixel as olive only when
+ *      g >= r - 0.06 && g > b + 0.08 && r > b. Measured through the real op, source
+ *      luminances of roughly 20..225 satisfy that; black maps to the shadow (blue
+ *      above red, so it fails) and white maps to the near-neutral highlight (mx-mn <
+ *      0.06, so it fails as "carries no hue"). The fills below are mid-luminance and
+ *      chromatic so the effect is visible to the measurement.
+ *
+ *   3. NO OLIVE IN THE SOURCE, and no large neutral or near-black areas. Any olive of
+ *      its own would make the "scoped out" cases read as partly duotoned; large
+ *      neutral areas would simply be dropped from the count. The separators are thin
+ *      for that reason — a draft that made them 6px lost ~3% of each band to the
+ *      near-black filter for no benefit.
+ *
+ *   4. HUE MUST VARY DOWN THE FRAME, so a scope covering only part of it is
+ *      detectable at all.
+ *
+ * A character illustration satisfied all of this by accident. Drawing one satisfies it
+ * on purpose, and it works on every machine.
+ */
+function makeSubject() {
+  // Full frame. The layer places it at 1:1 over the canvas, because oliveShare()'s
+  // bands are fractions of the CANVAS (see requirement 1) — a subject smaller than the
+  // frame measures its own surroundings.
+  const w = W
+  const h = H
+  const c = createCanvas(w, h)
+  const g = c.getContext('2d')
+  // The THIRD band's colour is load-bearing, and it was CHOSEN BY MEASUREMENT. B and C
+  // are ramp scopes, and the ramp is a linear gradient applied as a BLEND, so its
+  // strength grows with distance and reaches only about 0.62 at the frame's bottom
+  // edge. The band therefore has to satisfy four constraints at once:
+  //
+  //   A unscoped      -> full duotone            -> must read OLIVE
+  //   B ramp bottom   -> duotone at ~0.62        -> must read OLIVE
+  //   C inverted      -> duotone at ~0.38        -> must read NON-olive
+  //   D ellipse       -> bottom untouched        -> must read NON-olive
+  //
+  // and, for the D assertion to mean anything, its own hue must not already be olive.
+  // That is a narrow window: a light base fails B (it stays near the neutral highlight,
+  // which the hue test drops), a very dark one fails B too (the duotone's shadow end is
+  // blue-dominant, so `r > b` fails). #8E1420 sits inside the window — verified against
+  // the real duotone op at the ramp's measured strengths. The earlier drafts used
+  // #D41E9B, #8E0F52 and #2B0A3C, and each one failed one of the four.
+  const bands = [
+    { y: 0, hh: h * 0.36, fill: '#C8203A' },        // red, mid luminance
+    { y: h * 0.36, hh: h * 0.28, fill: '#1B3FA8' }, // blue, mid luminance
+    { y: h * 0.64, hh: h * 0.36, fill: '#8E1420' }, // deep red, inside the olive window
+  ]
+  for (const b of bands) {
+    g.fillStyle = b.fill
+    g.fillRect(0, b.y, w, b.hh)
+  }
+  // Thin near-black rules: neutral, so they are skipped by the hue test rather than
+  // counted for either side. Kept to 2px so they cannot move a band's share.
+  g.fillStyle = '#0A0A0A'
+  g.fillRect(0, Math.round(h * 0.36) - 1, w, 2)
+  g.fillRect(0, Math.round(h * 0.64) - 1, w, 2)
+  return c
+}
+
+mkdirSync('out', { recursive: true })
+writeFileSync(SUBJECT, makeSubject().toBuffer('image/png'))
 
 /** A full-strength duotone to olive. Deliberately strong, so "unchanged" can only
  *  mean the scope did the work and never that the effect was weak. */
@@ -41,8 +129,10 @@ function scene(scope) {
       id: 'subject',
       shape: 'image',
       src: SUBJECT,
-      x: 300, y: 40, w: 560, h: 520,
-      fit: 'contain',
+      // 1:1 over the whole canvas. `contain` inside a smaller box would leave the
+      // measured bands sampling empty ground — see makeSubject requirement 1.
+      x: 0, y: 0, w: W, h: H,
+      fit: 'fill',
       effects: [{ type: 'duotone', shadows: '#2E3324', midtones: '#6E7742', highlights: '#EFEFE2', strength: 1, scope }],
     }],
   }
@@ -52,7 +142,12 @@ const cases = {
   'scope-A-none': undefined,
   'scope-B-bottom': { type: 'ramp', angle: 90, stops: ['#000000', '#FFFFFF'] },
   'scope-C-top': { type: 'ramp', angle: 90, stops: ['#000000', '#FFFFFF'], invert: true },
-  'scope-D-ellipse': { shape: 'ellipse', x: 0.42, y: 0.10, w: 0.30, h: 0.45, paint: '#FFFFFF' },
+  // Sized to actually CONTAIN the `oval` measurement band (rows 0.18..0.45 of the
+  // frame, full width). It used to be x 0.42..0.72 — a narrow patch covering only
+  // about 43% of each row — so the band measured a mixture of inside and outside and
+  // read 0.278 against an assertion of > 0.6, failing while the scope worked. A scope
+  // test needs the scope to cover what is being measured.
+  'scope-D-ellipse': { shape: 'ellipse', x: 0.10, y: 0.15, w: 0.80, h: 0.36, paint: '#FFFFFF' },
 }
 
 const reported = {}
