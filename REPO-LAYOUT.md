@@ -413,14 +413,34 @@ $env:DSH_DESIGN_ENGINE = "$PWD\engine"
 
 ---
 
-## 八、已知缺口（诚实清单）
+## 八、已知缺口（系统性）
 
-1. **`design` preset 从未被任何会话真正运行过。** 16 份历史会话的 `agentPreset` 是
-   `standard`(8)/`unity`(6)/`cordis`(2)，没有一份是 `design`。挂载与 schema 都已验证，
-   「模型能看到并调得动这 8 个工具」只有 schema 层证据，没有一次真实运行。
-2. **`design_render` 在历史里从未被调用过**（只有 `design_analyze`×2、`design_verify`×2、
-   `design_critique`×1、`design_photoshop`×1）。`--scale` 的致命 bug 因此一直没暴露。
-3. **`muelsyse-ginkgo-kv` 成品不在本拷贝**（见 §5.2）。
-4. **对照表的拼版脚本没有留存**（见 `examples/README.md`）。
-5. 本机 Photoshop 启动挂死一事，`knowledge/agent/HANDOVER-交接与实测结论.md` §2 的结论是
-   **需要非受限 shell**；这是一条环境前提，不是本仓库能修的东西。
+**这一节只写「任何克隆者都会继承」的结构缺口。** 本机环境前提与交付记录写在
+工作区的本地库里 —— `knowledge/tooling/已知缺口与本地前提.md`（不进版本控制）。
+
+判据：**换一台机器、换一个工作区就失效的条目，不属于这里。**
+
+### 8.1 一个 preset 建好了，却从未被真正执行过
+
+`design` preset **从未被任何一次会话选中运行**。16 份历史会话的 `agentPreset` 是
+`standard`(8) / `unity`(6) / `cordis`(2)，**没有一份是 `design`**。
+
+挂载、schema、引擎三条都已验证，但「模型能看到并调得动这 8 个工具」**只有 schema 层证据**。
+
+**这是本仓库最重要的一个缺口，而且它系统性地削弱了全仓库的验证价值**：
+`design/` 里的工具、`design/skills/` 里的 7 个技能、常驻审美纪律 prompt——
+**全部从未在真实会话中生效过一次**。`design/tools` 里那些精心的描述文本、
+技能里那些判据与阈值，实际效果如何，目前无人知道。
+
+### 8.2 `design_render` 从未被调用，因此一个致命 bug 潜伏了很久
+
+历史里 `design_render` **一次都没被调用过**（同期只有 `design_analyze`×2、
+`design_verify`×2、`design_critique`×1、`design_photoshop`×1）。
+
+后果是具体的：`--scale` 参数把画布**宽度乘了两次、高度一次都没乘**
+（2400×1350 在 `--scale 0.5` 下变成 600×675，比例从 1.78 变成 0.89），
+**而报告始终 0 error / 0 warning**。它一直没暴露，不是因为难发现，是因为**那条代码路径从未被执行**。
+
+**这条缺口的类型比它本身更重要**：一个没人调用的功能，等于没有测试。
+`REPO-LAYOUT.md` §六那 416 项断言**没有一项**覆盖过「工具被真实调用」这件事。
+

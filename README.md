@@ -245,7 +245,11 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 测试套件已专门改成自给自足（不再加载 `engine/assets/`，也不再写死任何 per-machine 路径），
 所以克隆的人可以**先验证工具链，再用它做自己的东西**。
 
-已知缺口完整清单见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。
+**系统性的已知缺口**（任何克隆者都会继承的）见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。
+其中最重要的一条是：`design` preset 至今**从未被任何真实会话运行过**——挂载、schema、
+引擎三条都已验证，但「模型能调得动这 8 个工具」仍只有 schema 层证据。
+
+本机环境前提与交付记录**不写进仓库**，在本地库 `knowledge/tooling/已知缺口与本地前提.md`。
 
 ---
 
