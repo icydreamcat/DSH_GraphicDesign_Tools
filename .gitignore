@@ -46,22 +46,36 @@ engine/out/
 engine/.probe/
 .probe/
 
-# ── the scratch cache ────────────────────────────────────────────────────────
-# Everything that is regenerated on demand now lives in ONE place, and that place is
-# OUTSIDE the repository: `../.cache/` beside it. See .cache/README.md.
+# ── the working area around the repository ───────────────────────────────────
+# The repository is one part of a larger working area. Three of its neighbours must exist
+# for any design work to happen, must NOT be versioned, and are materialised on a fresh
+# clone by `node bootstrap-workspace.mjs`:
+#
+#   ../assets/     the shared design library, read on every generation
+#   ../projects/   one folder per project, each with its own private assets
+#   ../.cache/     everything regenerated on demand — delete freely
+#
+# The paths are defined once, as data, in `engine/src/paths.mjs`, and the layout test
+# (`engine/test/workspace-layout.mjs`) proves that definition and bootstrap-workspace.mjs
+# still agree.
+#
+# They live OUTSIDE the repository, so these rules are belt-and-braces for the day someone
+# runs bootstrap with DSH_WORKSPACE pointed into the tree, or copies a folder the wrong way.
 #
 #   ../.cache/video/           decoded video frames, ffmpeg temp, alpha fixtures
 #   ../.cache/test/            what the test suites write (scope renders, selftest)
 #   ../.cache/render-scratch/  one-off probe and iteration renders
 #
-# The reason is maintenance, not repository size. A cache that sits inside the tree —
-# even gitignored — still gets backed up, copied and, worst of all, mistaken for a
+# Why outside rather than merely gitignored: a cache in the tree is still copied by a
+# backup, still travels with a folder move, and is still there to be mistaken for a
 # deliverable. `engine/out/` now holds NOTHING but real render artifacts, which is what
 # makes "is this a finished poster or leftover probe output?" answerable at a glance.
 #
-# Measured: one 20-second clip decode produced 948 frames and 1.06 GB. A first staging
+# Measured: one 20-second clip decode produced 948 frames and 1.06 GB, and a first staging
 # pass once swept all of it into a commit.
 .cache/
+assets/
+projects/
 engine/.vp-frames/
 engine/.vp-tmp/
 

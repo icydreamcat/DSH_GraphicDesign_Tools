@@ -6,7 +6,7 @@
 
 - 仓库根：`DSH_GraphicDesign_Tools/`
 - 首次运行：`engine/` 里 `npm install`，然后根目录 `node deploy-preset.mjs`
-- 全部测试：`cd engine; node test/run-all.mjs`（14 套、398 项断言）
+- 全部测试：`cd engine; node test/run-all.mjs`（15 套、413 项断言）
 
 ---
 
@@ -25,7 +25,7 @@
 
 ---
 
-## 二、环境（仓库根 · 4 文件 · 约 11 KB）
+## 二、环境（仓库根 · 6 文件 · 约 30 KB）
 
 | 文件 | 作用 |
 |---|---|
@@ -49,8 +49,8 @@
 |---|---|---|---|
 | `engine/bin/` | 1 | 21 KB | `design.mjs` —— **全部 CLI 子命令的唯一入口**（render / analyze / critique / verify / fonts / ladder / ramp / palette / tool） |
 | `engine/src/` | 17 | 388 KB | 引擎本体：`render` `text` `color` `effects` `filters` `tone` `measure` `kernel` `palette` `presets` `analyze` `verify` `psd` `psd-read` `fonts` `scale` `tools-roster` |
-| `engine/tools/` | 25 | 134 KB | 25 个会话工具（量测与审计为主：`crop-view` `font-try` `subject-probe` `audit-plant` …） |
-| `engine/test/` | 16 | 180 KB | 14 套测试 + `run-all.mjs` + `_preset-locate.mjs`。见 §六 |
+| `engine/tools/` | 28 | 176 KB | 28 个会话工具（量测与审计为主：`crop-view` `font-try` `subject-probe` `audit-plant` `video-probe` …） |
+| `engine/test/` | 18 | 190 KB | 15 套测试 + `run-all.mjs` + `_preset-locate.mjs`。见 §六 |
 | `engine/jsx/` | 5 | 36 KB | Photoshop 桥：`psx.ps1` + 4 个 JSX 探针 |
 | `engine/scenes/` | 28 | 447 KB | 场景 JSON（**设计的源码**）+ 生成它们的 `build-*.mjs` + 决策笔记 `*.md` |
 | `engine/package.json` · `package-lock.json` | 2 | — | 依赖声明。只依赖 `@napi-rs/canvas` |
@@ -70,7 +70,7 @@
 > | 新克隆的人 | 能用吗 |
 > |---|---|
 > | 引擎、25 个会话工具、8 个 preset 工具 | ✅ |
-> | 全部 14 套测试（`node test/run-all.mjs`） | ✅ **完整可用**——为此专门把测试改成自给自足 |
+> | 全部 15 套测试（`node test/run-all.mjs`） | ✅ **完整可用**——为此专门把测试改成自给自足 |
 > | 渲染 `engine/scenes/*.json` | ❌ 它们的 `src` 是绝对路径，素材也不在 |
 > | 重出 `examples/` 里的图 | ❌ 同上 |
 >
@@ -215,11 +215,98 @@ design/                                    ← 仓库里的规范源（改这里
 
 ---
 
-## 六、测试（`node test/run-all.mjs` · 14 套 · 398 项）
+## 五之三、工作区：仓库之外的三块区域（本次新增，克隆后自动生成）
+
+仓库只是工作区的一半。旁边还有三块区域，**必须存在、不进版本控制、且新克隆会自动生成**：
+
+```
+D:\DSH_GDT\                        ← 工作区根（WORKSPACE）
+├── DSH_GraphicDesign_Tools\       ← 本仓库
+├── assets\                        ← ① 共享素材库（通用设计素材，每次生成都读）
+│   ├── icons\  textures\  type\  plates\
+├── projects\                      ← ② 项目区（按项目排序，每个项目自带私有素材）
+├── .cache\                        ← ③ 生成缓存（可随时删）
+└── refs\                          ← 参考素材（用来量，不交付）
+```
+
+### 5.3.1 三块区域的分工，以及**素材该放哪**
+
+| 区域 | 放什么 | 判据 |
+|---|---|---|
+| **`assets/`** 共享素材库 | 通用设计素材：标记、纹理、字体参考、底板 | **两个项目都会用到它** → 放这里 |
+| **`projects/<项目>/assets/`** | 该项目专用素材 | **只服务这一个项目** → 放项目里，随项目一起归档/删除 |
+| **`.cache/`** | 按需重新生成的一切 | **能从别处重算出来** → 放这里，删了不心疼 |
+
+> **一条纪律**：两处都留一份必然走样，而**你正看着的那份不会是你实际用过的那份**。
+> 提升到共享库要**移动**，不是复制。**一份文件，一个家。**
+
+判据要明写，因为「这个素材算通用还是项目专用」正是最容易含糊、最容易两边都放一份的地方。
+
+### 5.3.2 项目排序：`YYYY-MM-DD-slug`
+
+```
+projects\
+  2026-09-16-endfield-deck\        ← 按名字倒序 = 时间倒序，最新的永远在最上面
+  2026-09-14-muelsyse-kv\
+  2026-09-11-arknights-visual\
+```
+
+日期前缀是**承重的**：有了它，`ls` 一次就是一份状态报告，不必打开任何文件夹。
+「这六个文件夹哪个是当前的」这个问题，是几个月后才发现的那种问题。
+
+每个项目内固定四个位置：
+
+| 目录 | 用途 |
+|---|---|
+| `scenes/` | 场景 JSON —— **这个项目的唯一真相源** |
+| `assets/` | 仅本项目素材 |
+| `out/` | 本项目的渲染与报告 |
+| `notes.md` | 决策、被否掉的方案与原因 |
+
+### 5.3.3 指向写进了规则，而不是靠记忆
+
+**路径是数据，定义在 `engine/src/paths.mjs`**，工具读它，不再各自数 `'..','..','..'`
+（之前 `video-probe.mjs` 里就出现过凭空写死的 `D:\DSH_GDT\tools\bin`）。
+
+```js
+import { WORKSPACE, assetPath, projectPath, cachePath, listProjects, newProject } from './paths.mjs'
+assetPath('icons', 'mark-cross.png')          // <WORKSPACE>/assets/icons/mark-cross.png
+projectPath('2026-09-16-endfield-deck', 'out')// <WORKSPACE>/projects/<项目>/out
+```
+
+根目录由**本文件自身位置**推导（`<workspace>/<repo>/engine/src/`），所以克隆到哪都一样；
+`DSH_WORKSPACE` 可覆盖（素材库想放别的盘时用），`DSH_VIDEO_CACHE` 覆盖视频缓存。
+
+### 5.3.4 克隆之后自动生成
+
+```powershell
+git clone <url>
+cd <repo>\engine; npm install
+cd ..
+node bootstrap-workspace.mjs        # 生成 assets/ + 四个分类 + projects/ + .cache/
+node deploy-preset.mjs              # 装 preset
+node new-project.mjs --list         # 看项目；建新的：node new-project.mjs <slug>
+```
+
+`bootstrap-workspace.mjs` 是**幂等**的：只补缺失，从不删除或覆盖，可以随时再跑。
+`--check` 只报告不写。
+
+> **为什么需要一个脚本，而不是写进 README 让人手敲 mkdir**：
+> 一个会往 `../assets/` 写文件的工具，在 A 机器上能跑、在 B 机器上失败，就因为没人建过那个目录——
+> 那不叫可移植。**布局是数据，脚本是它落地的方式。**
+
+> **两张表必须一致**：`paths.mjs` 有 `LAYOUT`，`bootstrap-workspace.mjs` 有它自己的表
+> （它位于仓库根，不能 import `src/`，否则仓库就没法自举）。**重复的表会静默走样**，
+> 所以 `engine/test/workspace-layout.mjs`（15 项）逐键比对两者，并断言三个区域都在仓库之外。
+
+---
+
+## 六、测试（`node test/run-all.mjs` · 15 套 · 413 项）
 
 ```
 scale.mjs                26   缩放契约（--scale 双重缩放，见 §十）
-analyze-flatness.mjs     15   区域平涂统计（主导平涂 / 可分辨色数，见 §十一）
+analyze-flatness.mjs     15   区域平涂统计（主导平涂 / 可分辨色数）
+workspace-layout.mjs     15   工作区布局：两张表一致、三区在仓库之外
 render-regressions.mjs   11   line 坐标、halftone knockout
 scope-regions.mjs         9   作用范围（真实渲染管线，自给自足 fixture）
 scope-conflicts.mjs      13   范围冲突与 replace 语义
@@ -248,7 +335,7 @@ cd $repo
 # 0. git 不在 PATH 上时（本机由 GitHub Desktop 自带）
 $env:Path = "$env:LOCALAPPDATA\GitHubDesktop\app-3.6.5\resources\app\git\cmd;$env:Path"
 
-# 1. 先确认干净：14 套测试全绿
+# 1. 先确认干净：15 套测试全绿
 cd engine; node test/run-all.mjs; cd ..
 
 # 2. 确认 preset 与仓库源一致

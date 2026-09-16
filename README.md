@@ -36,20 +36,43 @@ DSH_GraphicDesign_Tools/
 # 1. 依赖（只有一个：@napi-rs/canvas，含平台原生二进制）
 cd engine; npm install
 
-# 2. 全部测试：14 套、398 项断言
-node test/run-all.mjs
+# 2. 生成工作区外围（素材库 / 项目区 / 缓存）—— 幂等，可随时再跑
+cd ..; node bootstrap-workspace.mjs
 
-# 3. 出一张图试试
+# 3. 全部测试：15 套、413 项断言
+cd engine; node test/run-all.mjs
+
+# 4. 出一张图试试
 node bin/design.mjs render scenes/poster-e-tooled.json --out out --name try
 
-# 4. 把 agent 装进 harness
+# 5. 把 agent 装进 harness
 cd ..; node deploy-preset.mjs
+
+# 6. 开一个新项目
+node new-project.mjs my-first-kv
 ```
 
 然后在 DSH 里开一个**选中「设计」预设**的新会话。
 
 > 仓库不在本文件假设的路径时：`$env:DSH_DESIGN_ENGINE = "$PWD\engine"`。
 > 这是唯一的绝对路径依赖，且现在有环境变量回退。
+
+### 工作区里什么在哪
+
+仓库只是工作区的一半。旁边三块区域**不进版本控制**，由 `bootstrap-workspace.mjs` 自动生成：
+
+```
+D:\DSH_GDT\                     ← 工作区
+├── DSH_GraphicDesign_Tools\    ← 本仓库（源码、文档、精选示例）
+├── assets\                     ← 共享素材库：通用素材，每次生成都读
+├── projects\<YYYY-MM-DD-slug>\ ← 项目：自带 scenes/ assets/ out/
+├── .cache\                     ← 生成缓存，可随时删
+└── refs\                       ← 参考素材（用来量，不交付）
+```
+
+**素材放哪的判据**：两个项目都会用到 → `assets/`；只服务一个项目 → 那个项目的 `assets/`。
+两处都留一份必然走样，提升到共享库要**移动**而不是复制。完整规则见
+[`REPO-LAYOUT.md`](REPO-LAYOUT.md) §五之三。
 
 ---
 
@@ -104,7 +127,7 @@ path / text / image / group / adjustment）。长度 ≤1 是画布比例，>1 �
 
 ## 状态
 
-引擎 14 套测试全绿（`node test/run-all.mjs`，exit 0）；preset 挂载通过。
+引擎 15 套测试全绿（`node test/run-all.mjs`，exit 0）；preset 挂载通过。
 **尚未在真实会话中运行过**——`design` preset 从未被任何一次会话选中，`design_render`
 也从未被真正调用过。挂载、schema、引擎三条都有验证，「模型能调得动这 8 个工具」还缺
 一次真实运行。
@@ -113,7 +136,7 @@ path / text / image / group / adjustment）。长度 ≤1 是画布比例，>1 �
 
 这个仓库交付的是**工具链**，不是这台机器的旧成品。所以：
 
-- ✅ 引擎、25 个会话工具、8 个 preset 工具、**全部 14 套测试**——开箱可用；
+- ✅ 引擎、25 个会话工具、8 个 preset 工具、**全部 15 套测试**——开箱可用；
 - ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材
   （`engine/assets/`、`engine/refs/`）是本机专用的输入，刻意未纳入版本控制，
   且场景里的 `src` 是绝对路径。
