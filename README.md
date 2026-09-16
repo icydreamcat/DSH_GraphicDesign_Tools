@@ -63,11 +63,25 @@ DSH_GraphicDesign_Tools/
 ├── bootstrap-workspace.mjs ← 生成工作区外围（素材库/项目区/缓存）
 ├── new-project.mjs      ← 开一个新项目
 ├── verify-knowledge.mjs ← 检查文档副本是否漂移
+├── encrypt-doc.mjs      ← 加密/解密一份文档
 └── REPO-LAYOUT.md       ← 每个目录的归属与边界（先读这个）
 ```
 
 `design/` 是 agent，`engine/` 是它的工具，`examples/` 是它的作品。
 **完整分类见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md)。**
+
+### 一份锁着的文档
+
+[`为什么做这个项目.md.enc`](为什么做这个项目.md.enc) 是这个项目**为什么存在**的说明，
+用 `encrypt-doc.mjs` 加过密（scrypt + AES-256-GCM）。它在仓库里，但只有拿到口令的人读得到。
+
+```powershell
+node encrypt-doc.mjs decrypt 为什么做这个项目.md.enc 为什么做这个项目.md
+node encrypt-doc.mjs inspect 为什么做这个项目.md.enc   # 只看文件头，不需要口令
+```
+
+它不谈方法——方法在这个 README 和 `docs/` 里。它谈的是立场：为什么做这件事、反对什么、
+把 AI 当作同事意味着什么。**加锁不是因为内容有害，是因为有些判断需要时间才能被公正地读。**
 
 ---
 

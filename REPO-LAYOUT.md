@@ -34,9 +34,12 @@
 |---|---|
 | `bootstrap-workspace.mjs` | **生成工作区外围**（素材库 / 项目区 / 缓存）。幂等：只补缺失，从不删除或覆盖；`--check` 只报告。 |
 | `deploy-preset.mjs` | **把 `design/` 安装到 harness 的 preset 目录。** 必须跑，不是可选的——DSH 靠 `readdir` 扫描 preset 根并跳过一切非真实目录，所以 junction / symlink / settings 根都不通（三条都实测过）。`--check` 只报告差异，`--prune` 清理已删除的文件。 |
+| `encrypt-doc.mjs` | **加密/解密一份文档。** scrypt(N=32768,r=8,p=1) 派生密钥 + AES-256-GCM（加密同时鉴权，口令错与文件被改都会明确报出来）。文件头明文可读，口令从不落盘、不进命令行。`inspect` 只看结构，不需要口令。 |
 | `new-project.mjs` | 建项目：`node new-project.mjs <slug>` → `projects/YYYY-MM-DD-slug/` 及标准内部结构。`--list` 按最新在前列出。 |
 | `make-examples.mjs` | 把 `engine/out/` 里的精选成品复制进 `examples/`。`--check` 只报告。 |
 | `verify-knowledge.mjs` | 比对 `docs/` 与 `../knowledge/` 里同名文档的哈希，报告漂移。两处内容相同，**互为快照而非两处维护**。 |
+| `encrypt-doc.mjs` | 加密/解密一份文档。见下方「一份锁着的文档」。 |
+| `为什么做这个项目.md.enc` | **加过密的动机文档。** 仓库里只有密文；明文底本在 `../knowledge/agent/`，**永不提交**。 |
 | `README.md` | 面向使用者的说明：它是什么、怎么开始、能做什么。 |
 | `REPO-LAYOUT.md` | 本文件。 |
 | `.gitignore` | 声明哪些不进仓库：依赖、构建产物、缓存、编辑器目录、工作区外围。每条都写了理由。 |
@@ -49,6 +52,24 @@ config.engineDir  >  环境变量 DSH_DESIGN_ENGINE  >  preset 模块内的内�
 ```
 
 克隆到别处时设 `$env:DSH_DESIGN_ENGINE = "<你的路径>\engine"` 即可，不必改 composition。
+
+### 一份锁着的文档
+
+`为什么做这个项目.md.enc` 是这个项目**为什么存在**的说明，加密存放。
+
+```powershell
+node encrypt-doc.mjs decrypt 为什么做这个项目.md.enc 为什么做这个项目.md
+node encrypt-doc.mjs inspect 为什么做这个项目.md.enc   # 只看文件头，不需要口令
+```
+
+**为什么加密**：它谈的是立场，不是方法——为什么做这件事、反对什么、把 AI 当作同事意味着什么。
+方法在这个文件与 `README.md` 里，那份文档不重复它们。**加锁不是因为内容有害，是因为有些判断需要
+时间才能被公正地读。** 写下立场，然后不去解释、不去辩护、不去要一个立刻的回音。
+
+**口令不在这里，也不在任何文件里。** 加密用 scrypt(N=32768,r=8,p=1) 派生密钥、AES-256-GCM
+加密并鉴权：口令错和文件被改都会明确报出来，而不是解出一段乱码。口令丢了，密文就是噪声——
+没有找回机制，所以明文底本留在 `../knowledge/agent/`（不版控）作为唯一可读的一份。
+**底本永不提交，往仓库里放明文等于没有加密。**
 
 ---
 
