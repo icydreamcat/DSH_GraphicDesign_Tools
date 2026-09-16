@@ -30,8 +30,7 @@
  * ---------------------------------------
  * The root is derived from this file's own location (`<workspace>/<repo>/engine/src/`), so a
  * checkout anywhere behaves identically. `DSH_WORKSPACE` overrides it for the case where the
- * library is deliberately kept on another drive — a 600 MB reference set has opinions about
- * which disk it lives on.
+ * library is deliberately kept on another drive.
  */
 import { resolve, join, isAbsolute } from 'node:path'
 import { existsSync, mkdirSync, readdirSync } from 'node:fs'

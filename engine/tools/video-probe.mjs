@@ -95,8 +95,8 @@ const OPAQUE_RATIO = 0.15        // PRIMARY opacity test: std(element)/std(backd
 // WHERE SCRATCH GOES
 //
 // Video work produces the largest regeneration garbage in this project: decoding a
-// single 15-30s clip at native resolution writes 90 frames, and 948 frames / 1.06 GB
-// was measured from one ordinary recording. That must never accumulate inside the
+// single 15-30s clip at native resolution writes on the order of a hundred frames. That
+// must never accumulate inside the
 // repository — not even gitignored, because a gitignored cache in the tree still gets
 // backed up, copied, and confused with deliverables.
 //

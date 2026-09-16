@@ -37,7 +37,7 @@ const M = 96
 const INK = '#20241C'
 const OLIVE = '#83923A'
 const PAPER = '#F1F1EC'
-const SUBJECT = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/assets/haruka-figure.png'
+const SUBJECT = '../assets/haruka-figure.png'
 
 const scene = {
   canvas: { width: W, height: H },

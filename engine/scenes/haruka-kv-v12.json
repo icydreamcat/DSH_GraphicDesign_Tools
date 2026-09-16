@@ -50,7 +50,7 @@
     {
       "id": "02-ghost",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\haruka-raw.png",
+      "src": "../assets/haruka-raw.png",
       "x": 1180,
       "y": -0.075,
       "w": 1900,
@@ -162,7 +162,7 @@
     {
       "id": "04-figure",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\haruka-raw.png",
+      "src": "../assets/haruka-raw.png",
       "x": 260,
       "y": 380,
       "w": 1552,

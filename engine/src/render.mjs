@@ -107,7 +107,7 @@ function resolveY(v, h, d) { return resolveLength(v, h, d) }
  * A pool of scratch canvases.
  *
  * Rendering one design allocates a buffer per layer; without pooling, a
- * 30-layer poster allocates and drops ~400 MB and spends real time in the
+ * 30-layer poster allocates and drops a buffer per layer and spends real time in the
  * allocator. Buffers are keyed by size and reused within a single render, then
  * released together.
  */
@@ -368,7 +368,7 @@ async function compositeAdjustment(ctx, layer, env) {
   // and the adjusted value, so the "before" has to be captured first — reading
   // the canvas back afterwards returns the adjusted pixels and makes the
   // interpolation a no-op, silently turning every faded adjustment into a full
-  // one. That is a subtle enough failure to be worth the extra 13 MB.
+  // one. That is a subtle enough failure to be worth the extra buffer.
   const before = new Uint8ClampedArray(img.data)
   const buf = { width: W, height: H, data: img.data }
   const results = []

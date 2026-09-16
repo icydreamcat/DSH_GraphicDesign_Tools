@@ -11,7 +11,7 @@
  * says it does.
  *
  * It does NOT decode every layer channel. A full PackBits round-trip across a
- * 22 MB document drifts at around the third megabyte, and chasing that further
+ * a large document drifts partway through, and chasing that further
  * was not worth the remaining budget: the drift is in the verification path, not
  * in the written file — PackBits itself round-trips exactly (see the unit cases
  * below), every declared length is internally consistent, and the composite
@@ -24,6 +24,7 @@
  * the PNG. What this file proves is that those buffers are framed correctly.
  */
 import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
 import { registerFonts } from '../src/fonts.mjs'
 import { renderScene, readBuffer } from '../src/render.mjs'
 import { writePsd, packChannel, unpackChannel } from '../src/psd.mjs'
@@ -54,8 +55,14 @@ for (const [name, src] of [
 }
 
 console.log('\n=== 1. render and write ===')
-const scene = JSON.parse(readFileSync('scenes/kv-timeline.json', 'utf8'))
-const { canvas, report, layers } = await renderScene(scene, { baseDir: process.cwd(), captureLayers: true })
+const SCENE_PATH = 'scenes/kv-timeline.json'
+const scene = JSON.parse(readFileSync(SCENE_PATH, 'utf8'))
+// `baseDir` must be the SCENE's directory, not the process working directory: a scene's image
+// paths are relative to the scene file. The CLI passes `dirname(resolvedScene)`, and anything
+// rendering a scene directly has to do the same. With `process.cwd()` the scene's
+// `../assets/...` resolved one level too high and two image layers failed to load — which
+// showed up as a layer-count mismatch rather than as a path error.
+const { canvas, report, layers } = await renderScene(scene, { baseDir: dirname(resolve(SCENE_PATH)), captureLayers: true })
 const composite = readBuffer(canvas)
 
 const bytes = writePsd({

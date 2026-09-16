@@ -89,7 +89,7 @@
     {
       "id": "03-figure",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\haruka-raw.png",
+      "src": "../assets/haruka-raw.png",
       "x": 0.0017,
       "y": 0.1732,
       "w": 0.7046,

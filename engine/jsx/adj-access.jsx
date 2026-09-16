@@ -8,7 +8,14 @@
 // and edited.
 //
 // That distinction decides the recommended workflow, so it is worth one run.
-var LOGPATH = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/adj2.log';
+// --- script-relative paths (ExtendScript has no import.meta; $.fileName is the anchor) ---
+var __here = (function () {
+  var p = $.fileName.replace(/\\/g, "/");
+  return p.substring(0, p.lastIndexOf("/"));
+})();
+function jsxPath(rel) { return __here + "/" + rel; }
+// --- end anchor ---
+var LOGPATH = jsxPath('.probe/adj2.log');
 
 function say(msg) {
     try {
@@ -33,7 +40,7 @@ try {
 
 // 2. Open the layered PSD the bridge wrote and inspect its layers.
 try {
-    var f = new File('D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/live.psd');
+    var f = new File(jsxPath('.probe/live.psd'));
     if (f.exists) {
         var doc = app.open(f);
         say('opened live.psd: ' + doc.name + '  layers=' + doc.layers.length);

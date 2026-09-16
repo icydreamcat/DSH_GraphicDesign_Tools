@@ -37,7 +37,7 @@
     {
       "id": "02-ghost",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\muelsyse-raw.webp",
+      "src": "../assets/muelsyse-raw.webp",
       "x": 0,
       "y": 152,
       "w": 1,
@@ -161,7 +161,7 @@
     {
       "id": "04-plate",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\muelsyse-raw.webp",
+      "src": "../assets/muelsyse-raw.webp",
       "x": 1140,
       "y": 230,
       "w": 642,
@@ -501,7 +501,7 @@
     {
       "id": "08-maple",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\maple-olive.png",
+      "src": "../assets/maple-olive.png",
       "x": -46,
       "y": 336,
       "w": 856,
@@ -1002,7 +1002,7 @@
         {
           "id": "13a-mk-type-tl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "src": "../assets/icons/mark-cross.png",
           "x": 578,
           "y": 339,
           "w": 30,
@@ -1015,7 +1015,7 @@
         {
           "id": "13a-mk-type-tr",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "src": "../assets/icons/mark-cross.png",
           "x": 578,
           "y": 339,
           "w": 30,
@@ -1028,7 +1028,7 @@
         {
           "id": "13a-mk-type-bl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "src": "../assets/icons/mark-cross.png",
           "x": 578,
           "y": 339,
           "w": 30,
@@ -1041,7 +1041,7 @@
         {
           "id": "13a-mk-type-br",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross.png",
+          "src": "../assets/icons/mark-cross.png",
           "x": 578,
           "y": 339,
           "w": 30,
@@ -1054,7 +1054,7 @@
         {
           "id": "13a-mk-band-tl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1447,
           "y": 670,
           "w": 28,
@@ -1067,7 +1067,7 @@
         {
           "id": "13a-mk-band-tr",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1447,
           "y": 670,
           "w": 28,
@@ -1080,7 +1080,7 @@
         {
           "id": "13a-mk-band-bl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1447,
           "y": 670,
           "w": 28,
@@ -1093,7 +1093,7 @@
         {
           "id": "13a-mk-band-br",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1447,
           "y": 670,
           "w": 28,
@@ -1106,7 +1106,7 @@
         {
           "id": "13a-mk-band-tm",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1451,
           "y": 673,
           "w": 20,
@@ -1119,7 +1119,7 @@
         {
           "id": "13a-mk-band-bm",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1451,
           "y": 673,
           "w": 20,
@@ -1132,7 +1132,7 @@
         {
           "id": "13a-mk-band-lm",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1086,
           "y": 673,
           "w": 20,
@@ -1145,7 +1145,7 @@
         {
           "id": "13a-mk-band-rm",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-cross-ring.png",
+          "src": "../assets/icons/mark-cross-ring.png",
           "x": 1816,
           "y": 673,
           "w": 20,
@@ -1158,7 +1158,7 @@
         {
           "id": "13a-mk-right-tl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "src": "../assets/icons/mark-ellipse-cross.png",
           "x": 2085,
           "y": 619,
           "w": 26,
@@ -1171,7 +1171,7 @@
         {
           "id": "13a-mk-right-tr",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "src": "../assets/icons/mark-ellipse-cross.png",
           "x": 2085,
           "y": 619,
           "w": 26,
@@ -1184,7 +1184,7 @@
         {
           "id": "13a-mk-right-bl",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "src": "../assets/icons/mark-ellipse-cross.png",
           "x": 2085,
           "y": 619,
           "w": 26,
@@ -1197,7 +1197,7 @@
         {
           "id": "13a-mk-right-br",
           "shape": "image",
-          "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\icons\\mark-ellipse-cross.png",
+          "src": "../assets/icons/mark-ellipse-cross.png",
           "x": 2085,
           "y": 619,
           "w": 26,

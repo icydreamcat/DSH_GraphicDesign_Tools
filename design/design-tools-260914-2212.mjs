@@ -27,7 +27,8 @@
  * `name` and `inject` are exported because the composition row declares them.
  */
 import { existsSync } from 'node:fs'
-import { isAbsolute, resolve } from 'node:path'
+import { isAbsolute, resolve, dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 
 export const inject = ['tools']
@@ -57,7 +58,29 @@ export const name = 'design-tools'
  * A row that lost its config would otherwise throw from a directory check with no hint of
  * what to repair; with a plausible default here, the error names `engineDir` explicitly.
  */
-const DEFAULT_ENGINE = 'D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine'
+/**
+ * Locate the engine by walking UP from this module, rather than naming a drive.
+ *
+ * WHY NOT AN ABSOLUTE PATH
+ * -----------------------
+ * A literal `D:\...\engine` is correct on exactly one machine, and it is inside a repository
+ * other people clone. It also makes the error message point at a directory the reader has never
+ * heard of. Walking up finds the checkout wherever it is.
+ *
+ * The walk is bounded, so a deployed copy that sits outside any checkout simply finds nothing
+ * and falls through to the error — which then names the config key and the override.
+ */
+function findEngineDir() {
+  let dir = dirname(fileURLToPath(import.meta.url))
+  for (let i = 0; i < 8; i++) {
+    const candidate = join(dir, 'DSH_GraphicDesign_Tools', 'engine')
+    if (existsSync(join(candidate, 'bin', 'design.mjs'))) return candidate
+    const parent = dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  return null
+}
 
 /**
  * Run the engine CLI and parse its JSON.
@@ -178,13 +201,14 @@ export function apply(ctx, config) {
   const fromEnv = typeof process.env.DSH_DESIGN_ENGINE === 'string' && process.env.DSH_DESIGN_ENGINE.trim() !== ''
     ? process.env.DSH_DESIGN_ENGINE.trim()
     : undefined
-  const engineDir = configured ?? fromEnv ?? DEFAULT_ENGINE
-  if (!existsSync(engineDir)) {
+  const engineDir = configured ?? fromEnv ?? findEngineDir()
+  if (engineDir === null || !existsSync(engineDir)) {
     throw new Error(
-      `design-tools: engine directory does not exist: ${engineDir}. ` +
-      `Fix this row's config.engineDir in agent.cordis.yml, or set DSH_DESIGN_ENGINE ` +
-      `to the engine directory of your checkout ` +
-      `(resolved from: ${configured !== undefined ? 'config.engineDir' : fromEnv !== undefined ? 'DSH_DESIGN_ENGINE' : 'the built-in default'}).`,
+      `design-tools: the design engine could not be located` +
+      `${engineDir === null ? '' : ` at ${engineDir}`}. ` +
+      `Set this row's config.engineDir in agent.cordis.yml, or set DSH_DESIGN_ENGINE to the ` +
+      `engine directory of your checkout ` +
+      `(tried: ${configured !== undefined ? 'config.engineDir' : fromEnv !== undefined ? 'DSH_DESIGN_ENGINE' : 'walking up from this module'}).`,
     )
   }
 

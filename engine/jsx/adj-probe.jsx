@@ -9,7 +9,14 @@
 //
 // So this tries several documented shapes for each, and reports which one (if
 // any) works. Whichever succeeds becomes the recipe.
-var LOGPATH = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/adj.log';
+// --- script-relative paths (ExtendScript has no import.meta; $.fileName is the anchor) ---
+var __here = (function () {
+  var p = $.fileName.replace(/\\/g, "/");
+  return p.substring(0, p.lastIndexOf("/"));
+})();
+function jsxPath(rel) { return __here + "/" + rel; }
+// --- end anchor ---
+var LOGPATH = jsxPath('.probe/adj.log');
 
 function say(msg) {
     try {

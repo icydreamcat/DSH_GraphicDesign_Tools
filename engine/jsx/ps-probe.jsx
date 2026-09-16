@@ -10,7 +10,14 @@
 // Each step is also chosen to be something that CANNOT raise a modal dialog:
 // no filter that may prompt, no file open, no save-as overwrite prompt.
 
-var LOGPATH = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/ps-probe.log';
+// --- script-relative paths (ExtendScript has no import.meta; $.fileName is the anchor) ---
+var __here = (function () {
+  var p = $.fileName.replace(/\\/g, "/");
+  return p.substring(0, p.lastIndexOf("/"));
+})();
+function jsxPath(rel) { return __here + "/" + rel; }
+// --- end anchor ---
+var LOGPATH = jsxPath('.probe/ps-probe.log');
 
 function say(msg) {
     try {
@@ -210,7 +217,7 @@ step('6b save layered PSD', function () {
     var o = new PhotoshopSaveOptions();
     o.layers = true;
     o.embedColorProfile = true;
-    doc.saveAs(new File('D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/probe.psd'), o, true, Extension.LOWERCASE);
+    doc.saveAs(new File(jsxPath('.probe/probe.psd')), o, true, Extension.LOWERCASE);
     return 'psd saved';
 });
 
@@ -219,7 +226,7 @@ step('6c export PNG', function () {
     var o = new ExportOptionsSaveForWeb();
     o.format = SaveDocumentType.PNG;
     o.PNG8 = false;
-    doc.exportDocument(new File('D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/probe.png'), ExportType.SAVEFORWEB, o);
+    doc.exportDocument(new File(jsxPath('.probe/probe.png')), ExportType.SAVEFORWEB, o);
     return 'png saved';
 });
 

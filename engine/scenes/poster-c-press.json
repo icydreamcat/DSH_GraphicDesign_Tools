@@ -60,7 +60,7 @@
     {
       "id": "03-subject",
       "shape": "image",
-      "src": "D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/assets/haruka-figure.png",
+      "src": "../assets/haruka-figure.png",
       "x": 1248,
       "y": 81,
       "w": 1056,

@@ -825,7 +825,7 @@
     {
       "id": "L05-subject",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\yao-cutout.png",
+      "src": "../assets/yao-cutout.png",
       "x": 0.545,
       "y": 0.085,
       "w": 0.395,
@@ -887,7 +887,7 @@
     {
       "id": "L06-subject-screen",
       "shape": "image",
-      "src": "D:\\DSH_GDT\\DSH_GraphicDesign_Tools\\engine\\assets\\yao-cutout.png",
+      "src": "../assets/yao-cutout.png",
       "x": 0.545,
       "y": 0.085,
       "w": 0.395,

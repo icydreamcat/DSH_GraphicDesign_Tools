@@ -44,7 +44,7 @@
 - **焦点靠反相，且一次只准一个。** 用第二个就不成立。
 - **靠明度差建立的结构要过灰度检查。** 某层压在近黑底上对比度只有 1.144:1——屏幕成立，
   打印即消失。
-- **指标是手段，不是目的。** 曾经为了让色数从 234 涨到 553 撒了 300 个斑点，
+- **指标是手段，不是目的。** 为了抬高「可分辨色数」而撒斑点，指标上去了，
   那片肉眼清晰可见的花纹**撤掉后色数只掉到 549**——指标没看见眼睛看见的东西。
 
 这些规则写在 [`design/skills/`](design/skills)——**7 个技能**，由 agent 按需加载。
@@ -126,15 +126,15 @@ node tools/read-report.mjs ../projects/<项目>/out/v1.report.json ../projects/<
 
 ## 工作区：仓库只是其中一块
 
-```powershell
-D:\DSH_GDT\                     ← 工作区
-├── DSH_GraphicDesign_Tools\    ← 本仓库
-├── knowledge\                  ← 复盘与参考库：reference/ tooling/ agent/
-├── assets\                     ← 共享素材库：通用素材，每次生成都读
-├── projects\<YYYY-MM-DD-slug>\ ← 项目：自带 scenes/ assets/ out/ notes.md
-├── refs\                       ← 供「量」的参考素材（截图/录像/官网源文件）
-├── .cache\                     ← 生成缓存，可随时删
-└── tools\bin\ffmpeg.exe        ← 共享工具
+```text
+<WORKSPACE>/                     ← 工作区根，默认是仓库的上一级
+├── DSH_GraphicDesign_Tools/    ← 本仓库
+├── knowledge/                  ← 复盘与参考库：reference/ tooling/ agent/
+├── assets/                     ← 共享素材库：通用素材，每次生成都读
+├── projects/<YYYY-MM-DD-slug>/ ← 项目：自带 scenes/ assets/ out/ notes.md
+├── refs/                       ← 供「量」的参考素材（截图/录像/官网源文件）
+├── .cache/                     ← 生成缓存，可随时删
+└── tools/bin/ffmpeg.exe        ← 共享工具
 ```
 
 `bootstrap-workspace.mjs` 会把这些**自动生成**（幂等：只补缺失，从不删除或覆盖）。
@@ -229,20 +229,14 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 引擎 **15 套测试全绿**（`node test/run-all.mjs`，exit 0，**416 项断言**）；preset 挂载通过。
 
-**已经端到端跑通过。** 累计 **4 个会话选中 `design` preset、104 次 `design_*` 工具调用**，
-产出是实物：十一页 deck（含逐页 `report.json` 与交付 `.pptx`）、一份 KV
-（`shiroko-kv.png` + **49 MB 分层 `shiroko-kv.psd`**）。所以
-**「preset 能挂载 → 技能能加载 → 工具能出图 → PSD 能写出」这条链路是有实证的。**
+**全链路可用。** preset 能挂载 → 技能能加载 → 工具能出图 → 分层 PSD 能写出，
+每一环都产出过实物：多页 deck（含逐页 `report.json` 与交付 `.pptx`）、KV
+（成品 `.png` 与**分层 `.psd`**）。
 
-> 早先本文档写过「尚未在真实会话中运行过」。**那是错的**，错因是把 session 首条记录的
-> `agentPreset` 字段当成了「选了哪个 preset」——真正的记录是 `agent-preset/selected`，
-> 两者经常不一致。一个读错字段的统计给出了一个稳定而错误的结论。
-> 完整更正与实测数据见 `knowledge/tooling/已知缺口与本地前提.md` §3.1。
-
-**但「跑过」不等于「测过」。** `bin/design.mjs` 的 10 个子命令**没有一个被测试经由程序路径执行过**
-——模块级 416 项断言覆盖不到参数解析与子命令分发。`--scale` 的 bug 就是在这条真空里出的：
-它在真实会话里被调用过，仍然带着比例错误出了图。详见
-[`REPO-LAYOUT.md`](REPO-LAYOUT.md) §8.1。
+**但「能用」不等于「测到」。** `bin/design.mjs` 的 9 个子命令**没有一个被测试经由程序路径执行过**
+——模块级断言覆盖不到参数解析与子命令分发，而 agent 的 8 个工具**恰恰通过子命令调用引擎**。
+`--scale` 的比例错误就是在这条真空里出的：它渲染出了错误的画面，而报告始终 0 error / 0 warning。
+详见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §8.1。
 
 ### 克隆下来能做什么
 

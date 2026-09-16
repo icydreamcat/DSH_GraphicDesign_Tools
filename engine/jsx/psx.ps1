@@ -41,11 +41,15 @@ param(
   [switch]$Status,
   [string]$Run,
   [int]$Timeout = 120,
-  [string]$Log = 'D:\DSH_GDT\DSH_GraphicDesign_Tools\engine\.probe\ps.log'
+  # Defaults to a log beside this script, so it works from any checkout. Pass -Log to
+  # redirect it.
+  [string]$Log = (Join-Path $PSScriptRoot '.probe\ps.log'),
+  # Photoshop's install path, overridable when it lives elsewhere.
+  [string]$Exe = 'C:\Program Files\Adobe\Adobe Photoshop 2026\Photoshop.exe'
 )
 
 $ErrorActionPreference = 'Continue'
-$exe = 'C:\Program Files\Adobe\Adobe Photoshop 2026\Photoshop.exe'
+$exe = $Exe
 $logDir = Split-Path -Parent $Log
 if (-not (Test-Path $logDir)) { New-Item -ItemType Directory -Force -Path $logDir | Out-Null }
 

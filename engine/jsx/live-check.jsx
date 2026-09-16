@@ -6,7 +6,14 @@
 // the photoshop-delivery skill describe them, so a failure here means the
 // environment is wrong rather than the script. Every step appends to the log
 // immediately, so a hang still shows which step completed last.
-var LOGPATH = 'D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/live.log';
+// --- script-relative paths (ExtendScript has no import.meta; $.fileName is the anchor) ---
+var __here = (function () {
+  var p = $.fileName.replace(/\\/g, "/");
+  return p.substring(0, p.lastIndexOf("/"));
+})();
+function jsxPath(rel) { return __here + "/" + rel; }
+// --- end anchor ---
+var LOGPATH = jsxPath('.probe/live.log');
 
 function say(msg) {
     try {
@@ -91,7 +98,7 @@ step('export PNG', function () {
     var o = new ExportOptionsSaveForWeb();
     o.format = SaveDocumentType.PNG;
     o.PNG8 = false;
-    doc.exportDocument(new File('D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/live.png'), ExportType.SAVEFORWEB, o);
+    doc.exportDocument(new File(jsxPath('.probe/live.png')), ExportType.SAVEFORWEB, o);
     return 'written';
 });
 
@@ -100,7 +107,7 @@ step('save layered PSD', function () {
     var o = new PhotoshopSaveOptions();
     o.layers = true;
     o.embedColorProfile = true;
-    doc.saveAs(new File('D:/DSH_GDT/DSH_GraphicDesign_Tools/engine/.probe/live.psd'), o, true, Extension.LOWERCASE);
+    doc.saveAs(new File(jsxPath('.probe/live.psd')), o, true, Extension.LOWERCASE);
     return 'written';
 });
 

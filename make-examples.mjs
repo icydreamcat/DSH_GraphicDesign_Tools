@@ -3,8 +3,8 @@
  *
  * WHY THIS IS A SCRIPT AND NOT A COPY-PASTE
  * -----------------------------------------
- * `engine/out/` is gitignored on purpose: 42 files and 46 MB of intermediate figures that
- * change on every iteration. But a design engine with no picture in its repository is
+ * `engine/out/` is gitignored on purpose: intermediate figures that change on every
+ * iteration. But a design engine with no picture in its repository is
  * asking to be taken on faith, so a handful of the renders that represent the toolchain
  * are promoted into `examples/`, which IS versioned.
  *

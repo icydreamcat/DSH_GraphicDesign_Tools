@@ -4,8 +4,8 @@
  * WHY A RUNNER EXISTS
  * -------------------
  * The suites were run one at a time by hand, and that is how a stale guard in
- * `tool-schemas.mjs` sat red without anyone noticing: 8/8 tools passed, the exit code
- * was 1, and no one was reading the exit code of a command they had typed individually.
+ * a suite sat red without anyone noticing: every tool passed, the exit code
+ * was non-zero, and no one was reading the exit code of a command they had typed individually.
  * A single runner with a single exit status makes "all green" checkable in one go.
  *
  * Usage:

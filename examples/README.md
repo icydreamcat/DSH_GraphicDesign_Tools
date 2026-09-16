@@ -1,14 +1,14 @@
 # examples — what this engine actually draws
 
 Three renders, promoted out of the gitignored `engine/out/`. Everything in `engine/out/`
-is a build artifact (42 files, ~46 MB, rewritten on every iteration); these three are here
+is a build artifact, rewritten on every iteration; these three are here
 because a rendering engine with no picture in its repository has to be taken on faith.
 
 | file | what it shows |
 |---|---|
 | `poster-e-tooled.png` | A finished poster at full delivery size, **2400×1350**. Ground, accent band, cut-out subject, a 214px title, a rule system, and an `emboss` + `pattern` treatment on the type. |
 | `poster-variants-and-scope.png` | The same layout in **six treatments** (flat / soft / press / light / tooled / scoped), annotated. This is the clearest single statement of what the seventeen layer effects do, and of why the sixth one exists: comparing C and F shows the same duotone-and-screen idea, with `scope` keeping the treatment off the face. |
-| `effect-sheet.png` | The effect vocabulary side by side. 128 KB, so it is cheap to keep. |
+| `effect-sheet.png` | The effect vocabulary side by side. Small enough to keep. |
 
 ## Reproducibility, stated honestly
 

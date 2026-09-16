@@ -32,11 +32,9 @@ const REPO = dirname(fileURLToPath(import.meta.url))
 
 // The workspace root. `DSH_WORKSPACE` overrides it, and it MUST be honoured here for the
 // same reason engine/src/paths.mjs honours it: the library can legitimately live on another
-// drive (a 600 MB reference set has opinions), and if only one of the two files respected
-// the override they would bootstrap one area and write into another. That divergence was
-// live for one revision — this script hard-coded the parent of the repo while paths.mjs read
-// the variable — and was caught by pointing DSH_WORKSPACE at a scratch directory and
-// watching this script report "already present" for a directory that did not exist.
+// drive. If only one of the two files respected the override they would bootstrap one area
+// and write into another — so both read it, and engine/test/workspace-layout.mjs asserts
+// that they do.
 const WORKSPACE = process.env.DSH_WORKSPACE
   ? resolve(process.env.DSH_WORKSPACE)
   : resolve(REPO, '..')

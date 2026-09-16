@@ -8,7 +8,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── bulk material that only THIS machine needs ───────────────────────────────
-# `engine/assets/` (17 files, 5.9 MB) and `engine/refs/` (3 files, 3.5 MB) are INPUT
+# `engine/assets/` and `engine/refs/` are INPUT
 # material for scenes authored on this machine — game character art, processed
 # cut-outs, reference posters. They are not part of the toolchain: a fresh clone is
 # meant to make its OWN work, not to rebuild this machine's posters.
@@ -25,16 +25,15 @@ engine/refs/
 
 # ── dependencies ─────────────────────────────────────────────────────────────
 # Reproduce with `npm install` in engine/. @napi-rs/canvas ships per-platform
-# native binaries (a 27 MB skia build), so a committed copy is both large and
+# native binaries (a skia build), so a committed copy is both large and
 # wrong on any machine that is not this one.
 engine/node_modules/
 node_modules/
 
 # ── build artifacts ──────────────────────────────────────────────────────────
-# engine/out/ holds 42 files and about 46 MB of renders, measurement reports and
-# PSDs that are rewritten on every iteration. They regenerate in about a second
-# each from the scenes committed beside them, which is the definition of
-# something that does not belong in a commit.
+# engine/out/ holds renders, measurement reports and PSDs that are rewritten on every
+# iteration. They regenerate in about a second each from the scenes committed beside them,
+# which is the definition of something that does not belong in a commit.
 #
 # The curated subset that IS versioned lives in examples/ — excluded from the
 # rule below on purpose, because a design engine with no picture in its
@@ -71,8 +70,7 @@ engine/.probe/
 # deliverable. `engine/out/` now holds NOTHING but real render artifacts, which is what
 # makes "is this a finished poster or leftover probe output?" answerable at a glance.
 #
-# Measured: one 20-second clip decode produced 948 frames and 1.06 GB, and a first staging
-# pass once swept all of it into a commit.
+# Decoding a clip to frames is large enough that a staging pass must never pick it up.
 .cache/
 assets/
 projects/

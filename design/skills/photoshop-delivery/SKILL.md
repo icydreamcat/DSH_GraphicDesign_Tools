@@ -131,7 +131,7 @@ to write, reported `COM ready in 9.4s, version 27.6.0`.
 
 Each **failed** start makes Adobe's licensing subsystem spawn another
 `adobe_licensing_wf.exe` that **never exits**. Measured in one session: **38
-accumulated processes holding 349 MB**, growing by roughly one per attempt.
+accumulated processes**, growing by roughly one per attempt.
 
 Healthy is **0–1** of them, and a new one exits on its own about two minutes
 later. The distinguishing test:
