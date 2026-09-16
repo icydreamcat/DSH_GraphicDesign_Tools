@@ -441,12 +441,22 @@ bin/design.mjs 的子命令：render analyze critique verify fonts ladder ramp p
 于是整条面向使用者的路径——参数解析、子命令分发、JSON 输出契约、退出码——
 **处在测试之外**。
 
-这不是理论风险：`--scale` 把画布宽度乘两次、高度一次不乘，**报告始终 0 error / 0 warning**，
-一直没暴露。它当时被当作「历史里没人调用过」来解释，但**同一类型的洞仍在**：
-`palette apply` / `palette run` / `palette show` / `design verify` 至今没有任何测试经过子命令路径。
+这不是理论风险：`--scale` 把画布宽度乘两次、高度一次不乘（2400×1350 在 `--scale 0.5`
+下变成 600×675），**而报告始终 0 error / 0 warning**。
+
+> **关于它为什么没被发现，有一条更值得记的事实**（早先本文档写错过）：
+> `design_render` **不是**「从未被调用」——按权威记录 `agent-preset/selected` 实测，
+> 4 个会话选中 `design` preset、累计 104 次 `design_*` 调用、**其中 `design_render` 8 次**。
+>
+> 所以真相是：**它被用过 8 次，每次都带着比例错误出了图，而每次报告都是绿的。**
+> 这比「没人用过」严重——**一个被使用、看起来成功、却没有任何检查会失败的路径。**
+>
+> **同一类型的洞仍在**：`palette apply` / `palette run` / `palette show` / `design verify`
+> 至今没有任何测试经过子命令路径。
 
 **修法**：加一套把 CLI 当程序驱动的测试（spawn + 校验 JSON 与退出码），
 而不是继续只测模块。这类测试恰好是唯一能抓住「参数解析写错」的那种。
+**使用次数增加不会消掉这个缺口——只有测试会。**
 
 ### 8.2 preset 里留着一个写死的作者路径
 

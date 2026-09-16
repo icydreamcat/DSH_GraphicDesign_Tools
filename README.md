@@ -229,9 +229,20 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 引擎 **15 套测试全绿**（`node test/run-all.mjs`，exit 0，**416 项断言**）；preset 挂载通过。
 
-**尚未在真实会话中运行过**——`design` preset 从未被任何一次会话选中，`design_render`
-也从未被真正调用过。挂载、schema、引擎三条都有验证，「模型能调得动这 8 个工具」还缺一次
-真实运行。这一点写在这里而不是藏着，因为**"验证过"和"跑过"是两件事**。
+**已经端到端跑通过。** 累计 **4 个会话选中 `design` preset、104 次 `design_*` 工具调用**，
+产出是实物：十一页 deck（含逐页 `report.json` 与交付 `.pptx`）、一份 KV
+（`shiroko-kv.png` + **49 MB 分层 `shiroko-kv.psd`**）。所以
+**「preset 能挂载 → 技能能加载 → 工具能出图 → PSD 能写出」这条链路是有实证的。**
+
+> 早先本文档写过「尚未在真实会话中运行过」。**那是错的**，错因是把 session 首条记录的
+> `agentPreset` 字段当成了「选了哪个 preset」——真正的记录是 `agent-preset/selected`，
+> 两者经常不一致。一个读错字段的统计给出了一个稳定而错误的结论。
+> 完整更正与实测数据见 `knowledge/tooling/已知缺口与本地前提.md` §3.1。
+
+**但「跑过」不等于「测过」。** `bin/design.mjs` 的 10 个子命令**没有一个被测试经由程序路径执行过**
+——模块级 416 项断言覆盖不到参数解析与子命令分发。`--scale` 的 bug 就是在这条真空里出的：
+它在真实会话里被调用过，仍然带着比例错误出了图。详见
+[`REPO-LAYOUT.md`](REPO-LAYOUT.md) §8.1。
 
 ### 克隆下来能做什么
 
