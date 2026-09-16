@@ -76,12 +76,15 @@ DSH_GraphicDesign_Tools/
 用 `encrypt-doc.mjs` 加过密（scrypt + AES-256-GCM）。它在仓库里，但只有拿到口令的人读得到。
 
 ```powershell
-node encrypt-doc.mjs decrypt 为什么做这个项目.md.enc 为什么做这个项目.md
+# 读完写在 .cache/ 里（可随时删），不要把明文写回仓库
+node encrypt-doc.mjs decrypt 为什么做这个项目.md.enc ..\.cache\为什么做这个项目.md
 node encrypt-doc.mjs inspect 为什么做这个项目.md.enc   # 只看文件头，不需要口令
 ```
 
 它不谈方法——方法在这个 README 和 `docs/` 里。它谈的是立场：为什么做这件事、反对什么、
 把 AI 当作同事意味着什么。**加锁不是因为内容有害，是因为有些判断需要时间才能被公正地读。**
+
+**本机不留明文**：这一份密文就是保险库，没有第二把钥匙。口令丢了，它就没有了。
 
 ---
 
