@@ -46,11 +46,22 @@ engine/out/
 engine/.probe/
 .probe/
 
-# Video-probe scratch. `video-probe.mjs frames` extracts every frame of a recording to
-# disk so the alpha regression can run without a decoder, and `alpha`/`motion` use a
-# temp directory beside it. ONE 20-second clip produced 948 files and 1.06 GB — which is
-# why this rule exists, and why the size is written down rather than the word "large".
-# The TOOLS are versioned; their output is not.
+# ── the scratch cache ────────────────────────────────────────────────────────
+# Everything that is regenerated on demand now lives in ONE place, and that place is
+# OUTSIDE the repository: `../.cache/` beside it. See .cache/README.md.
+#
+#   ../.cache/video/           decoded video frames, ffmpeg temp, alpha fixtures
+#   ../.cache/test/            what the test suites write (scope renders, selftest)
+#   ../.cache/render-scratch/  one-off probe and iteration renders
+#
+# The reason is maintenance, not repository size. A cache that sits inside the tree —
+# even gitignored — still gets backed up, copied and, worst of all, mistaken for a
+# deliverable. `engine/out/` now holds NOTHING but real render artifacts, which is what
+# makes "is this a finished poster or leftover probe output?" answerable at a glance.
+#
+# Measured: one 20-second clip decode produced 948 frames and 1.06 GB. A first staging
+# pass once swept all of it into a commit.
+.cache/
 engine/.vp-frames/
 engine/.vp-tmp/
 

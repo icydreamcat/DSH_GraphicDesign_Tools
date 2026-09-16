@@ -60,7 +60,7 @@
 | 目录 | 大小 | 为什么不进 |
 |---|---|---|
 | `engine/node_modules/` | 37.5 MB | `@napi-rs/canvas` 带平台原生二进制（27 MB skia），提交了在别的机器上就是错的。`npm install` 重现。 |
-| `engine/out/` | 46.8 MB | 42 个构建产物，每轮迭代都重写；每个约 1 秒即可从旁边的 scene 重出。 |
+| `engine/out/` | 23.4 MB | 18 个**成品**与报告。scene 在仓库里，约 1 秒/稿即可重出。**测试与探针产物不在其中**（见 §5.4）。 |
 | **`engine/assets/`** | 5.9 MB | **本机专用的输入素材**：游戏立绘、处理后素材、`icons/` 标记。不是工具链的一部分——克隆的人是要做**自己的**东西，不是重出这台机器的海报。 |
 | **`engine/refs/`** | 3.5 MB | 同上：参考图是 `design_analyze` 的输入，属于那台机器的工作资料。 |
 
@@ -132,15 +132,43 @@ design/                                    ← 仓库里的规范源（改这里
 | `effect-sheet.png` | 效果词汇总表，128 KB。 |
 | `README.md` | 每条图的重出命令，以及一句诚实说明：对照表那张的拼版脚本当年是临时写的、没有留存。 |
 
-### 5.2 `engine/out/` —— 不进仓库（42 文件 · 46.8 MB）
+### 5.2 `engine/out/` —— 不进仓库（18 文件 · 23.4 MB，**只有成品**）
 
-全部渲染稿、量测报告与 PSD。**它们是构建产物**：scene 在仓库里，约 1 秒/稿即可重出。
+真正的渲染成品与量测报告：poster a–e 五版 + `press-scoped`、对照表、效果表（含 12 MB PSD）、
+字体样张。**它们是产物**：scene 在仓库里，约 1 秒/稿即可重出。
+
+> **这个目录现在只放成品——这是本次整理的结果，也是维护上最要紧的一条。**
+> 整理前它混着四类东西：成品、测试重写的图（`scope-*`、`selftest.png`）、
+> 多轮探针覆盖的迭代图（`iso-*`、`step*`、`screen-*`、`probe-grain`）、以及临时报告。
+> 44 个条目里只有一半是成品，「这是成品还是探针残留」看路径答不出来。
+>
+> 现在：**测试与探针产物一律写到仓库外的 `../.cache/`**，见 §5.4。
+> 判断规则简化成一条：**在 `out/` 里 = 成品；在 `.cache/` 里 = 可随时删。**
 
 > **注意一处缺口**：`docs/AGENT-REPAIR-NOTES.md` §七 交付物清单里的
 > `out/muelsyse-ginkgo-kv.png` / `.psd` / `.report.json` **不在这份拷贝里**。
 > 源头都在（`scenes/muelsyse-ginkgo.json`、`scenes/build-muelsyse-kv.mjs`、决策笔记），
-> 按 `AGENT-REPAIR-NOTES.md` 的实测基线可以重出。`engine/out/` 里现存的是 33 张
-> 迭代与探针图以及 `effect-sheet.psd`。
+> 按 `AGENT-REPAIR-NOTES.md` 的实测基线可以重出。
+
+### 5.4 `../.cache/` —— **仓库之外**（1,220 文件 · 1.14 GB）
+
+一切「按需重新生成」的东西都集中在这里，而且放在**仓库外面**（与仓库同级），
+不是放进去再 gitignore。
+
+| 目录 | 写入者 | 体积 | 可删 |
+|---|---|---|---|
+| `video/frames/` | `tools/video-probe.mjs frames` | 953 文件 / **1,084 MB** | ✅ 从原片重解码约 1 分钟 |
+| `video/hud-frames/` | 手工抽帧 | 8 文件 / 41 MB | ✅ 前提是原录像还在 |
+| `video/survey/` | `design analyze` 批量跑截图 | 25 文件 / 11 MB | ✅ |
+| `video/alpha-fixtures/` | `tools/make-alpha-fixture.mjs` | 234 文件 / 0.5 MB | ✅ |
+| `test/` | `test/run-all.mjs` | 6 文件 / 0.2 MB | ✅ 每次跑测试都重写 |
+| `render-scratch/` | 一次性探针与迭代图 | 25 文件 / 21 MB | ✅ |
+
+`D:\DSH_GDT\.cache\README.md` 是它的说明，含 `DSH_VIDEO_CACHE` 覆盖方式。
+
+> **为什么不放仓库里再 gitignore**：树里的缓存照样会被备份、被整目录搬走，
+> 最要紧的是——**照样会被误认成交付物**。代价是实测的：一次暂存扫进了
+> **948 个抽帧（1.06 GB）**；`out/` 也曾把 25 个测试/探针图混在 18 个成品里。
 
 ### 5.3 `docs/` —— 进仓库（7 文件 · 200 KB）
 
@@ -242,10 +270,10 @@ git push -u origin main
 ### 上传前的自查清单
 
 - [ ] `engine/node_modules/` 没有被加入（37.5 MB 原生二进制）
-- [ ] `engine/out/` 没有被加入（46.8 MB 构建产物）
+- [ ] `engine/out/` 没有被加入（23.4 MB 成品；测试与探针产物已移到仓库外的 `.cache/`）
 - [ ] `examples/` **在**里面（3.2 MB，是仓库唯一的成品展示）
 - [ ] `engine/scenes/.idea/` 没有被加入
-- [ ] `docs/` 三份文档都在
+- [ ] `docs/` 七份文档都在（含四份设计方法论）
 - [ ] `design/` 只有 **10** 个文件（没有残留的旧 `design-tools-*.mjs`）
 - [ ] 没有任何地方写入 harness home 的路径
 

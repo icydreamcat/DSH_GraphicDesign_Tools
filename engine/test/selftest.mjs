@@ -12,7 +12,7 @@
  */
 
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { registerFonts, fontFamilyReport, styleFor } from '../src/fonts.mjs'
@@ -26,7 +26,12 @@ import { textureStats, buildCurveTable } from '../src/tone.mjs'
 import { analyseReference } from '../src/analyze.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const outDir = join(here, '..', 'out')
+
+// Test artefacts go to the cache OUTSIDE the repository, beside it at .cache/test/.
+// `engine/out/` is for real render artifacts; a file this suite rewrites on every run
+// does not belong beside a finished deliverable, where it invites exactly the wrong
+// assumption during maintenance.
+const outDir = resolve(here, '..', '..', '..', '.cache', 'test')
 mkdirSync(outDir, { recursive: true })
 
 let failures = 0

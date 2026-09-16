@@ -92,13 +92,36 @@ const OPAQUE_RATIO = 0.15        // PRIMARY opacity test: std(element)/std(backd
                                  // what the panning-camera case actually delivers.
 
 // ---------------------------------------------------------------------------
+// WHERE SCRATCH GOES
+//
+// Video work produces the largest regeneration garbage in this project: decoding a
+// single 15-30s clip at native resolution writes 90 frames, and 948 frames / 1.06 GB
+// was measured from one ordinary recording. That must never accumulate inside the
+// repository — not even gitignored, because a gitignored cache in the tree still gets
+// backed up, copied, and confused with deliverables.
+//
+// So scratch lives OUTSIDE the repository, one level up beside it, in `.cache/video/`,
+// and DSH_VIDEO_CACHE overrides it. The dump/  frames/  tmp/  split keeps a decoded
+// frame sequence distinguishable from a one-off ffmpeg report and from a fixture we
+// deliberately want to keep.
+// ---------------------------------------------------------------------------
+const CACHE = process.env.DSH_VIDEO_CACHE
+  ? resolve(process.env.DSH_VIDEO_CACHE)
+  : resolve(HERE, '..', '..', '..', '.cache', 'video')
+
+function cacheDir(kind) {
+  const d = join(CACHE, kind)
+  mkdirSync(d, { recursive: true })
+  return d
+}
+
+// ---------------------------------------------------------------------------
 // subprocess plumbing. stdio is redirected to FILE DESCRIPTORS, never pipes:
 // under the DSH sandbox a piped child fails with EPERM, so capturing stdout the
 // usual way would break inside the very environment this tool runs in.
 // ---------------------------------------------------------------------------
 function runTool(bin, args) {
-  const td = join(HERE, '..', '.vp-tmp')
-  mkdirSync(td, { recursive: true })
+  const td = cacheDir('tmp')
   const o = join(td, `o-${process.pid}-${Math.random().toString(36).slice(2)}.txt`)
   const e = join(td, `e-${process.pid}-${Math.random().toString(36).slice(2)}.txt`)
   const ofd = openSync(o, 'w'), efd = openSync(e, 'w')
@@ -114,17 +137,25 @@ function runTool(bin, args) {
   return { status: r.status, out, err, error: r.error }
 }
 
+/**
+ * Find ffmpeg/ffprobe without hard-coding this machine.
+ *
+ * The previous version carried `join('D:', '\\', 'DSH_GDT', 'tools', 'bin', ...)` — a
+ * literal path on the author's drive. It was inert (existsSync failed and the PATH
+ * fallback took over) but it still told the next reader a wrong fact about where the
+ * binary is. Resolution order is now: explicit argument, DSH_FFMPEG/DSH_FFPROBE, a
+ * `tools/bin` beside the repository, then PATH.
+ */
 function resolveBin(explicit, name) {
   const env = process.env[name === 'ffmpeg' ? 'DSH_FFMPEG' : 'DSH_FFPROBE']
   const cands = [
     explicit,
     env,
-    join(HERE, '..', '..', '..', 'tools', 'bin', `${name}.exe`),   // workspace tools/bin
-    join('D:', '\\', 'DSH_GDT', 'tools', 'bin', `${name}.exe`),
-    name,
+    join(HERE, '..', '..', '..', 'tools', 'bin', `${name}.exe`),   // beside the repo
+    name,                                                          // PATH
   ].filter(Boolean)
   for (const c of cands) {
-    if (c === name) return c                                   // PATH fallback
+    if (c === name) return c
     if (existsSync(c)) return c
   }
   return name
@@ -218,7 +249,7 @@ function extract(input, tag = 'f') {
     console.log(`# input is a FRAME SEQUENCE (no decoder needed): ${files.length} images from ${input}`)
     console.log(`# first=${files[0].split(/[\\/]/).pop()}  last=${files[files.length - 1].split(/[\\/]/).pop()}`)
   } else {
-    const dir = join(HERE, '..', '.vp-frames', `${tag}-${process.pid}-${frameDirCache.size}`)
+    const dir = join(cacheDir('frames'), `${tag}-${process.pid}-${frameDirCache.size}`)
     rmSync(dir, { recursive: true, force: true })
     mkdirSync(dir, { recursive: true })
     const vf = []

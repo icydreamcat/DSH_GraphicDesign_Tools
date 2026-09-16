@@ -18,7 +18,8 @@
  *
  * So: saturation is measured over INKED, CHROMATIC pixels only, within bands of the
  * subject's own ink extent (found from the alpha, not assumed); and a render failure
- * aborts loudly. The four renders are written to `out/` so the numbers can be
+ * aborts loudly. The four renders are written to the test cache (`.cache/test/`, outside
+ * the repository — see TEST_OUT below) so the numbers can be
  * checked against the pictures rather than believed.
  *
  * 3. It used to load a character illustration out of `engine/assets/` by ABSOLUTE
@@ -32,11 +33,23 @@
  */
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { writeFileSync, mkdirSync } from 'node:fs'
+import { resolve, join } from 'node:path'
 import { renderScene } from '../src/render.mjs'
 
 const W = 900
 const H = 620
-const SUBJECT = 'out/scope-subject.png'
+
+// Test scratch goes to a cache OUTSIDE the repository, beside it at .cache/test/.
+//
+// WHY NOT `out/`: that directory holds real render artifacts, and mixing them with
+// files a test rewrites on every run is how a deliverable comes to be mistaken for
+// scratch during maintenance. This suite writes five files per run; they stay on disk
+// because the file's own advice is to check the numbers against the pictures — but they
+// do not belong where a finished render lives.
+const TEST_OUT = resolve(import.meta.dirname, '..', '..', '..', '.cache', 'test')
+mkdirSync(TEST_OUT, { recursive: true })
+const scratch = (name) => join(TEST_OUT, name)
+const SUBJECT = scratch('scope-subject.png')
 
 /**
  * Draw the subject this test needs, instead of loading one from `engine/assets/`.
@@ -116,7 +129,6 @@ function makeSubject() {
   return c
 }
 
-mkdirSync('out', { recursive: true })
 writeFileSync(SUBJECT, makeSubject().toBuffer('image/png'))
 
 /** A full-strength duotone to olive. Deliberately strong, so "unchanged" can only
@@ -161,7 +173,7 @@ for (const [name, scope] of Object.entries(cases)) {
     console.log('  ' + name + ': RENDER THREW -> ' + e.message)
     throw e
   }
-  writeFileSync('out/' + name + '.png', out.canvas.toBuffer('image/png'))
+  writeFileSync(scratch(name + '.png'), out.canvas.toBuffer('image/png'))
   const rec = out.report.log.find((e) => e.step === 'layer' && e.id === 'subject')
   reported[name] = rec?.drawn?.effects?.[0]?.scope ?? null
   console.log('  ' + name.padEnd(18) + ' scope in report: ' + JSON.stringify(reported[name]))
@@ -227,7 +239,7 @@ const table = {}
 for (const name of Object.keys(cases)) {
   table[name] = {}
   for (const [where, [a, b]] of Object.entries(BANDS)) {
-    table[name][where] = await oliveShare('out/' + name + '.png', a, b)
+    table[name][where] = await oliveShare(scratch(name + '.png'), a, b)
   }
 }
 
@@ -287,5 +299,5 @@ check('the report names the scope applied', reported['scope-B-bottom'] !== null,
 check('an unscoped effect reports no scope', reported['scope-A-none'] === null)
 
 console.log('\n=== ' + (failed === 0 ? checks + '/' + checks + ' scope checks passed' : failed + ' FAILED') + ' ===')
-console.log('pictures: out/scope-A-none.png, scope-B-bottom.png, scope-C-top.png, scope-D-ellipse.png')
+console.log('pictures: ' + ['scope-A-none', 'scope-B-bottom', 'scope-C-top', 'scope-D-ellipse'].map((n) => scratch(n + '.png')).join(', '))
 process.exit(failed === 0 ? 0 : 1)
