@@ -360,12 +360,12 @@ node bin/design.mjs tool <子命令>                              # 25 个会话
 pwsh jsx/psx.ps1 -Up | -Status | -Run <file.jsx> | -Down       # Photoshop 桥
 ```
 
-**全部 13 个测试套件（383 项断言，必须全绿）**：
+**全部 14 个测试套件（398 项断言，必须全绿）**：
 
 一条命令跑完，一条退出码看结论：
 
 ```powershell
-node test/run-all.mjs            # 13 套全跑，任一失败即非零退出
+node test/run-all.mjs            # 14 套全跑，任一失败即非零退出
 ```
 
 `run-all.mjs` 会**拒绝运行**「存在于 `test/` 但不在它清单里」的套件，所以新增测试文件
@@ -381,6 +381,7 @@ node test/scope-regions.mjs      #  9  作用范围（真实渲染管线）
 node test/scope-conflicts.mjs    # 13  作用范围冲突检测与 replace 语义
 node test/render-regressions.mjs # 11  line 坐标、halftone knockout
 node test/scale.mjs              # 26  缩放契约（--scale；见 §十）
+node test/analyze-flatness.mjs   # 15  区域平涂统计（见 §十一）
 node test/selftest.mjs           # 42  引擎自检
 node test/psd-roundtrip.mjs      # 24  PSD 结构校验
 node test/tool-schemas.mjs       #  8  preset 工具 schema

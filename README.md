@@ -16,7 +16,7 @@
 
 ```
 DSH_GraphicDesign_Tools/
-├── design/       ← AGENT：preset 的规范源（8 工具 + 6 技能 + 常驻审美纪律）
+├── design/       ← AGENT：preset 的规范源（8 工具 + 7 技能 + 常驻审美纪律）
 ├── engine/       ← 工具：Node 渲染引擎、25 个会话工具、Photoshop 桥
 ├── examples/     ← 产出：3 张成品图（进仓库的精选）
 ├── docs/         ← 说明：需求简报 + 交接 + 复盘
@@ -36,7 +36,7 @@ DSH_GraphicDesign_Tools/
 # 1. 依赖（只有一个：@napi-rs/canvas，含平台原生二进制）
 cd engine; npm install
 
-# 2. 全部测试：13 套、383 项断言
+# 2. 全部测试：14 套、398 项断言
 node test/run-all.mjs
 
 # 3. 出一张图试试
@@ -104,7 +104,7 @@ path / text / image / group / adjustment）。长度 ≤1 是画布比例，>1 �
 
 ## 状态
 
-引擎 13 套测试全绿（`node test/run-all.mjs`，exit 0）；preset 挂载通过。
+引擎 14 套测试全绿（`node test/run-all.mjs`，exit 0）；preset 挂载通过。
 **尚未在真实会话中运行过**——`design` preset 从未被任何一次会话选中，`design_render`
 也从未被真正调用过。挂载、schema、引擎三条都有验证，「模型能调得动这 8 个工具」还缺
 一次真实运行。
@@ -113,7 +113,7 @@ path / text / image / group / adjustment）。长度 ≤1 是画布比例，>1 �
 
 这个仓库交付的是**工具链**，不是这台机器的旧成品。所以：
 
-- ✅ 引擎、25 个会话工具、8 个 preset 工具、**全部 13 套测试**——开箱可用；
+- ✅ 引擎、25 个会话工具、8 个 preset 工具、**全部 14 套测试**——开箱可用；
 - ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材
   （`engine/assets/`、`engine/refs/`）是本机专用的输入，刻意未纳入版本控制，
   且场景里的 `src` 是绝对路径。

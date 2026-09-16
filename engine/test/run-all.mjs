@@ -22,6 +22,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 // cheap suite fails the run before the slow ones spend time.
 const SUITES = [
   'scale.mjs',
+  'analyze-flatness.mjs',
   'render-regressions.mjs',
   'scope-regions.mjs',
   'scope-conflicts.mjs',

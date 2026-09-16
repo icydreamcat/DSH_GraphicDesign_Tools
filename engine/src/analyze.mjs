@@ -129,6 +129,67 @@ export function luminanceHistogram(img, bins = 32) {
 }
 
 /**
+ * How much of a region is ONE flat colour, and how many colours it distinguishes.
+ *
+ * WHY THESE TWO NUMBERS EXIST
+ * ---------------------------
+ * The cheapest way to make a layout measure "the same" as a reference is to match its
+ * AREA: the reference gives 42% of the canvas to a region, so a 42%-sized block goes
+ * there. The area matches and the design is zero, because the reference's 42% was not a
+ * colour — it was an organised surface with internal hierarchy. A fill was substituted
+ * for an organisation, and nothing in a flat area measurement can see the difference.
+ *
+ * These two statistics separate them directly:
+ *   dominantFlatShare — the most frequent single colour, as a share of the region.
+ *   distinctColours   — how many different colours appear in it.
+ *
+ * Measured anchors (a shipped design language's UI surfaces): dominant flat 3.0%-20.8%
+ * and 188-7032 colours. A block reads 42.8%/327 and 87.6%/191; a designed surface reads
+ * 3.5%/234. The threshold used by the rule is dominant flat < 25%.
+ *
+ * QUANTISATION IS 5 BITS PER CHANNEL, deliberately, to match findAccents(). Raw 8-bit
+ * RGB counts are dominated by antialiasing: every glyph edge invents colours, so a
+ * region holding one line of text would score thousands of "distinct colours" without
+ * being organised. Quantising measures the same thing at the scale a reader sees. The
+ * consequence to remember when comparing against a figure from elsewhere: a raw-RGB
+ * count will come out higher than these.
+ *
+ * Fully transparent pixels are excluded — a transparent region is not a designed surface.
+ *
+ * @param {{width:number,height:number,data:Uint8ClampedArray}} img
+ * @param {{x:number,y:number,w:number,h:number}} region - fractional, 0..1
+ * @returns {{dominantFlatShare:number, distinctColours:number, opaquePixels:number}}
+ */
+export function regionFlatness(img, region) {
+  const x0 = Math.max(0, Math.floor(region.x * img.width))
+  const y0 = Math.max(0, Math.floor(region.y * img.height))
+  const x1 = Math.min(img.width, Math.ceil((region.x + region.w) * img.width))
+  const y1 = Math.min(img.height, Math.ceil((region.y + region.h) * img.height))
+
+  const counts = new Map()
+  let opaque = 0
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      const i = (y * img.width + x) * 4
+      if (img.data[i + 3] < 8) continue
+      opaque++
+      const key = ((img.data[i] >> 3) << 10) | ((img.data[i + 1] >> 3) << 5) | (img.data[i + 2] >> 3)
+      counts.set(key, (counts.get(key) || 0) + 1)
+    }
+  }
+  if (opaque === 0) return { dominantFlatShare: 0, distinctColours: 0, opaquePixels: 0 }
+
+  let top = 0
+  for (const n of counts.values()) if (n > top) top = n
+  return {
+    dominantFlatShare: round3(top / opaque),
+    distinctColours: counts.size,
+    opaquePixels: opaque,
+  }
+}
+
+
+/**
  * Find the accent colours: the most chromatic pixels, not the most common.
  *
  * A NOTE ON WHAT "ACCENT" MEANS HERE
@@ -657,7 +718,10 @@ export async function analyseReference(src, options = {}) {
     structure: {
       elementCount: elements.elementCount,
       groundLuminance: elements.ground.luminance,
-      regions: elements.regions.slice(0, 24),
+      // Each region carries dominantFlatShare and distinctColours, so "is this large area
+      // an organised surface or a filled block" is answerable per region rather than only
+      // for the whole frame. See regionFlatness() for why those two numbers exist.
+      regions: elements.regions.slice(0, 24).map((r) => ({ ...r, ...regionFlatness(img, r) })),
       strokeWeights: strokes.weights,
       strokeMedian: strokes.median,
       hairlineShare: strokes.share1px,
