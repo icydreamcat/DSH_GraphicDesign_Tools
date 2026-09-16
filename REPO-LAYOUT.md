@@ -76,8 +76,9 @@
 >
 > **测试自给自足是这次的关键改动**，因为原来的套件机器绑死：
 > `scope-regions.mjs` 用绝对路径加载 `assets/haruka-figure.png`；
-> `tool-schemas.mjs` / `tool-registry-gate.mjs` 把**用户名**写死在路径里
-> （`C:/Users/iced're'a'm/...`），而且指向的是**部署副本**而不是仓库源。
+> `tool-schemas.mjs` / `tool-registry-gate.mjs` 把 **Windows 用户名**写死在路径里
+> （`C:/Users/<用户名>/...`，且空格之类还被 URL 编码成 `%27`），
+> 而且指向的是**部署副本**而不是仓库源。
 > 结果是：除了原作者这台机器，**任何人在任何地方都跑不了这套测试**。
 > 现在改为运行时解析（`engine/test/_preset-locate.mjs`），并支持
 > `DSH_TOOLS_DIR` / `DSH_PRESET_DIR` 覆盖。
