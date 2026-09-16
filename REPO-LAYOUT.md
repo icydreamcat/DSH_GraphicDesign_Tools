@@ -6,7 +6,7 @@
 
 - 仓库根：`DSH_GraphicDesign_Tools/`
 - 首次运行：`engine/` 里 `npm install`，然后根目录 `node deploy-preset.mjs`
-- 全部测试：`cd engine; node test/run-all.mjs`（15 套、413 项断言）
+- 全部测试：`cd engine; node test/run-all.mjs`（15 套、416 项断言）
 
 ---
 
@@ -15,7 +15,7 @@
 | 你要找的 | 在哪 | 是什么 | 进 GitHub |
 |---|---|---|---|
 | **环境** | 仓库根 4 个文件 | 让上面三样跑起来的胶水 | ✅ |
-| **工具** | `engine/` | Node 渲染引擎 + 25 个会话工具 + Photoshop 桥 | ✅ 源码<br>❌ 依赖、产物 |
+| **工具** | `engine/` | Node 渲染引擎 + 28 个会话工具 + Photoshop 桥 | ✅ 源码<br>❌ 依赖、产物 |
 | **Agent** | `design/` | 唯一的 preset 规范源（10 文件 + 7 技能） | ✅ |
 | **设计产出** | `examples/`（精选）<br>`engine/out/`（全部） | 成品图、效果对照表 | ✅ 精选<br>❌ 其余 |
 | 说明 | `docs/` | 需求简报 + 交接 + 复盘 | ✅ |
@@ -69,7 +69,7 @@
 >
 > | 新克隆的人 | 能用吗 |
 > |---|---|
-> | 引擎、25 个会话工具、8 个 preset 工具 | ✅ |
+> | 引擎、28 个会话工具、8 个 preset 工具 | ✅ |
 > | 全部 15 套测试（`node test/run-all.mjs`） | ✅ **完整可用**——为此专门把测试改成自给自足 |
 > | 渲染 `engine/scenes/*.json` | ❌ 它们的 `src` 是绝对路径，素材也不在 |
 > | 重出 `examples/` 里的图 | ❌ 同上 |
@@ -237,19 +237,31 @@ Agent 自己用的文档库，三类：
 
 ---
 
-## 五之三、工作区：仓库之外的三块区域（本次新增，克隆后自动生成）
+## 五之三、工作区：仓库之外的区域
 
-仓库只是工作区的一半。旁边还有三块区域，**必须存在、不进版本控制、且新克隆会自动生成**：
+仓库只是工作区的一半。旁边还有几块区域，**必须存在、不进版本控制、且新克隆会自动生成**（`knowledge/` 例外，它由 Agent 逐步积累）：
 
 ```
 D:\DSH_GDT\                        ← 工作区根（WORKSPACE）
 ├── DSH_GraphicDesign_Tools\       ← 本仓库
-├── assets\                        ← ① 共享素材库（通用设计素材，每次生成都读）
+├── knowledge\                     ← 复盘与参考库（agent 自己用；见 §5.5）
+│   ├── reference\  tooling\  agent\
+├── assets\                        ← 共享素材库（通用设计素材，每次生成都读）
 │   ├── icons\  textures\  type\  plates\
-├── projects\                      ← ② 项目区（按项目排序，每个项目自带私有素材）
-├── .cache\                        ← ③ 生成缓存（可随时删）
-└── refs\                          ← 参考素材（用来量，不交付）
+├── projects\                      ← 项目区（按项目排序，每个项目自带私有素材）
+├── refs\                          ← 供测量的参考素材（截图/录像/官网源文件）
+├── .cache\                        ← 生成缓存（可随时删）
+└── tools\bin\ffmpeg.exe           ← 共享工具，video-probe.mjs 自己会找到它
 ```
+
+> `refs/` 与 `assets/` 的区别，别混：
+> **`refs/` 是拿来「量」的**（别人的截图、录像、官网源文件，用来推导规格）；
+> **`assets/` 是拿来「用」的**（标记、纹理、字体参考、底板，直接进版面）。
+> 一个是读的对象，一个是写的材料。
+
+> `tools/bin/ffmpeg.exe`（77 MB）留在这里而不是进仓库：它是**平台二进制**，
+> 提交了在别的机器上就是错的。`video-probe.mjs` 按
+> 「显式参数 → `DSH_FFMPEG` → 仓库旁的 `tools/bin` → PATH」的顺序自己找它。
 
 ### 5.3.1 三块区域的分工，以及**素材该放哪**
 
@@ -323,12 +335,12 @@ node new-project.mjs --list         # 看项目；建新的：node new-project.m
 
 ---
 
-## 六、测试（`node test/run-all.mjs` · 15 套 · 413 项）
+## 六、测试（`node test/run-all.mjs` · 15 套 · 416 项）
 
 ```
 scale.mjs                26   缩放契约（--scale 双重缩放，见 §十）
 analyze-flatness.mjs     15   区域平涂统计（主导平涂 / 可分辨色数）
-workspace-layout.mjs     15   工作区布局：两张表一致、三区在仓库之外
+workspace-layout.mjs     18   工作区布局：两张表一致、三区在仓库之外
 render-regressions.mjs   11   line 坐标、halftone knockout
 scope-regions.mjs         9   作用范围（真实渲染管线，自给自足 fixture）
 scope-conflicts.mjs      13   范围冲突与 replace 语义
