@@ -77,6 +77,7 @@ if (command === undefined || command === '-h' || command === '--help') {
     '  palette show   <preset> [--params JSON]      # the operator graph a preset builds\n' +
     '  palette apply  <image> <preset> [--params JSON] [--out FILE] [--graph FILE]\n' +
     '  palette run    <image> --graph FILE [--out FILE]\n' +
+    '  check-render <png> --report R.json [--zones Z.json] [--draw OUT.png]  # measure a built PNG\n' +
     '  tool    [--list | --describe NAME | <name> [args...]]   # the session tool roster\n' +
     '  fonts\n' +
     '  ladder  [--base N] [--ratio N] [--steps N]\n' +
@@ -245,6 +246,18 @@ if (command === 'palette') {
     inertSteps: r.steps.filter((s) => s.suspicious).length,
   })
   process.exit(0)
+}
+
+// ── check-render ────────────────────────────────────────────────────────────
+//
+// Reading the DELIVERED pixels is a question the scene cannot answer: `verifyScene` sees a text
+// layer's declared colour and the scene's declared ground, never what ended up under the letters.
+// The check itself lives in `tools/check-render.mjs` with the rest of the measurement probes, and
+// is reached through `design tool check-render` as well. This alias exists so the one command a
+// delivery step needs is discoverable from `--help` rather than from a directory listing.
+if (command === 'check-render') {
+  const { runTool } = await import('../src/tools-roster.mjs')
+  process.exit(await runTool('check-render', argv.slice(1)))
 }
 
 // ── tool ────────────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * The renderer.
  *
  * ARCHITECTURE
@@ -792,6 +792,9 @@ async function drawTextLayer(g, layer, env) {
   const text = layer.text === undefined ? '' : String(layer.text)
   const align = layer.align === undefined ? 'left' : layer.align
   const color = typeof layer.paint === 'string' ? layer.paint : (layer.color === undefined ? '#000000' : layer.color)
+  // One normalised copy for the report, so a consumer compares `#RRGGBBAA` against `#RRGGBBAA`
+  // regardless of which of the several accepted colour forms the scene used.
+  const paint = toHex8(color)
 
   const x = resolveX(layer.x, W, 0)
   const y = resolveY(layer.y, H, 0)
@@ -799,12 +802,12 @@ async function drawTextLayer(g, layer, env) {
 
   if (layer.vertical === true) {
     const r = drawVerticalText(g, text, x, y, font.stack, font.spec, font.trackingEm, cssColor(parseColor(color)))
-    return { mode: 'vertical', x: round(x), y: round(y), height: round(r.height), characters: r.characters }
+    return { mode: 'vertical', x: round(x), y: round(y), height: round(r.height), characters: r.characters, paint }
   }
 
   if (layer.path !== undefined && layer.path !== null) {
     const r = drawTextOnPath(g, text, layer.path, font.stack, font.spec, font.trackingEm, cssColor(parseColor(color)))
-    return { mode: 'path', placed: r.placed }
+    return { mode: 'path', placed: r.placed, paint }
   }
 
   let spec = font.spec
@@ -854,6 +857,14 @@ async function drawTextLayer(g, layer, env) {
   const blockHeight = layout.lines.length * lineHeight
   return {
     mode: 'block',
+    // The ink the scene asked for, recorded in the report rather than only in the scene.
+    //
+    // A report has to describe its own render. Without this, anything auditing the finished
+    // PNG knows where the type is but not what colour it was meant to be — so it has to infer
+    // the ink from the pixels, and inferring it from the darkest and lightest pixels of a text
+    // box reads anti-aliased type on a light ground as 2.5:1 when the type is perfectly legible.
+    // That mistake was made, measured, and is why this field exists.
+    paint,
     lines: layout.lines.length,
     widest: round(layout.widest),
     boxWidth: round(boxW),

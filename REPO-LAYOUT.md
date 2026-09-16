@@ -18,7 +18,7 @@
 | 你要找的 | 在哪 | 是什么 | 进 GitHub |
 |---|---|---|---|
 | **环境** | 仓库根 5 个脚本/配置 | 让其余三样跑起来的胶水 | ✅ |
-| **工具** | `engine/` | Node 渲染引擎 + 28 个会话工具 + Photoshop 桥 | ✅ 源码<br>❌ 依赖、产物 |
+| **工具** | `engine/` | Node 渲染引擎 + 29 个会话工具 + Photoshop 桥 | ✅ 源码<br>❌ 依赖、产物 |
 | **Agent** | `design/` | preset 的规范源：8 工具 + 7 技能 + 常驻纪律 | ✅ |
 | **产出** | `examples/`（精选，进仓库）<br>`engine/out/`（成品，不进） | 成品图、效果对照表 | ✅ 精选 |
 | **文档** | `docs/`（进仓库，2 份）<br>`../knowledge/`（不进，复盘库） | 方法论 vs 复盘素材 | 部分 |
@@ -60,13 +60,47 @@ config.engineDir  >  环境变量 DSH_DESIGN_ENGINE  >  preset 模块内的内�
 |---|---|
 | `engine/bin/` | `design.mjs` —— **全部 CLI 子命令的唯一入口** |
 | `engine/src/` | 引擎本体：`render` `text` `color` `effects` `filters` `tone` `measure` `kernel` `palette` `presets` `analyze` `verify` `psd` `psd-read` `fonts` `scale` `paths` `tools-roster` |
-| `engine/tools/` | 会话工具，量测与审计为主：`crop-view` `font-try` `subject-probe` `audit-plant` `video-probe` … |
+| `engine/tools/` | 会话工具，量测与审计为主：`crop-view` `font-try` `subject-probe` `audit-plant` `video-probe` `check-render` … |
 | `engine/test/` | 测试套件 + `run-all.mjs` + `_preset-locate.mjs`（辅助，不是套件） |
 | `engine/jsx/` | Photoshop 桥：`psx.ps1` + 4 个 JSX 探针 |
 | `engine/scenes/` | 场景 JSON（**设计的源码**）+ 生成器 `build-*.mjs` + 决策笔记 |
 | `engine/package.json` · `package-lock.json` | 依赖声明。只依赖 `@napi-rs/canvas` |
 
-**CLI 子命令**（9 个）：`render` `analyze` `critique` `verify` `fonts` `ladder` `ramp` `palette` `tool`。
+**CLI 子命令**（10 个）：`render` `analyze` `critique` `verify` `check-render` `fonts` `ladder` `ramp` `palette` `tool`。
+
+`check-render` 是 `design tool check-render` 的别名，为的是让交付步骤要用的那条命令能从 `--help` 里看到。
+它的判据与其它工具一样在 `tools/` 里，不在入口——入口只负责找得到。
+
+#### `check-render` —— 在**交付的那张图**上量文字
+
+```powershell
+node bin/design.mjs check-render out/poster.png --report out/poster.report.json
+node bin/design.mjs check-render out/poster.png --zones my-zones.json --draw out/zoned.png
+```
+
+**它补的是 `verifyScene` 结构上做不到的那件事。** 场景级检查只能拿文字层声明的颜色去比**页面声明的
+`ground`**，它永远看不到字底下实际是什么——那正是 `scene.allow` 那张豁免清单存在的原因。
+而这个工具读的是成品像素，也**只读成品像素**。
+
+**为什么必须是成品**：另一张海报曾在 hero 合成图上量，那是效果与新图层**之前**的状态；
+在成品上同一批区是 3.7:1 与 3.9:1。量测本身没错，**被量的对象错了**。
+
+**两个读数，因为它们在两处各自失明：**
+
+| 读数 | 是什么 | 什么时候用 |
+|---|---|---|
+| 屏幕上 | 区内像素的**墨核与底核**之比（不需要事先知道墨色） | 描述读者实际看到的对比 |
+| 声明 | 场景里写的墨色对实测底子 + **屏幕上的墨是否还是那个墨** | 抓「效果改了字形、没改声明色」 |
+
+第二列是**这个工具存在的理由**。曾经有两版文字报「80 层全部 ≥ 4.5:1」而字是灰的：一个
+`outerGlow` 配 `blend: 'normal'` 把暗色**盖在笔画上**，声明的墨色没变、底子没变，改的是字形——
+凡是拿那两个输入作比较的检查都看不见它。
+
+**判据（WCAG 那一套，不另立标准）**：`ok` = 比值 ≥ 4.5 且底子撑不住的 < 10%；`warn` = ≥ 4.0 且 < 20%；
+其余 `LOW`。退出码只在 `LOW` 时非零——`warn` 是「该有人看一眼」的带，让它在 `warn` 上失败会开始逼版面改形状。
+
+**它不做的**：不判断低对比是不是有意为之（水印、压下去的字是设计决定），也量不了
+「字被效果打碎了」这类比值之外的事。这两条写在 JSON 的 `limits` 里，不写在注释里。
 
 ### 3.2 不进仓库的部分
 
@@ -81,7 +115,7 @@ config.engineDir  >  环境变量 DSH_DESIGN_ENGINE  >  preset 模块内的内�
 
 | 新克隆的人 | 能用吗 |
 |---|---|
-| 引擎、28 个会话工具、8 个 preset 工具 | ✅ |
+| 引擎、29 个会话工具、8 个 preset 工具 | ✅ |
 | 全部测试（`node test/run-all.mjs`） | ✅ **完整可用**——测试自给自足 |
 | 7 个技能与 2 份方法论（`docs/`） | ✅ 新克隆即可自举 |
 | 渲染 `engine/scenes/*.json` | ❌ 素材不在，且它们的 `src` 是绝对路径 |

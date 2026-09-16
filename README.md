@@ -56,7 +56,7 @@
 ```
 DSH_GraphicDesign_Tools/
 ├── design/       ← AGENT：preset 的规范源（8 工具 + 7 技能 + 常驻审美纪律）
-├── engine/       ← 工具：Node 渲染引擎、28 个会话工具、Photoshop 桥
+├── engine/       ← 工具：Node 渲染引擎、29 个会话工具、Photoshop 桥
 ├── examples/     ← 产出：精选成品图
 ├── docs/         ← 方法论：两份规范（新克隆自举用）
 ├── deploy-preset.mjs    ← 把 design/ 装进 harness
@@ -80,7 +80,7 @@ cd engine; npm install
 # 2. 生成工作区外围（素材库 / 项目区 / 缓存）—— 幂等，可随时再跑
 cd ..; node bootstrap-workspace.mjs
 
-# 3. 全部测试：15 套、416 项断言
+# 3. 全部测试：16 套、448 项断言
 cd engine; node test/run-all.mjs
 
 # 4. 出一张图试试
@@ -165,7 +165,7 @@ node bin/design.mjs critique <png>                                    # 四问�
 node bin/design.mjs verify   <scene.json>                             # 反模式硬约束
 node bin/design.mjs fonts | ladder | ramp                             # 设计系统原语
 node bin/design.mjs palette  <子命令>                                 # 滤镜词汇表（算子图）
-node bin/design.mjs tool     --list                                   # 28 个会话工具的名册
+node bin/design.mjs tool     --list                                   # 29 个会话工具的名册
 ```
 
 **场景是声明式的**：一块画布、一个底色、一叠图层（rect / ellipse / line / polygon /
@@ -227,13 +227,13 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 ## 状态
 
-引擎 **15 套测试全绿**（`node test/run-all.mjs`，exit 0，**416 项断言**）；preset 挂载通过。
+引擎 **16 套测试全绿**（`node test/run-all.mjs`，exit 0，**448 项断言**）；preset 挂载通过。
 
 **全链路可用。** preset 能挂载 → 技能能加载 → 工具能出图 → 分层 PSD 能写出，
 每一环都产出过实物：多页 deck（含逐页 `report.json` 与交付 `.pptx`）、KV
 （成品 `.png` 与**分层 `.psd`**）。
 
-**但「能用」不等于「测到」。** `bin/design.mjs` 的 9 个子命令**没有一个被测试经由程序路径执行过**
+**但「能用」不等于「测到」。** `bin/design.mjs` 的 10 个子命令**没有一个被测试经由程序路径执行过**
 ——模块级断言覆盖不到参数解析与子命令分发，而 agent 的 8 个工具**恰恰通过子命令调用引擎**。
 `--scale` 的比例错误就是在这条真空里出的：它渲染出了错误的画面，而报告始终 0 error / 0 warning。
 详见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §8.1。
@@ -242,7 +242,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 这个仓库交付的是**工具链**，不是这台机器的旧成品：
 
-- ✅ 引擎、28 个会话工具、8 个 preset 工具、**全部 15 套测试**——开箱可用；
+- ✅ 引擎、29 个会话工具、8 个 preset 工具、**全部 16 套测试**——开箱可用；
 - ✅ 7 个技能与两份方法论规范，新克隆即可自举；
 - ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材是本机专用的输入，
   刻意未纳入版本控制。
@@ -252,7 +252,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 **工具链自身的技术性与流程性缺口**见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。其中两条最实在的：
 
-- **CLI 入口从未被端到端测试。** 模块级测试很密（416 项断言），但 `bin/design.mjs`
+- **CLI 入口从未被端到端测试。** 模块级测试很密（448 项断言），但 `bin/design.mjs`
   的 10 个子命令没有一个被测试经由程序路径跑过——而 agent 的 8 个工具**恰恰通过子命令调用引擎**。
   `--scale` 那个「宽度乘两次、高度一次不乘而报告全绿」的 bug，就长在这个洞上。
 - **没有任何自动化在跑这套测试。** 无 CI、无根 `package.json`，`run-all.mjs` 的执行全靠自觉。

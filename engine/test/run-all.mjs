@@ -23,6 +23,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const SUITES = [
   'scale.mjs',
   'analyze-flatness.mjs',
+  'check-render.mjs',
   'workspace-layout.mjs',
   'render-regressions.mjs',
   'scope-regions.mjs',
