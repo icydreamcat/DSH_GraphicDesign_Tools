@@ -55,10 +55,10 @@
 
 ```
 DSH_GraphicDesign_Tools/
-├── design/       ← AGENT：preset 的规范源（8 工具 + 7 技能 + 常驻审美纪律）
+├── design/       ← AGENT：preset 的规范源（8 工具 + 9 技能 + 常驻审美纪律）
 ├── engine/       ← 工具：Node 渲染引擎、29 个会话工具、Photoshop 桥
 ├── examples/     ← 产出：精选成品图
-├── docs/         ← 方法论：两份规范（新克隆自举用）
+├── docs/         ← 文档：`rules/` 九份规则 + 两份方法论（新克隆自举用）
 ├── deploy-preset.mjs    ← 把 design/ 装进 harness
 ├── bootstrap-workspace.mjs ← 生成工作区外围（素材库/项目区/缓存）
 ├── new-project.mjs      ← 开一个新项目
@@ -67,8 +67,25 @@ DSH_GraphicDesign_Tools/
 └── REPO-LAYOUT.md       ← 每个目录的归属与边界（先读这个）
 ```
 
-`design/` 是 agent，`engine/` 是它的工具，`examples/` 是它的作品。
+`design/` 是 agent，`engine/` 是它的工具，`examples/` 是它的作品，
+`docs/rules/` 是**可以直接照着做的规则**。
 **完整分类见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md)。**
+
+### 想直接用规则，从 `docs/rules/` 开始
+
+那九份是**纯结论与规则**，按内容分类——不讲"怎么得来的、曾经错在哪"，
+只写照着做什么、以及什么算错。每份末尾都有禁止清单。
+
+| 规则 | 什么时候看 |
+|---|---|
+| [`rules/README.md`](docs/rules/README.md) | 第一次读，先看索引与三类内容的分工 |
+| [`rules/设计判断.md`](docs/rules/设计判断.md) | 画面不对又说不清为什么时 |
+| [`rules/交付与检查.md`](docs/rules/交付与检查.md) | 交付之前逐条过 |
+| [`rules/深色界面-完整做法.md`](docs/rules/深色界面-完整做法.md) | 要做一套界面语言时 |
+| `rules/测量与清点.md` · `排版与字阶.md` · `色彩系统.md` · `版式与网格.md` · `制作与材质.md` | 各自对应的工作阶段 |
+
+**规则背后的案例不随仓库发布**：别人的作品拆解、实测数据、课程笔记留在本地，
+那些是**证据**，不是执行件。一份只想照做的人不该被迫先读几万字的实测过程。
 
 ### 一份锁着的文档
 
@@ -97,7 +114,7 @@ cd engine; npm install
 # 2. 生成工作区外围（素材库 / 项目区 / 缓存）—— 幂等，可随时再跑
 cd ..; node bootstrap-workspace.mjs
 
-# 3. 全部测试：16 套、448 项断言
+# 3. 全部测试：20 套、537 项断言
 cd engine; node test/run-all.mjs
 
 # 4. 出一张图试试
@@ -250,7 +267,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 ## 状态
 
-引擎 **16 套测试全绿**（`node test/run-all.mjs`，exit 0，**448 项断言**）；preset 挂载通过。
+引擎 **20 套测试全绿**（`node test/run-all.mjs`，exit 0，**537 项断言**）；preset 挂载通过。
 
 **全链路可用。** preset 能挂载 → 技能能加载 → 工具能出图 → 分层 PSD 能写出，
 每一环都产出过实物：多页 deck（含逐页 `report.json` 与交付 `.pptx`）、KV
@@ -265,7 +282,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 这个仓库交付的是**工具链**，不是这台机器的旧成品：
 
-- ✅ 引擎、29 个会话工具、8 个 preset 工具、**全部 16 套测试**——开箱可用；
+- ✅ 引擎、29 个会话工具、8 个 preset 工具、**全部 20 套测试**——开箱可用；
 - ✅ 9 个技能与两份方法论规范，新克隆即可自举；
 - ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材是本机专用的输入，
   刻意未纳入版本控制。
@@ -275,7 +292,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 **工具链自身的技术性与流程性缺口**见 [`REPO-LAYOUT.md`](REPO-LAYOUT.md) §八。其中两条最实在的：
 
-- **CLI 入口从未被端到端测试。** 模块级测试很密（448 项断言），但 `bin/design.mjs`
+- **CLI 入口从未被端到端测试。** 模块级测试很密（537 项断言），但 `bin/design.mjs`
   的 10 个子命令没有一个被测试经由程序路径跑过——而 agent 的 8 个工具**恰恰通过子命令调用引擎**。
   `--scale` 那个「宽度乘两次、高度一次不乘而报告全绿」的 bug，就长在这个洞上。
 - **没有任何自动化在跑这套测试。** 无 CI、无根 `package.json`，`run-all.mjs` 的执行全靠自觉。
