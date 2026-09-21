@@ -25,7 +25,11 @@ const SUITES = [
   'analyze-flatness.mjs',
   'check-render.mjs',
   'workspace-layout.mjs',
+  // Cheap, and it is the gate that says whether the harness is loading the preset this
+  // repository describes — so it runs before anything that spends time on pixels.
+  'deploy-drift.mjs',
   'render-regressions.mjs',
+  'input-spellings.mjs',
   'scope-regions.mjs',
   'scope-conflicts.mjs',
   'filters.mjs',

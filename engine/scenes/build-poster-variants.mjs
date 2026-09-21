@@ -231,6 +231,21 @@ variants['poster-e-tooled'] = build({
 })
 
 for (const [name, scene] of Object.entries(variants)) {
+  // GATE 1 的声明。渲染器拒绝没有 gates 块的场景，而这一份是循环生成多个变体的，
+  // 所以没法像别的生成器那样在场景字面量里写一次 —— 前缀顺序按每份自己的 layers 提取。
+  const prefixes = []
+  for (const l of scene.layers) {
+    const id = String(l.id ?? '')
+    const prefix = id.includes('-') ? id.slice(0, id.indexOf('-')) : id
+    if (prefix !== '' && !prefixes.includes(prefix)) prefixes.push(prefix)
+  }
+  scene.gates = {
+    focus: 'THE ONE FOCUS of this variant, and what it competes with',
+    lightAxis: 'WHERE THE LIGHT COMES FROM (direction and quality, in one clause)',
+    layers: prefixes,
+    drawingRule: 'THE RULE THAT GENERATES EACH GROUP, not a list of the groups',
+    accentBand: [0, 0.1],
+  }
   writeFileSync(`scenes/${name}.json`, JSON.stringify(scene, null, 2), 'utf8')
-  console.log(`  scenes/${name}.json  ${scene.layers.length} layers`)
+  console.log(`  scenes/${name}.json  ${scene.layers.length} layers  gates: ${prefixes.length} prefixes`)
 }

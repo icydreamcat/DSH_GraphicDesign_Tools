@@ -46,7 +46,7 @@ import { isAbsolute, resolve } from 'node:path'
 
 import { parseColor, cssColor, clamp, resolvePaint, toHex8 } from './color.mjs'
 import { LAYER_EFFECTS, alphaPlane, resolveScope, blendByScope } from './effects.mjs'
-import { SAT_FILTERS } from './filters.mjs'
+import { SAT_FILTERS, FILTER_DEFAULT_RADIUS } from './filters.mjs'
 import { run as runPalette } from './palette.mjs'
 import {
   parseFontSpec, measureLine, layoutParagraph, drawLine, strokeLine,
@@ -54,9 +54,10 @@ import {
 } from './text.mjs'
 import {
   halftoneScreen, grain, duotone, curves, hueSaturation,
-  desaturate, toneWipe, textureStats,
+  desaturate, toneWipe, textureStats, HALFTONE_DEFAULT_CELL,
 } from './tone.mjs'
 import { face } from './fonts.mjs'
+import { inflateScene, downsampleRGBA, scalePixelKeys, resolveSupersample } from './supersample.mjs'
 
 /** Canvas blend modes the renderer accepts, matching Photoshop's set. */
 export const BLEND_MODES = new Set([
@@ -65,13 +66,37 @@ export const BLEND_MODES = new Set([
   'exclusion', 'hue', 'saturation', 'color', 'luminosity',
 ])
 
-/** `normal` is Photoshop's name for the canvas default. */
-function toCompositeOp(mode) {
+/**
+ * The ONE blend-mode vocabulary and the ONE error message for it.
+ *
+ * WHY THIS IS EXPORTED AND NOT INLINED
+ * ------------------------------------
+ * A blend mode can be written in two places: on a layer (where this file composites
+ * it) and inside an effect spec (where `effects.mjs` composites it with its own
+ * `overImage`). The layer path was checked here and the effect path was checked
+ * NOWHERE, so the two spellings of the same mistake behaved differently: a typo on a
+ * layer failed its layer loudly, and a typo in an effect spec — `softLight` written
+ * for `soft-light` — raised nothing at all and composited as `normal`
+ * (see `overImage`, which is where both are now refused). Two vocabularies for one
+ * field is how that happens, so there is one function, used by both paths, and its
+ * message names the offending value and every accepted one — a failed layer surfaces
+ * through the per-layer catch as a warning, and a warning has to be actionable on
+ * its own.
+ *
+ * @param {unknown} mode
+ * @returns {string} the canvas composite operation for `mode`
+ */
+export function assertBlendMode(mode) {
   if (mode === undefined || mode === null || mode === 'normal') return 'source-over'
   if (!BLEND_MODES.has(mode)) {
     throw new Error(`unknown blend mode "${mode}". Known: ${[...BLEND_MODES].join(', ')}`)
   }
   return mode
+}
+
+/** `normal` is Photoshop's name for the canvas default. */
+function toCompositeOp(mode) {
+  return assertBlendMode(mode)
 }
 
 /**
@@ -199,8 +224,8 @@ export function applyMask(layerImg, maskImg, options = {}) {
  * Render one scene.
  *
  * @param {object} scene
- * @param {{pool?: BufferPool, baseDir?: string}} [options]
- * @returns {Promise<{canvas: object, report: object}>}
+ * @param {{pool?: BufferPool, baseDir?: string, captureLayers?: boolean, supersample?: number}} [options]
+ * @returns {Promise<{canvas: object, report: object, layers: object[]|null}>}
  */
 export async function renderScene(scene, options = {}) {
   const pool = options.pool === undefined ? new BufferPool() : options.pool
@@ -217,13 +242,30 @@ export async function renderScene(scene, options = {}) {
   if (scene === null || typeof scene !== 'object') {
     throw new Error('scene must be an object')
   }
-  const doc = scene.canvas
+
+  // Supersampling is not a canvas transform and not a resize of the result: the
+  // SAME scene goes through the same code with its absolute lengths multiplied, so
+  // the larger canvas draws the same picture with finer sampling. At 1 — the
+  // default — nothing is copied and nothing is multiplied: `target` IS the caller's
+  // scene object, so the default path is the path it has always been, and the
+  // delivered PNG is byte-identical to what it was before this option existed.
+  const ss = resolveSupersample(options.supersample)
+  const target = ss === 1 ? scene : inflateScene(scene, ss)
+
+  const doc = target.canvas
   if (doc === null || typeof doc !== 'object') {
     throw new Error('scene.canvas is required, e.g. {"width":2400,"height":1350}')
   }
-  const W = Math.round(doc.width)
-  const H = Math.round(doc.height)
-  if (!(W > 0 && H > 0)) throw new Error(`scene.canvas needs positive width and height, got ${doc.width}x${doc.height}`)
+  // The DELIVERED size is what the scene declares and what the report states; the
+  // internal canvas is an exact multiple of it, so every reduction block is whole.
+  // A width of 800.4 already rounds to 800 today, and at 3x it has to round to 2400
+  // rather than to 2401, or the last block would be short and the delivered size
+  // would drift away from the declared one.
+  const outW = Math.round(doc.width)
+  const outH = Math.round(doc.height)
+  if (!(outW > 0 && outH > 0)) throw new Error(`scene.canvas needs positive width and height, got ${doc.width}x${doc.height}`)
+  const W = outW * ss
+  const H = outH * ss
 
   const canvas = createCanvas(W, H)
   const ctx = canvas.getContext('2d')
@@ -233,18 +275,38 @@ export async function renderScene(scene, options = {}) {
   // has no accidental transparency that a later blend mode would treat as
   // black. An unset ground defaults to opaque white, which is what a print
   // design starts from.
-  const ground = scene.ground === undefined ? '#FFFFFF' : scene.ground
+  const ground = target.ground === undefined ? '#FFFFFF' : target.ground
   ctx.save()
   ctx.fillStyle = resolvePaint(ctx, ground, { x: 0, y: 0, width: W, height: H }, '#FFFFFF')
   ctx.fillRect(0, 0, W, H)
   ctx.restore()
   log.push({ step: 'ground', paint: typeof ground === 'string' ? ground : ground.type })
 
-  const layers = Array.isArray(scene.layers) ? scene.layers : []
+  if (ss > 1) {
+    // In the log as well as in `report.supersample`, because the log is the ordered
+    // account of what the render actually did, and "the canvas was drawn at 3x and
+    // reduced" is a step of it — one a reader comparing two renders needs to see.
+    //
+    // The note is the price of doing it this way: the per-layer records in this log
+    // are measured in the buffer being drawn, which at 3x is three times the
+    // delivered size. Saying so is better than dividing every field by the factor —
+    // some of them are not lengths at all (an image's `natural` size, a point count,
+    // a dot count) and a generic division would quietly corrupt those.
+    log.push({
+      step: 'supersample',
+      factor: ss,
+      internal: { width: W, height: H },
+      delivered: { width: outW, height: outH },
+      note: `drawn at ${W}x${H} and reduced to ${outW}x${outH}; lengths recorded in this log are in the `
+        + `internal canvas's pixels, so divide them by ${ss} to read them in delivered pixels`,
+    })
+  }
+
+  const layers = Array.isArray(target.layers) ? target.layers : []
   if (layers.length === 0) warnings.push('scene has no layers — only the ground will render')
 
   await compositeLayers(ctx, layers, {
-    W, H, pool, baseDir, log, warnings, doc, scene, dpr,
+    W, H, outW, outH, ss, pool, baseDir, log, warnings, doc, scene: target, dpr,
     parentOpacity: 1, captured,
   })
 
@@ -256,16 +318,35 @@ export async function renderScene(scene, options = {}) {
     if (entry.step === 'scopeConflict') warnings.push(entry.note)
   }
 
+  // Reduced ONCE, after compositing, rather than per layer: layers that overlap are
+  // then blended at the supersampled resolution, so the edge where two of them meet
+  // is resolved as finely as a single layer's own edge. Reducing each layer first
+  // would throw that away and cost a downsample per layer as well.
+  const delivered = ss === 1 ? canvas : reduceCanvas(canvas, ss)
+
   const report = {
-    canvas: { width: W, height: H },
+    canvas: { width: outW, height: outH },
+    // The factor this render actually used, so the report describes its own render
+    // rather than needing the caller to remember what it asked for. Delivered
+    // throughout: `report.canvas` is the size of the returned canvas even when the
+    // canvas was drawn at three times it.
+    supersample: ss,
     layerCount: countLayers(layers),
     topLevelLayers: layers.length,
     log,
     warnings,
     allocations: pool.allocs,
-    stats: textureStats(readBuffer(canvas)),
+    stats: textureStats(readBuffer(delivered)),
   }
-  return { canvas, report, layers: captured }
+  return { canvas: delivered, report, layers: captured }
+}
+
+/** Reduce a supersampled canvas to the delivered size, by area average. */
+function reduceCanvas(canvas, factor) {
+  const reduced = downsampleRGBA(readBuffer(canvas), factor)
+  const out = createCanvas(reduced.width, reduced.height)
+  writeBuffer(out, reduced)
+  return out
 }
 
 /**
@@ -333,15 +414,7 @@ async function compositeGroup(ctx, layer, env) {
   await applyLayerFinishing(buffer, layer, env)
 
   if (env.captured !== null && env.captured !== undefined) {
-    const img = readBuffer(buffer.canvas)
-    env.captured.push({
-      name: String(layer.id === undefined ? 'group' : layer.id),
-      x: 0, y: 0, width: W, height: H,
-      rgba: new Uint8ClampedArray(img.data),
-      opacity: layer.opacity === undefined ? 1 : layer.opacity,
-      blend: layer.blend === undefined ? 'normal' : layer.blend,
-      visible: layer.hidden !== true,
-    })
+    captureLayer(env, buffer, layer, String(layer.id === undefined ? 'group' : layer.id))
   }
 
   ctx.save()
@@ -351,6 +424,42 @@ async function compositeGroup(ctx, layer, env) {
   ctx.restore()
 
   env.log.push({ step: 'group', id: layer.id, children: Array.isArray(layer.children) ? layer.children.length : 0 })
+}
+
+/**
+ * Snapshot a finished layer buffer for a layered export.
+ *
+ * WHY THE CAPTURE IS REDUCED HERE AND NOT AT THE END
+ * --------------------------------------------------
+ * `captureLayers` exists so a PSD can be delivered as a layered version of the
+ * PNG beside it, which requires the layers to be the DELIVERED size — `design
+ * render --psd` writes the PSD header from `report.canvas`, and the PSD's own
+ * round-trip test holds every layer to it. Refusing to combine capture with
+ * supersampling was the other option and it is the wrong one: it would remove the
+ * most useful combination there is — a clean PNG and a matching layered file from
+ * one render.
+ *
+ * The reduction happens HERE, on the way into the list, rather than over the whole
+ * list at the end. Holding every layer at the internal size until the render
+ * finishes would cost nine times the memory for the whole of it: a 2400x1350 layer
+ * buffer is 13 MB at 1x and 116 MB at 3x, so a twenty-layer poster would hold
+ * 2.3 GB of layers before the first one was reduced. Reducing on capture keeps the
+ * retained memory identical to the 1x case and pays one transient buffer per
+ * layer.
+ */
+function captureLayer(env, buffer, layer, name) {
+  const img = readBuffer(buffer.canvas)
+  env.captured.push({
+    name,
+    x: 0,
+    y: 0,
+    width: env.outW,
+    height: env.outH,
+    rgba: env.ss === 1 ? new Uint8ClampedArray(img.data) : downsampleRGBA(img, env.ss).data,
+    opacity: layer.opacity === undefined ? 1 : layer.opacity,
+    blend: layer.blend === undefined ? 'normal' : layer.blend,
+    visible: layer.hidden !== true,
+  })
 }
 
 /**
@@ -417,7 +526,10 @@ function applyToneOp(buf, op, env) {
     case 'tone-wipe':
       return { op: kind, ...toneWipe(buf, op) }
     case 'halftone': {
-      const r = halftoneScreen(buf, op)
+      // An adjustment layer runs on a full-canvas buffer, so a defaulted cell is a
+      // device-pixel size here too and is resolved at the device scale.
+      const spec = op.cell === undefined ? { ...op, cell: HALFTONE_DEFAULT_CELL * env.ss } : op
+      const r = halftoneScreen(buf, spec)
       return { op: kind, dots: r.dots, coverage: Number(r.coverage.toFixed(5)) }
     }
     default:
@@ -462,7 +574,7 @@ async function compositeLeaf(ctx, layer, env) {
         step: 'shapetone',
         id: layer.id,
         op: op.op === undefined ? op.type : op.op,
-        ...applyToneInBox(g, op, box),
+        ...applyToneInBox(g, op, box, env.ss),
       })
     }
   }
@@ -475,18 +587,7 @@ async function compositeLeaf(ctx, layer, env) {
   // Copied by value: the buffer goes back to the pool and will be cleared and
   // reused by the next layer.
   if (env.captured !== null && env.captured !== undefined && env.suppressCapture !== true) {
-    const img = readBuffer(buffer.canvas)
-    env.captured.push({
-      name: String(layer.id === undefined ? (layer.shape === undefined ? 'layer' : layer.shape) : layer.id),
-      x: 0,
-      y: 0,
-      width: W,
-      height: H,
-      rgba: new Uint8ClampedArray(img.data),
-      opacity: layer.opacity === undefined ? 1 : layer.opacity,
-      blend: layer.blend === undefined ? 'normal' : layer.blend,
-      visible: layer.hidden !== true,
-    })
+    captureLayer(env, buffer, layer, String(layer.id === undefined ? (layer.shape === undefined ? 'layer' : layer.shape) : layer.id))
   }
 
   ctx.save()
@@ -595,6 +696,13 @@ async function drawMask(g, mask, env) {
 async function drawLeaf(g, layer, env) {
   const { W, H, baseDir } = env
   const shape = layer.shape
+  // A length that comes from THIS FILE rather than from the scene is the one thing
+  // `inflateScene` cannot have multiplied: a stroke width default, or an image drawn
+  // at its natural size. At 3x those are still declared in delivered pixels, so they
+  // are lifted here — a 1px default stroke left at 1 device pixel would deliver a
+  // third of a pixel of ink. At ss = 1 this is the identity. (Named `devicePx`, not
+  // `px`, because the polygon case below destructures a point as `px`.)
+  const devicePx = (v) => v * env.ss
 
   switch (shape) {
     case 'rect': {
@@ -619,7 +727,7 @@ async function drawLeaf(g, layer, env) {
       }
       if (layer.stroke !== undefined && layer.stroke !== null) {
         const s = typeof layer.stroke === 'string' ? { color: layer.stroke } : layer.stroke
-        g.lineWidth = s.width === undefined ? 1 : s.width
+        g.lineWidth = s.width === undefined ? devicePx(1) : s.width
         g.strokeStyle = typeof s.color === 'string' ? cssColor(parseColor(s.color)) : s.color
         if (s.dash !== undefined) g.setLineDash(s.dash)
         g.stroke()
@@ -649,7 +757,7 @@ async function drawLeaf(g, layer, env) {
       }
       if (layer.stroke !== undefined && layer.stroke !== null) {
         const s = typeof layer.stroke === 'string' ? { color: layer.stroke } : layer.stroke
-        g.lineWidth = s.width === undefined ? 1 : s.width
+        g.lineWidth = s.width === undefined ? devicePx(1) : s.width
         g.strokeStyle = cssColor(parseColor(s.color))
         g.stroke()
       }
@@ -695,7 +803,7 @@ async function drawLeaf(g, layer, env) {
       } else {
         g.lineTo(x2, y2)
       }
-      g.lineWidth = layer.width === undefined ? 1 : layer.width
+      g.lineWidth = layer.width === undefined ? devicePx(1) : layer.width
       const col = parseColor(typeof layer.paint === 'string' ? layer.paint : '#000000')
       g.strokeStyle = cssColor(col)
       if (layer.dash !== undefined) g.setLineDash(layer.dash)
@@ -725,7 +833,7 @@ async function drawLeaf(g, layer, env) {
       }
       if (layer.stroke !== undefined && layer.stroke !== null) {
         const s = typeof layer.stroke === 'string' ? { color: layer.stroke } : layer.stroke
-        g.lineWidth = s.width === undefined ? 1 : s.width
+        g.lineWidth = s.width === undefined ? devicePx(1) : s.width
         g.strokeStyle = cssColor(parseColor(s.color))
         g.stroke()
       }
@@ -737,21 +845,53 @@ async function drawLeaf(g, layer, env) {
       // SVG path data, drawn directly. This is the escape hatch for the hand
       // shapes the reference language uses (chevrons, brackets, blobs) that are
       // tedious to express as polygons.
-      if (typeof layer.d !== 'string') throw new Error('path needs a `d` string')
+      //
+      // BOTH KEY SPELLINGS ARE ACCEPTED. `d` is the SVG attribute name; `path` is
+      // what an author writing a scene by hand reaches for, and in a real session
+      // one did — `{ shape: 'path', path: 'M 46 300 L 46 326 …' }`. This case
+      // required `d`, so the layer failed, the failure landed in `warnings`, and
+      // the mark was simply ABSENT from the finished image. The author looked at
+      // that image five times and never saw it was missing. A silently dropped
+      // layer is the most expensive failure class in this engine, and the engine
+      // already accepts more than one spelling for a colour (`paint` vs `color`)
+      // and for text runs, so accepting both here is the existing rule rather
+      // than a new one.
+      const d = typeof layer.d === 'string' ? layer.d : layer.path
+      if (typeof d !== 'string') {
+        throw new Error('path needs a `d` string (or a `path` string holding the same SVG path data)')
+      }
       g.save()
-      const p = new (await import('@napi-rs/canvas')).Path2D(layer.d)
+      const { Path2D } = await import('@napi-rs/canvas')
+      let p = new Path2D(d)
+      if (env.ss > 1) {
+        // SVG path data is the one length-bearing value `inflateScene` does not
+        // multiply, because not every number in a path is a length — an arc command
+        // carries two flags — so scaling it would mean writing a path parser and
+        // getting its grammar exactly right. Transforming the Path2D is exact and
+        // needs no parser. The stroke width is already multiplied by the scene walk
+        // and must NOT be multiplied again: the transform is on the path, not on the
+        // context, so `lineWidth` is read in device pixels either way.
+        const grown = new Path2D()
+        grown.addPath(p, { a: env.ss, b: 0, c: 0, d: env.ss, e: 0, f: 0 })
+        p = grown
+      }
       if (layer.paint !== 'none') {
         g.fillStyle = resolvePaint(g, layer.paint, { x: 0, y: 0, width: W, height: H }, '#000000')
         g.fill(p)
       }
       if (layer.stroke !== undefined && layer.stroke !== null) {
         const s = typeof layer.stroke === 'string' ? { color: layer.stroke } : layer.stroke
-        g.lineWidth = s.width === undefined ? 1 : s.width
+        g.lineWidth = s.width === undefined ? devicePx(1) : s.width
         g.strokeStyle = cssColor(parseColor(s.color))
         g.stroke(p)
       }
       g.restore()
-      return { path: layer.d.slice(0, 64) + (layer.d.length > 64 ? '…' : '') }
+      return {
+        path: d.slice(0, 64) + (d.length > 64 ? '…' : ''),
+        // Recorded ONLY when the key was not `d`, so the report says which spelling
+        // the scene used without repeating an unremarkable fact on every path layer.
+        ...(typeof layer.d === 'string' ? {} : { dFrom: 'path' }),
+      }
     }
 
     case 'text': {
@@ -788,7 +928,9 @@ async function drawLeaf(g, layer, env) {
  */
 async function drawTextLayer(g, layer, env) {
   const { W, H } = env
-  const font = parseFontSpec(layer.font, layer.size === undefined ? 16 : layer.size)
+  // A text layer names its size, and a scene that does not gets 16 delivered
+  // pixels — which is a length from this file, so it is lifted like any other.
+  const font = parseFontSpec(layer.font, layer.size === undefined ? 16 * env.ss : layer.size)
   const text = layer.text === undefined ? '' : String(layer.text)
   const align = layer.align === undefined ? 'left' : layer.align
   const color = typeof layer.paint === 'string' ? layer.paint : (layer.color === undefined ? '#000000' : layer.color)
@@ -846,7 +988,7 @@ async function drawTextLayer(g, layer, env) {
     if (layer.stroke !== undefined && layer.stroke !== null && layer.stroke !== false) {
       const s = typeof layer.stroke === 'string' ? { color: layer.stroke, width: 1 } : layer.stroke
       strokeLine(g, line, font.stack, spec, font.trackingEm, x, baselineY, boxW, align, {
-        width: s.width === undefined ? 1 : s.width,
+        width: s.width === undefined ? 1 * env.ss : s.width,
         color: cssColor(parseColor(s.color === undefined ? '#000000' : s.color)),
         cap: s.cap,
         join: s.join,
@@ -888,8 +1030,12 @@ async function drawImageLayer(g, layer, env) {
   const img = await loadImage(path)
   const x = resolveX(layer.x, W, 0)
   const y = resolveY(layer.y, H, 0)
-  const w = resolveLength(layer.w, W, img.width)
-  const h = resolveLength(layer.h, H, img.height)
+  // With no explicit size an image is drawn at its natural pixels, and natural
+  // pixels are DELIVERED pixels: at 3x that fallback has to be lifted too, or a
+  // placed illustration would come out at a third of its size relative to the
+  // canvas. The explicit case needs nothing — `inflateScene` multiplied it already.
+  const w = resolveLength(layer.w, W, img.width * env.ss)
+  const h = resolveLength(layer.h, H, img.height * env.ss)
 
   const fit = layer.fit === undefined ? 'stretch' : layer.fit
   let dw = w, dh = h, dx = x, dy = y
@@ -1145,7 +1291,12 @@ async function applyEffectUnscoped(buffer, fx, env, pool, scopePlane = null) {
   if (layerFx !== undefined) {
     const img = readBuffer(buffer.canvas)
     const alpha = alphaPlane(img)
-    const spec = { ...(layerFx.defaults || {}), ...fx }
+    // The DEFAULTS come from `effects.mjs`, not from the scene, so they are the one
+    // part of a spec `inflateScene` cannot have reached: they are declared in
+    // delivered pixels and have to be lifted like any other absolute length, or a
+    // `dropShadow` with no `size` would cast a shadow a third as far at 3x as at 1x.
+    // The scene's own values are already scaled and override them unchanged.
+    const spec = { ...scalePixelKeys(layerFx.defaults || {}, env.ss), ...fx }
     const out = layerFx.run({ image: img, alpha, width: W, height: H, spec }).image
     buffer.ctx.clearRect(0, 0, W, H)
     writeBuffer(buffer.canvas, out)
@@ -1159,7 +1310,14 @@ async function applyEffectUnscoped(buffer, fx, env, pool, scopePlane = null) {
   const filter = SAT_FILTERS[filterName]
   if (filter !== undefined) {
     const img = readBuffer(buffer.canvas)
-    const res = filter(img, fx)
+    // A filter's default radius lives in `filters.mjs`, so it is filled in here at
+    // the device scale — see `FILTER_DEFAULT_RADIUS`. `radial` has no radius and is
+    // listed there as absent rather than given a zero.
+    const defaultRadius = FILTER_DEFAULT_RADIUS[filterName]
+    const spec = fx.radius === undefined && defaultRadius !== undefined
+      ? { ...fx, radius: defaultRadius * env.ss }
+      : fx
+    const res = filter(img, spec)
     const data = res.data === undefined ? res : res.data
     buffer.ctx.clearRect(0, 0, W, H)
     writeBuffer(buffer.canvas, { width: W, height: H, data })
@@ -1281,10 +1439,15 @@ async function applyEffectUnscoped(buffer, fx, env, pool, scopePlane = null) {
       })()
 
       const shapeSource = preKnockout === null ? undefined : preKnockout.data
+      // The screen's cell comes from the code when the scene does not state one, so
+      // it is resolved here in device pixels — otherwise a defaulted 6px screen would
+      // be three times too fine on a supersampled canvas. A cell the scene did state
+      // arrives already multiplied.
+      const cell = fx.cell === undefined ? HALFTONE_DEFAULT_CELL * env.ss : fx.cell
       const r = savedAlpha !== null && !hadInk
         ? { dots: 0, coverage: 0, maxTone: fx.maxTone, toneSource: 'none' }
         : halftoneScreen(img, {
-          cell: fx.cell,
+          cell,
           angle: fx.angle,
           gamma: fx.gamma,
           color: fx.color,
@@ -1335,7 +1498,12 @@ async function applyEffectUnscoped(buffer, fx, env, pool, scopePlane = null) {
     // Outline by alpha dilation: grow the layer's silhouette and knock out the
     // original, leaving a ring. This is what a真 knockout outline needs and
     // what `strokeText` over a non-flat ground cannot do.
-    const w = Math.max(1, Math.round(fx.width === undefined ? 2 : fx.width))
+    //
+    // The width is a genuine pixel count on the buffer, so both the code default and
+    // the 1px floor are in delivered pixels and are lifted here. `dilateAlpha` works
+    // on a square structuring element, so at 3x the ring is grown three times as many
+    // device pixels wide — and comes back as the same ring.
+    const w = Math.max(env.ss, Math.round(fx.width === undefined ? 2 * env.ss : fx.width))
     const grown = pool.acquire(W, H)
     grown.ctx.drawImage(buffer.canvas, 0, 0)
     const dilated = dilateAlpha(readBuffer(grown.canvas), w)
@@ -1487,9 +1655,10 @@ function shapeBox(layer, W, H) {
  * @param {CanvasRenderingContext2D} g
  * @param {object} op
  * @param {{x:number,y:number,w:number,h:number}|null} box
+ * @param {number} ss device pixels per delivered pixel; 1 unless supersampling
  * @returns {object} a compact record for the render report
  */
-function applyToneInBox(g, op, box) {
+function applyToneInBox(g, op, box, ss) {
   const type = op.op === undefined ? op.type : op.op
   const target = box === null
     ? { x: 0, y: 0, w: g.canvas.width, h: g.canvas.height }
@@ -1509,6 +1678,11 @@ function applyToneInBox(g, op, box) {
       rampOrigin: [0, 0],
       rampSize: [target.w, target.h],
       ...op,
+      // After the spread, so that `cell: undefined` written out in a scene cannot
+      // override the resolved default with nothing — a spread copies the key, and an
+      // explicit undefined then wins. Same reason as the effect path: the cell default
+      // is a pixel size declared in code, resolved here in device pixels.
+      cell: op.cell === undefined ? HALFTONE_DEFAULT_CELL * ss : op.cell,
     })
     g.putImageData(id, target.x, target.y)
     return { dots: r.dots, coverage: Number(r.coverage.toFixed(5)), maxTone: r.maxTone, toneSource: r.toneSource }

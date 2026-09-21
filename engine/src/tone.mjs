@@ -26,6 +26,17 @@
 import { parseColor, clamp, relativeLuminance } from './color.mjs'
 
 /**
+ * Cell size a dot screen uses when a scene names one without a `cell`, in
+ * DELIVERED pixels.
+ *
+ * Exported for the same reason `FILTER_DEFAULT_RADIUS` is: a length that comes
+ * from code and not from the scene is the one the renderer cannot multiply on its
+ * way past, so supersampled rendering has to read it from here rather than keep a
+ * copy that can drift out of step with this one.
+ */
+export const HALFTONE_DEFAULT_CELL = 6
+
+/**
  * Ordered-dither threshold matrix (8x8 Bayer).
  *
  * Bayer rather than random because the resulting dot field has a regular
@@ -79,7 +90,7 @@ const BAYER8 = [
  * @returns {{dots:number, coverage:number, maxTone:number, toneSource:string}}
  */
 export function halftoneScreen(target, spec) {
-  const cell = spec.cell === undefined ? 6 : spec.cell
+  const cell = spec.cell === undefined ? HALFTONE_DEFAULT_CELL : spec.cell
   const angle = ((spec.angle === undefined ? 45 : spec.angle) * Math.PI) / 180
   const gamma = spec.gamma === undefined ? 1 : spec.gamma
   const color = parseColor(spec.color === undefined ? '#000000' : spec.color)

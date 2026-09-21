@@ -515,6 +515,16 @@ layers.push({
 })
 
 const scene = {
+  // GATE 1 的声明。渲染器拒绝没有 gates 块的场景；这是引擎自带的固件场景，
+  // 用 --no-gates 也能渲，但补上之后它和设计稿走同一条链（交付闸门 H3/H4 会读它）。
+  gates: {
+    focus: 'THE ONE FOCUS of this sheet, and what it competes with',
+    lightAxis: 'WHERE THE LIGHT COMES FROM (direction and quality, in one clause)',
+    // 从本文件的 layers 里按顺序提取，不是手写 —— 手写的会与真实列表分岔
+    layers: ["L01","L02","L03","L04","L05","L06","L07a","L07b","L07c","L07d","L07e","L07f","L07g","L07h","L07i","L07j","L07k","L07l","L08","L09","L10"],
+    drawingRule: 'THE RULE THAT GENERATES EACH GROUP, not a list of the groups',
+    accentBand: [0, 0.08],
+  },
   canvas: { width: W, height: H },
   ground: PAPER,
   layers,

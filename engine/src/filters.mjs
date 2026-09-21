@@ -45,6 +45,20 @@
 // ── the integral image ──────────────────────────────────────────────────────
 
 /**
+ * The radius each filter uses when a scene names it without one, in DELIVERED
+ * pixels.
+ *
+ * Exported because a radius that comes from here rather than from the scene is
+ * the one pixel length the renderer cannot multiply on its way past: supersampled
+ * rendering draws into a canvas three times the size, so a defaulted radius has
+ * to grow with everything else or `{type:'blur'}` would blur a third as far at 3x
+ * as at 1x. `src/render.mjs` reads this table rather than keeping a second copy of
+ * the numbers. `radial` is absent because it has no radius — it is driven by
+ * `amount` and `taps`.
+ */
+export const FILTER_DEFAULT_RADIUS = { gaussian: 4, motion: 12, lens: 8, box: 6 }
+
+/**
  * A summed-area table per channel, at 32-bit precision.
  *
  * Built with `(w+1) x (h+1)` so the rectangle query needs no bounds test: an
@@ -194,7 +208,7 @@ export function gaussianBlur(img, radius) {
  * @param {{radius?:number, angle?:number}} spec
  */
 export function motionBlur(img, spec) {
-  const radius = spec.radius === undefined ? 12 : spec.radius
+  const radius = spec.radius === undefined ? FILTER_DEFAULT_RADIUS.motion : spec.radius
   const angle = ((spec.angle === undefined ? 0 : spec.angle) * Math.PI) / 180
   const dx = Math.abs(Math.cos(angle)) * radius
   const dy = Math.abs(Math.sin(angle)) * radius
@@ -284,7 +298,7 @@ export function lineAverage(data, w, h, len, horizontal) {
  * it would reintroduce the O(pixels x samples) cost this function exists to remove.
  */
 export function lensBlur(img, spec) {
-  const radius = Math.max(1, Math.round(spec.radius === undefined ? 8 : spec.radius))
+  const radius = Math.max(1, Math.round(spec.radius === undefined ? FILTER_DEFAULT_RADIUS.lens : spec.radius))
   const { width: w, height: h } = img
   const sat = integralImage(img)
   const out = new Uint8ClampedArray(img.data.length)
@@ -462,11 +476,11 @@ export function radialBlur(img, spec) {
  * ones are removed this name can be folded back.
  */
 export const SAT_FILTERS = {
-  gaussian: (img, s) => gaussianBlur(img, s.radius === undefined ? 4 : s.radius),
+  gaussian: (img, s) => gaussianBlur(img, s.radius === undefined ? FILTER_DEFAULT_RADIUS.gaussian : s.radius),
   motion: (img, s) => motionBlur(img, s),
   radial: (img, s) => radialBlur(img, s),
   box: (img, s) => {
-    const r = Math.max(1, Math.round(s.radius === undefined ? 6 : s.radius))
+    const r = Math.max(1, Math.round(s.radius === undefined ? FILTER_DEFAULT_RADIUS.box : s.radius))
     return { width: img.width, height: img.height, data: boxBlurSAT(img.data, img.width, img.height, r) }
   },
   lens: (img, s) => lensBlur(img, s),

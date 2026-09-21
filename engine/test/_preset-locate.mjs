@@ -21,6 +21,10 @@
  * dsh-tools:  DSH_TOOLS_DIR  ->  the npm global root that owns the running Node
  *             ->  the usual global locations. Nothing is hard-coded per user.
  * preset:     DSH_PRESET_DIR ->  this repository's `design/`  ->  $DSH_HOME deployed copy.
+ * installed:  $DSH_HOME deployed copy, and ONLY that — `installedPresetDir()` below
+ *             returns undefined when there is none, because the drift suite has to be
+ *             able to say "nothing is installed" instead of silently comparing the
+ *             source against itself.
  *
  * The repository copy is preferred for the preset: it is the only one that exists in a
  * fresh clone, and it is the one under version control.
@@ -94,6 +98,25 @@ export function presetDir() {
     'Set DSH_PRESET_DIR, or run `node deploy-preset.mjs` from the repository root.\n' +
     'tried:\n  ' + candidates.join('\n  '),
   )
+}
+
+/**
+ * The INSTALLED copy of the preset — the one the harness actually loads, under the
+ * harness home. `undefined` when nothing is installed, which is a legitimate state for
+ * a fresh clone and not an error: the drift suite treats it as "nothing to compare"
+ * rather than as a failure.
+ *
+ * Separate from `presetDir()` on purpose. That one prefers the repository's `design/`
+ * because the other suites check the source under version control; a drift check has to
+ * name both sides explicitly, and `deploy-preset.mjs` resolves the same two paths the
+ * same way (DSH_HOME, then the home directory).
+ *
+ * @returns {string|undefined} absolute path, or undefined when there is no install
+ */
+export function installedPresetDir() {
+  const home = process.env.DSH_HOME ?? join(homedir(), '.dsh')
+  const dir = join(home, '.agent-presets', 'design')
+  return existsSync(join(dir, 'agent.cordis.yml')) ? dir : undefined
 }
 
 /**

@@ -34,6 +34,7 @@ import { scaleLadder } from '../src/text.mjs'
 import { scaleRamp, toHex8, toOklch, contrastRatio } from '../src/color.mjs'
 import { textureStats } from '../src/tone.mjs'
 import { scaleScene } from '../src/scale.mjs'
+import { validateGates, refusalMessage } from '../src/gates.mjs'
 
 // Fonts must be registered before any canvas context exists; every subcommand
 // that measures or draws depends on it.
@@ -68,10 +69,11 @@ const command = argv[0]
 if (command === undefined || command === '-h' || command === '--help') {
   process.stderr.write(
     'design <command> [options]\n\n' +
-    '  render  <scene.json> [--out DIR] [--name FILE] [--psd]\n' +
+    '  render  <scene.json> [--out DIR] [--name FILE] [--psd] [--scale N] [--supersample N] [--no-gates]\n' +
     '  analyze <image> [--max-side N] [--cols N --rows N]\n' +
     '  verify  <scene.json> [--png FILE] [--intent FILE]\n' +
     '  critique <png> [--json]\n' +
+    '  gate-delivery <scene.json> [--report R.json]   # the delivery gate; non-zero = do not ship\n' +
     '  palette ops    [--kind KIND]                 # the operator vocabulary\n' +
     '  palette presets                              # the named filter library\n' +
     '  palette show   <preset> [--params JSON]      # the operator graph a preset builds\n' +
@@ -248,6 +250,18 @@ if (command === 'palette') {
   process.exit(0)
 }
 
+// ── gate-delivery ───────────────────────────────────────────────────────────
+//
+// The delivery gate, reachable as a subcommand because it is a delivery STEP, not a probe: a
+// designer running a batch of renders should not have to remember a nested path to check them.
+// The check itself lives in `tools/gate-delivery.mjs` with the rest of the measurement tools,
+// and is reached through `design tool gate-delivery` as well. This alias exists so the one
+// command a delivery step needs is discoverable from `--help`.
+if (command === 'gate-delivery') {
+  const { runTool } = await import('../src/tools-roster.mjs')
+  process.exit(await runTool('gate-delivery', argv.slice(1)))
+}
+
 // ── check-render ────────────────────────────────────────────────────────────
 //
 // Reading the DELIVERED pixels is a question the scene cannot answer: `verifyScene` sees a text
@@ -393,6 +407,8 @@ if (command === 'render') {
       name: { type: 'string' },
       scale: { type: 'string' },
       psd: { type: 'boolean' },
+      'no-gates': { type: 'boolean' },
+      supersample: { type: 'string' },
     },
     allowPositionals: true,
   })
@@ -400,6 +416,29 @@ if (command === 'render') {
   if (scenePath === undefined) fail('render needs a scene JSON path')
 
   const { data: scene, path: resolvedScene } = readJson(scenePath)
+
+  // ── GATE 1, enforced by the renderer rather than requested in prose ────────
+  //
+  // A scene with no usable `gates` block is REFUSED. Nothing is written, the exit code is
+  // non-zero, and the message names what to decide.
+  //
+  // This is the single change that turns the working policy from a request into a constraint.
+  // Its justification is measured, not theoretical: the policy that told the agent to answer
+  // four questions before placing anything was verified to be resident in the model's context
+  // in every request — and the session that followed violated at least nine of its own
+  // principles, because prose costs nothing to skip. A refused render costs an image.
+  //
+  // `--no-gates` exists for the engine's own fixtures, probes and one-off experiments. It is
+  // deliberately explicit: a flag that has to be typed is a decision someone made, whereas a
+  // default would be the same silence this gate was built to break.
+  if (values['no-gates'] !== true) {
+    const check = validateGates(scene.gates)
+    if (!check.ok) fail(refusalMessage(check.problems, resolvedScene))
+    process.stderr.write(
+      `gates declared · focus: ${String(scene.gates.focus).slice(0, 60)}${String(scene.gates.focus).length > 60 ? '…' : ''}\n`,
+    )
+  }
+
   const outDir = isAbsolute(values.out === undefined ? 'out' : values.out)
     ? values.out
     : resolve(process.cwd(), values.out === undefined ? 'out' : values.out)
@@ -418,11 +457,19 @@ if (command === 'render') {
 
   const t0 = Date.now()
   const wantsPsd = values.psd === true
+  // Supersampled rendering: draw at N× and downsample. The reason it exists is concrete —
+  // curves drawn at final resolution come out aliased (a wire reads as a gear-toothed band,
+  // an ink circle as a polygon), and no amount of scene authoring fixes that.
+  const supersample = values.supersample === undefined ? 1 : Number(values.supersample)
+  if (!Number.isFinite(supersample) || supersample < 1) {
+    fail(`--supersample must be a number >= 1, got ${values.supersample}`)
+  }
   const { canvas, report, layers: captured } = await renderScene(scene, {
     baseDir: dirname(resolvedScene),
     // Captured in the same pass that composites them, so the delivered layers
     // cannot disagree with the delivered PNG.
     captureLayers: wantsPsd,
+    supersample,
   })
   const elapsed = Date.now() - t0
 

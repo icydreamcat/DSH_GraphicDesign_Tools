@@ -47,7 +47,7 @@
 - **指标是手段，不是目的。** 为了抬高「可分辨色数」而撒斑点，指标上去了，
   那片肉眼清晰可见的花纹**撤掉后色数只掉到 549**——指标没看见眼睛看见的东西。
 
-这些规则写在 [`design/skills/`](design/skills)——**7 个技能**，由 agent 按需加载。
+这些规则写在 [`design/skills/`](design/skills)——**9 个技能**，由 agent 按需加载。
 
 ---
 
@@ -200,17 +200,23 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 
 ---
 
-## 7 个技能（agent 按需加载）
+## 9 个技能（agent 按需加载）
 
 | 技能 | 什么时候用 |
 |---|---|
 | [`depth-and-structure`](design/skills/depth-and-structure/SKILL.md) | **开工前必读**。四层级顺序、深度轴、先定层再定密度、面积占比陷阱、合成值 vs 设计值 |
 | [`design-foundations`](design/skills/design-foundations/SKILL.md) | 审美与设计理解、四问、反模式清单 |
+| [`craft-and-material`](design/skills/craft-and-material/SKILL.md) | **做质感时读**。一门手艺而非配方库、合成的复杂度从哪来、为什么不能用透明做叠层、元素之间要有物理牵连、超采样与曲线质量、引擎能做什么与做不到什么 |
+| [`design-judgement`](design/skills/design-judgement/SKILL.md) | **画面不对又说不清时读**。风格是看出来的不是算出来的、「高频低对比」是多而淡不是少、为什么 17 轮局部修补不可救、「量达标了」为什么是失败 |
 | [`typography-and-scale`](design/skills/typography-and-scale/SKILL.md) | 排版与字阶、真实度量、中英混排 |
 | [`colour-systems`](design/skills/colour-systems/SKILL.md) | OKLab 阶梯、强调色预算、调子带 |
 | [`reference-analysis`](design/skills/reference-analysis/SKILL.md) | 参考规格提取（观感 → 可执行数值） |
 | [`filters-and-palette`](design/skills/filters-and-palette/SKILL.md) | 滤镜词汇表、算子图、`scope` |
 | [`photoshop-delivery`](design/skills/photoshop-delivery/SKILL.md) | 分层交付、Photoshop 驱动与它的坑 |
+
+**常驻与按需的分工是故意的，不是重复。** 常驻 policy 只放**能失败**的规则——每条都对应一个会返回
+非零的检查；凡是无法这样强制的，一律进技能，不在常驻段重复。这不是为了省字数：上一版常驻段是
+15,640 字符的论述，它确实在每次请求里，而接下来的会话违反了它自己九条原则。**常驻不等于有约束力。**
 
 ---
 
@@ -260,7 +266,7 @@ path / text / image / group / adjustment）。**长度 ≤1 是画布比例，>1
 这个仓库交付的是**工具链**，不是这台机器的旧成品：
 
 - ✅ 引擎、29 个会话工具、8 个 preset 工具、**全部 16 套测试**——开箱可用；
-- ✅ 7 个技能与两份方法论规范，新克隆即可自举；
+- ✅ 9 个技能与两份方法论规范，新克隆即可自举；
 - ❌ `engine/scenes/*.json` 与 `examples/` 里的图**重不出来**：它们的素材是本机专用的输入，
   刻意未纳入版本控制。
 

@@ -90,10 +90,58 @@ node encrypt-doc.mjs inspect 为什么做这个项目.md.enc   # 只看文件头
 | `engine/scenes/` | 场景 JSON（**设计的源码**）+ 生成器 `build-*.mjs` + 决策笔记 |
 | `engine/package.json` · `package-lock.json` | 依赖声明。只依赖 `@napi-rs/canvas` |
 
-**CLI 子命令**（10 个）：`render` `analyze` `critique` `verify` `check-render` `fonts` `ladder` `ramp` `palette` `tool`。
+**CLI 子命令**（11 个）：`render` `analyze` `critique` `verify` `gate-delivery` `check-render` `fonts` `ladder` `ramp` `palette` `tool`。
 
-`check-render` 是 `design tool check-render` 的别名，为的是让交付步骤要用的那条命令能从 `--help` 里看到。
-它的判据与其它工具一样在 `tools/` 里，不在入口——入口只负责找得到。
+`check-render` 与 `gate-delivery` 都是 `design tool <name>` 的别名，为的是让交付步骤要用的那两条命令
+能从 `--help` 里看到。判据与其它工具一样在 `tools/` 里，不在入口——入口只负责找得到。
+
+#### GATE 1 —— 渲染是闸门，不是请求
+
+**没有 `gates` 块的场景会被渲染器拒绝**：不写出任何文件，退出码非零，错误信息直接列出要决定的那几件事。
+
+这条的成立理由是量出来的。之前那份常驻 policy 要求「动第一个元素前先答四问」，它**确实常驻**——
+在会话记录的 `system` 字段里能查到——而接下来那一场仍然违反了它自己九条原则。**写在提示词里的要求
+是可跳过的，因为跳过的代价是零。** 唯一躲不掉的形态，是跳过了就没有图。
+
+```
+render <scene.json> [--out DIR] [--name FILE] [--psd] [--scale N] [--supersample N] [--no-gates]
+```
+
+前五个键必填，闸门读它们：
+
+| 键 | 声明什么 |
+|---|---|
+| `focus` | 读者唯一先看到的那样东西，以及它跟谁竞争 |
+| `lightAxis` | 光从哪来 |
+| `layers` | 绘制顺序（id 前缀序列）——`H4` 拿它比对真实列表 |
+| `drawingRule` | 生成每一组的规则；说不出规则的组不算设计过 |
+| `accentBand` | 强调色的允许平铺占比，如 `[0, 0.05]` |
+
+可选键**只在声明时才查**：`forbiddenZones`（`H4b`）、`sheetRoles`（`H5`）、`groundEntities`（`H4b` 的豁免）、
+`allowTranslucent`（`H5` 的例外）。
+
+`--no-gates` 是**显式**逃生门，给引擎固件场景与一次性探针用。它需要被敲出来，这是刻意的：
+默认放行就等于回到这道闸门要打破的那种沉默。
+
+#### 为什么 `H4b` / `H5` 是声明驱动，不是正则
+
+这两项原先靠**图层名**判断该放过谁：一张 sheet 前缀表、一张 overlay 后缀表、一张 ground 关键词表。
+三张表都是从**一个项目**的命名里学来的。后果比误报更糟——换一套命名，检查会放过整个场景然后报
+「通过」，而**沉默会被读成成功**。
+
+现在它们读声明：`gates.groundEntities` 说明哪些图层是「人物站在其上的东西」，
+`gates.sheetRoles` 说明哪些图层**就是**一张实体纸（也可以顺便声明哪些不是，附理由）。
+两者都不声明时给的是 **SKIP 并说明原因**，不是 PASS。
+
+这条原则本来就管着 `forbiddenZones`，而闸门自己的文件头先说过：**闸门无法发现脸在哪，所以区域必须由
+场景声明。** 它同样无法知道两张满幅图层里哪一张是底——那就声明。
+
+#### 部署漂移是断路的来源，现在有退出码
+
+`deploy-preset.mjs --check` 的三种状态与退出码：**0 一致**、**1 有漂移**、**2 未安装**。
+这条闸门是补出来的，因为确实出过一次事故：源文件改了一大轮、YAML 校验、行数统计、独立解析脚本
+全部通过——**而没有 deploy**，harness 加载的还是旧的 402 行版本。所有校验都在验源文件，活的
+那一份是旧的，几周没人发现。校验的全部意义，被那个没人强制执行的步骤抵消了。
 
 #### `check-render` —— 在**交付的那张图**上量文字
 

@@ -27,12 +27,37 @@
  * is not part of this deployment — `--prune` is opt-in, because a stray file in a preset
  * directory is much cheaper than a deleted one.
  *
+ * THIS IS A GATE, SO IT HAS AN EXIT CODE
+ * ---------------------------------------
+ * `--check` used to print the differences and exit 0 whatever they were. That made
+ * it a report rather than a check, and the cost of that is on record: a long series
+ * of edits went into `design/agent.cordis.yml` and was validated every way available
+ * — YAML parsed, line counts, a checker script — but `deploy` was never run, so the
+ * harness kept loading a stale installed copy for weeks. Every validation had been
+ * performed against the SOURCE while the live artefact was old. The one step nobody
+ * enforced was the one that mattered, so the step is now enforced: the exit code is
+ * the verdict, and `engine/test/deploy-drift.mjs` asserts it in the test gate.
+ *
+ * Three states, and what each exit code means:
+ *
+ *   in sync        source and installed copy are byte-identical          0
+ *   drift          any file differs, is missing or is extra             1
+ *   not installed  no preset directory under the harness home at all    2
+ *
+ * Code 2 is a STATE, not a failure: a fresh clone has never been deployed, so
+ * "not installed" is a legitimate answer for `--check` to give. It is still non-zero
+ * so that no gate can mistake "nothing to compare" for "compared and clean".
+ *
+ * `--prune` cannot be combined with `--check` — the comparison does not depend on
+ * the extra-file flag, so parse the two as mutually exclusive.
+ *
  * Usage:
- *   node deploy-preset.mjs            # copy, reporting every file
- *   node deploy-preset.mjs --check    # report what differs, write nothing
+ *   node deploy-preset.mjs            # copy, reporting every file; exit 0 on success
+ *   node deploy-preset.mjs --check    # report what differs, write nothing; exit code = verdict
  *   node deploy-preset.mjs --prune    # also remove deployed files no longer in the repo
  */
-import { readdir, readFile, mkdir, writeFile, rm, stat } from 'node:fs/promises'
+import { readdir, readFile, mkdir, writeFile, rm } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { dirname, join, relative } from 'node:path'
 import { homedir } from 'node:os'
@@ -40,6 +65,13 @@ import { homedir } from 'node:os'
 const SOURCE = join(import.meta.dirname, 'design')
 const HARNESS_HOME = process.env.DSH_HOME ?? join(homedir(), '.dsh')
 const TARGET = join(HARNESS_HOME, '.agent-presets', 'design')
+
+// "Not installed" has to be a state of its own rather than a special case of drift.
+// Comparing file-by-file cannot tell the two apart — an absent directory reports every
+// source file as `+`, which reads as drift — and the two want different answers: drift
+// is a fault to fix, a fresh clone that has never been deployed is normal. The
+// directory itself is the evidence, because an installed preset always has one.
+const installed = existsSync(TARGET)
 
 const mode = process.argv.includes('--check') ? 'check'
   : process.argv.includes('--prune') ? 'prune'
@@ -119,4 +151,21 @@ if (extra.length > 0) {
 
 const verb = mode === 'check' ? 'would copy' : 'copied'
 console.log(`\n${verb} ${copied}, identical ${same}, ${extra.length} extra`)
-if (mode === 'check' && changed.length > 0) process.exit(1)
+
+// ── the verdict ─────────────────────────────────────────────────────────────
+//
+// Printed on its own line and last, because the exit code is the whole point of
+// `--check` and a gate should say out loud what its code means. See the header for
+// the three states; the numbers here are the contract, not a convention.
+if (mode === 'check') {
+  if (!installed) {
+    console.log(`verdict: not installed — ${TARGET} does not exist (exit 2)`)
+    process.exit(2)
+  }
+  const differences = changed.length + extra.length
+  if (differences > 0) {
+    console.log(`verdict: DRIFT — ${changed.length} differing or missing, ${extra.length} extra (exit 1)`)
+    process.exit(1)
+  }
+  console.log(`verdict: in sync — ${same} files identical (exit 0)`)
+}

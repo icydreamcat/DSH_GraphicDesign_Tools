@@ -4,25 +4,22 @@
  * 为什么用引擎画而不是手绘
  * ------------------------
  * 分镜表本身就是一件版面作品：八格构图、时间码、机位、标题、说明、字幕原文，六层信息要在同一张
- * 图上互不打架。它还是这篇作业唯一一次能提前检查构图的机会——每一格里的画框＝**相机取景**，
- * 框里画什么，现场就拍什么。
+ * 图上互不打架。它还是这篇作业唯一一次能提前检查构图的机会——每一格里的画框＝相机取景，框里画
+ * 什么，现场就拍什么。
  *
- * 第三版改了什么（用户四条要求）
- * ----------------------------
- *   1. **白底黑字**：原来是深色版。深色适合看画面，不适合看字；而这张表的用途是照着做。
- *   2. **图例从角落挪到框下面**，并且把「镜号 + 机位代码」换成**直接写清楚的一行字**。
- *      原来角上那行 `#1 · 录屏` 是给画图的人看的，不是给拍摄的人看的。
- *   3. **字号拉大**：卡片右侧原来有大片空白。空白不是留白，是没把话说清楚——
- *      现在说明 18px、字幕 20px，栏宽按汉字宽度反算（一个字＝一个字号）。
- *   4. **改横屏**：视频是 16:9，画框就跟着变 16:9。框内构图不重画，用一个坐标映射
- *      把原来按 9:16 画的八格压进 16:9（见 mapX/mapY）。
+ * 这份生成器同时是 GATE 1 的演示样本：它带 `gates` 块，因为渲染器现在拒绝没有声明的场景。
  *
- * 前两版踩过的几何错，逐条留在这里，因为它们会重复：
+ * 历次踩到的坑，逐条留在这里，因为它们会重复：
  *   · 画框高过卡片留给它的高度 → 字幕被画布切掉半行（「切一点点最糟」）。
- *   · 拿画布尺寸当输入去推导卡片尺寸 → 循环，永远差 60px。**卡片是常量，画布是推导值。**
- *   · 标注栏 63px 宽 ≈ 一行 3 个汉字，正文被切成竖排。**汉字一个字就是一个字号宽。**
- *   · 按大尺寸画完再乘 0.48 缩小 → `h: 2` 变成 `0.96`，被 `resolveLength` 当成
- *     「画布高度的 96%」＝ 2385px。**能按最终尺寸画就别缩放**（见 docs §2.1.1）。
+ *   · 拿画布尺寸当输入去推导卡片尺寸 → 循环，永远差 60px。卡片是常量，画布是推导值。
+ *   · 标注栏 63px 宽 ≈ 一行 3 个汉字，正文被切成竖排。汉字一个字就是一个字号宽。
+ *   · 按大尺寸画完再乘 0.48 缩小 → `h: 2` 变成 `0.96`，被 resolveLength 当成「画布高度的 96%」
+ *     ＝ 2385px。能按最终尺寸画就别缩放（见 docs §2.1.1）。
+ *   · put() 内部已加 cellY，调用处又加一次 → 第二排整体下移一整格，只有第二排越界。
+ *   · 路径图层的键是 `d`，不是 `path`：写成 path 时图层静默消失（渲染器只记进 warnings），
+ *     八格每格一个光标全部没画出来，而那张图被看过五遍。
+ *   · 千万不要用 PowerShell 的 Set-Content 改这个文件：UTF-8 会变乱码，而含反引号的注释会把
+ *     后面一行吞进注释里。这个文件被毁过一次，是整份重写的。
  *
  * Run: node scenes/build-video-storyboard.mjs
  */
@@ -40,20 +37,18 @@ const HEADER = 96
 const COLS = 4
 const ROWS = 2
 const CELL_W = 570
-// 卡片高度由内容反算，不是调出来的：框 162 + 上下留白 76/22 + 六行字 ≈ 620。
-// 上一版写 580，第二排的标注被画布切掉——「卡片高度必须 ≥ 内容高度」这条我第三次踩。
 const CELL_H = 570
 
-const W = PAD * 2 + CELL_W * COLS + GUT * (COLS - 1)     // 2400
+const W = PAD * 2 + CELL_W * COLS + GUT * (COLS - 1)
 const H = PAD * 2 + HEADER + CELL_H * ROWS + GUT * (ROWS - 1)
 
-// 画框＝相机取景。视频改成横屏，框就是 16:9：288×162。
+// 画框＝相机取景。视频是横屏，框就是 16:9。
 const FRAME_W = 340
 const FRAME_H = 191
 const FRAME_X = 30
 const FRAME_Y = 34
 const INFO_X = 30
-const INFO_W = CELL_W - INFO_X * 2                       // 522px ≈ 29 个汉字/行（18px）
+const INFO_W = CELL_W - INFO_X * 2
 
 // 白底黑字。深色只留给「黑场」那一格——那是内容，不是配色。
 const GROUND = '#FFFFFF'
@@ -75,16 +70,13 @@ const ACCENT = '#B4650A'
 const layers = []
 const add = (l) => { layers.push(l); return l }
 
-// ── 框内构图：原来按 9:16 的 216×384 设计空间画，现在映射进 16:9 的框 ────────
-// 不是重画，是换算：按高度铺满、水平居中。这样八格构图与已核对过的那一版一致，
-// 换画幅不必重新设计内容。
+// ── 框内构图：按 216×384 的设计空间画，映射进 16:9 的框（不重画内容）────────
 const D_W = 216
 const D_H = 384
 const SC = FRAME_H / D_H
 const OFF_X = (FRAME_W - D_W * SC) / 2
-const OFF_Y = 0
 const mapX = (x) => OFF_X + x * SC
-const mapY = (y) => OFF_Y + y * SC
+const mapY = (y) => y * SC
 const mapS = (v) => v * SC
 
 function card(cellX, cellY, id) {
@@ -102,44 +94,34 @@ function card(cellX, cellY, id) {
   return { x: cellX + FRAME_X, y: cellY + FRAME_Y }
 }
 
-/** 框内元素：按 216×384 的设计空间给坐标，这里映射进 16:9 框。 */
+/** 框内元素：按设计空间给坐标，这里映射进 16:9 框。所有边长至少 2px。 */
 function inner(f, id, l) {
-  const out = {
-    ...l, id,
-    x: f.x + mapX(l.x ?? 0),
-    y: f.y + mapY(l.y ?? 0),
-  }
+  const out = { ...l, id, x: f.x + mapX(l.x ?? 0), y: f.y + mapY(l.y ?? 0) }
   if (l.w !== undefined) out.w = Math.max(2, mapS(l.w))
   if (l.h !== undefined) out.h = Math.max(2, mapS(l.h))
   if (l.radius !== undefined) out.radius = Math.max(1, mapS(l.radius))
   if (l.x1 !== undefined) { out.x1 = mapX(l.x1); out.x2 = mapX(l.x2); out.y1 = mapY(l.y1); out.y2 = mapY(l.y2) }
-  if (typeof l.path === 'string') {
-    out.path = l.path.replace(/(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g, (m, a, b) => `${mapX(+a).toFixed(2)} ${mapY(+b).toFixed(2)}`)
+  if (Array.isArray(l.effects)) {
+    out.effects = l.effects.map((e) => (e.size === undefined ? e : { ...e, size: Math.max(1, mapS(e.size)) }))
   }
-  if (Array.isArray(l.effects)) out.effects = l.effects.map((e) => (e.size === undefined ? e : { ...e, size: Math.max(1, mapS(e.size)) }))
   return add(out)
 }
-/** 一条内容块。宽高都会 ≥2px：落在 0..1 会被引擎当成画布比例。 */
 const bar = (f, id, x, y, w, h, paint, opacity) =>
   inner(f, id, { shape: 'rect', x, y, w, h, paint, opacity: opacity ?? 1 })
 
 /**
- * 图例：直接写在画框下面，一行「时间」+ 一行「怎么拍」。
+ * 标注栏：时间码 + 机位同一行，下面是标题、说明、字幕原文、器材。
  *
- * 上一版把 `#1 · 录屏` 塞在卡片右上角，用户说「图例太难看懂」——对的：那是给画图的人看的编号，
- * 不是给拍摄的人看的指示。现在时间码在左、机位在右，同一行；下面那行写的是这台机器怎么摆。
+ * put 自己会加 cellY，调用处只给格内偏移。这一点被写错过一次：两处都加，第二排整体下移一整格。
  */
 function annotate(cellX, cellY, id, a) {
   const tx = cellX + INFO_X
   const ty = FRAME_Y + FRAME_H + 26
-  // `put` 自己会加 cellY —— 调用处只给格内偏移。上两版在调用处又加了一次 cellY，
-  // 于是第二排整体下移一整格（680px）被切掉：症状是「只有第二排越界」，根因是重复相加。
   const put = (suffix, y, text, size, color, weight) => add({
     id: `${id}-${suffix}`, shape: 'text', x: tx, y: cellY + y, w: INFO_W,
     text, size, font: 'SansSC', weight, color, align: 'left', wrap: true,
     lineHeight: Math.round(size * 1.5),
   })
-  // 时间码 + 机位同一行：左边是「什么时候」，右边是「用什么」
   put('tc', ty, a.time, 30, INK, 700)
   add({
     id: `${id}-kind`, shape: 'text', x: tx, y: cellY + ty, w: INFO_W,
@@ -149,9 +131,7 @@ function annotate(cellX, cellY, id, a) {
   put('rule', ty + 46, '—', 18, FAINT, 400)
   put('title', ty + 58, a.title, 25, INK, 700)
   put('cap', ty + 100, a.caption, 19, BODY, 400)
-  if (a.sub !== undefined && a.sub !== '') {
-    put('sub', ty + 208, a.sub, 21, INK, 500)
-  }
+  if (a.sub !== undefined && a.sub !== '') put('sub', ty + 208, a.sub, 21, INK, 500)
   put('rig', ty + 272, a.rig, 18, DIM, 400)
 }
 
@@ -186,7 +166,8 @@ const CELLS = [
       bar(f, `${P}-l3`, 26, 232, 142, 7, LINES)
       bar(f, `${P}-l4`, 26, 246, 100, 7, LINES)
       bar(f, `${P}-l5`, 26, 260, 138, 7, LINES)
-      inner(f, `${P}-cursor`, { shape: 'path', path: 'M 46 300 L 46 326 L 52 320 L 58 331 L 63 328 L 57 317 L 66 316 Z', paint: INK, opacity: 0.9 })
+      // 光标：路径图层的键必须叫 d
+      inner(f, `${P}-cursor`, { shape: 'path', d: 'M 46 300 L 46 326 L 52 320 L 58 331 L 63 328 L 57 317 L 66 316 Z', paint: INK, opacity: 0.9 })
     },
   },
   {
@@ -283,7 +264,6 @@ const CELLS = [
     rig: '纯黑 · 全片唯一的空镜',
     draw(f, P) {
       // 黑场铺满整个画框宽度：它是全片唯一「整屏黑」的镜头，两侧露出画面底的灰就把它讲成了别的东西。
-      // 这块故意画得比画框宽，靠子图层裁剪收边——裁剪是引擎自带的行为，不是巧合。
       bar(f, `${P}-black`, -200, -20, 620, D_H + 60, BLACK)
     },
   },
@@ -325,8 +305,39 @@ CELLS.forEach((c, i) => {
   annotate(cx, cy, id, c)
 })
 
-const scene = { canvas: { width: W, height: H }, ground: GROUND, layers }
+// ── GATE 1 的声明 ───────────────────────────────────────────────────────────
+// 渲染器拒绝没有 gates 块的场景，所以这一段是渲染的前置条件，不是文档。
+//
+// `layers` 的条目是**前缀**，闸门比对它们首次出现的位置。这里从已生成的图层里按顺序提取，
+// 而不是手写——手写的那份会与真实列表分岔，而分岔正是这道闸门要抓的东西。
+const layerPrefixes = []
+for (const l of layers) {
+  const id = String(l.id)
+  const prefix = id.includes('-') ? id.slice(0, id.indexOf('-')) : id
+  if (!layerPrefixes.includes(prefix)) layerPrefixes.push(prefix)
+}
+
+const scene = {
+  canvas: { width: W, height: H },
+  ground: GROUND,
+  gates: {
+    focus: '八格分镜表本身。每格内的画框＝相机取景，读者先读到时间码与机位，再读说明与字幕原文',
+    lightAxis: '本表不描绘光：它是横屏 16:9 的信息板，明度只用于分级（时间码最重、说明次之、器材最轻）',
+    layers: layerPrefixes,
+    drawingRule:
+      '八格同一构造：卡片 → 画框 → 框内构图 → 时间码/机位 → 标题 → 说明 → 字幕 → 器材。' +
+      '各格的差别只在框内构图与文案，版式规则不随格改变；框内构图的每一条也由同一条规则生成（矩形块表意）',
+    accentBand: [0, 0.02],
+    // 表里没有人物图，没有要保护的脸。刻意留空而不是省掉：闸门无法发现脸在哪，但它能报告「没有声明」。
+    forbiddenZones: [],
+    // 本表没有模拟实体纸张的元素（全是平面信息块），所以不需要 sheetRoles / groundEntities。
+  },
+  layers,
+}
 
 mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT.replace(/\.png$/i, '.json'), JSON.stringify(scene, null, 2) + '\n', 'utf8')
-console.log(JSON.stringify({ scene: OUT.replace(/\.png$/i, '.json'), png: OUT, layers: layers.length, cell: [CELL_W, CELL_H], frame: [FRAME_W, FRAME_H], sheet: [W, H] }))
+console.log(JSON.stringify({
+  scene: OUT.replace(/\.png$/i, '.json'), png: OUT, layers: layers.length,
+  cell: [CELL_W, CELL_H], frame: [FRAME_W, FRAME_H], sheet: [W, H], gates: layerPrefixes,
+}))

@@ -38,6 +38,16 @@
  */
 
 import { parseColor, cssColor, clamp, mixOklab, relativeLuminance } from './color.mjs'
+// The blend vocabulary and its error message live in `render.mjs` so that a layer's
+// `blend` and an effect spec's `blend` cannot drift apart; importing it here is what
+// makes the effect path refuse a typo instead of compositing it as `normal`.
+//
+// This is a deliberate module cycle — `render.mjs` imports this module at its top —
+// and it is safe for one specific reason: `assertBlendMode` is a function DECLARATION,
+// so its binding exists before either module body runs, and nothing calls it during
+// module evaluation. `LAYER_EFFECTS` below is one object literal; every call happens
+// at render time, long after both modules have finished loading.
+import { assertBlendMode } from './render.mjs'
 
 // ── shared image plumbing ───────────────────────────────────────────────────
 
@@ -333,8 +343,45 @@ export function edgeRamp(alpha, width, height, size) {
   return out
 }
 
-/** Composite one RGBA image over another with a uniform alpha multiplier. */
+/**
+ * Composite one RGBA image over another with a uniform alpha multiplier.
+ *
+ * THE MODE IS VALIDATED HERE, WHICH IS THE ONE PLACE EVERY LAYER EFFECT PASSES
+ * ---------------------------------------------------------------------------
+ * `blend` reaches this function from all ten `LAYER_EFFECTS` entries, and this is
+ * where it is checked — centrally, rather than once per effect. The rule for whoever
+ * adds the eleventh: an effect may carry `blend` and pass it here; nothing else is
+ * needed, and nothing here should be duplicated in `run()`.
+ *
+ * WHAT IT USED TO DO WITH A TYPO, AND WHY THAT WAS THE WORSE BUG
+ * -------------------------------------------------------------
+ * Only `multiply` and `screen` are implemented below; every other mode falls through
+ * to normal source-over compositing, which is right for `normal` and wrong for all
+ * fifteen of the others. The mode was never validated, so an effect written
+ * `blend: 'softLight'` — the canvas name being `soft-light` — composited as `normal`
+ * and said nothing. Measured against a `colorOverlay` of white at opacity 1 over a
+ * mid-grey shape: `blend: 'normal'` and `blend: 'softLight'` produced byte-identical
+ * output with zero warnings, while the `multiply` the author meant came out visibly
+ * different. In a real session six texture layers were written with that typo, every
+ * one of them fell back to normal, and the render still looked plausible enough to
+ * ship. A silent fallback to a different mode is harder to see than a missing layer,
+ * because a missing layer at least changes the composition.
+ *
+ * So an unknown mode THROWS. The throw is not swallowed: the per-layer try/catch in
+ * `render.mjs` turns it into a `warnings` entry naming the layer, the offending value
+ * and every accepted one. That is the same channel a failed layer already uses, and
+ * deliberately not a second one.
+ *
+ * What that costs, stated rather than glossed: several effects compute their pixels
+ * before they composite (a bevel builds its ramp and shades every edge first), so the
+ * throw lands after that work has been spent and the failed layer is the price. The
+ * alternative — checking earlier, in the dispatcher — would be the same vocabulary in a
+ * second place, which is the thing this function exists to prevent. The cost is bounded
+ * by one layer and the failure is loud, which is the trade this engine already made
+ * everywhere else.
+ */
 export function overImage(base, top, alpha, mode) {
+  assertBlendMode(mode)
   const out = new Uint8ClampedArray(base.data.length)
   for (let i = 0; i < base.data.length; i += 4) {
     const sa = (top.data[i + 3] / 255) * alpha
