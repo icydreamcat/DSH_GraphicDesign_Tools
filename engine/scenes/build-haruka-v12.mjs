@@ -508,6 +508,19 @@ const scene = {
   // GATE 1 的声明。渲染器拒绝没有 gates 块的场景；这是引擎自带的固件场景，
   // 用 --no-gates 也能渲，但补上之后它和设计稿走同一条链（交付闸门 H3/H4 会读它）。
   gates: {
+    sequence: [
+      "the layers listed in `gates.layers`: a fixed engine fixture, not a scene read from a brief",
+      "engine fixture — it demonstrates a technique rather than reproducing a reference language",
+      "top-left to bottom-right; the sheet is read as a grid of cells",
+      "no depicted light source; the fixture demonstrates effects, so each layer states its own",
+      "held in a narrow band by construction, because a fixture must not fight the effect it shows",
+      "each cell is a sample; nothing here is a label, prop or device",
+      "a single accent carries the sheet; see `accentBand`",
+      "no material families on this sheet, so nothing to interleave",
+      "rectangles and ellipses only — the geometry is deliberately plain so the effect is what is judged",
+      "the effect under demonstration is the subject of the sheet",
+      "whatever the demonstrated effect produces, reported by the render rather than claimed here",
+    ],
     focus: 'THE ONE FOCUS of this sheet, and what it competes with',
     lightAxis: 'WHERE THE LIGHT COMES FROM (direction and quality, in one clause)',
     // 从本文件的 layers 里按顺序提取，不是手写 —— 手写的会与真实列表分岔

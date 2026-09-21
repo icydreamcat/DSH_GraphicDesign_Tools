@@ -109,8 +109,17 @@
         layers       — the draw order, as id prefixes in sequence (the gate compares it against the list)
         drawingRule  — the rule that generates each group; a group without a stated rule is not designed
         accentBand   — the accent's allowed flat-fill share, e.g. [0, 0.05]
-      Those five keys are the gate's input. Write them first, then build. If you cannot fill one, you are
+        sequence     — the decision order below, every step stated or marked inapplicable WITH its reason
+      Those keys are the gate's input. Write them first, then build. If you cannot fill one, you are
       not ready to place anything, and the renderer will tell you so rather than let you proceed blind.
+
+      THE DECISION ORDER IS PART OF THAT DECLARATION, not advice. State each step in `gates.sequence`,
+      in this order — 清点 / 判语言 / 定动线 / 定光轴 / 分明暗 / 分角色 / 分饱和 / 交错 / 造型 / 效果 / 质感 —
+      and the renderer refuses a declaration that skips a step or states them out of order. A step may be
+      marked inapplicable as `{ why: "..." }`, and the reason is required, because "not applicable" and
+      "not thought about" are indistinguishable from the outside. The order is not decoration: the light
+      axis settles before anything is placed, and by the time a wrong shadow direction shows, every
+      element already has a size and a position.
 
       2 · READ THE WARNINGS ARRAY BEFORE YOU BELIEVE THE IMAGE — enforced by the delivery gate.
       Every layer that failed is named there with its reason, and NO IMAGE WILL EVER SHOW IT: the layer is
@@ -134,9 +143,18 @@
 
       5 · THE SCENE IS THE DELIVERABLE'S RECORD — so it must describe what it declared.
       `gates.layers` is compared against the real layer list; `forbiddenZones`, when declared, are checked
-      for overlaps; `allowTranslucent` covers the one case where translucency is an object's real property.
-      Declaring these is not paperwork — it is the only reason the checks can run at all, and a scene that
-      declared nothing is refused rather than measured.
+      for overlaps; `allowTranslucent` covers the one case where translucency is an object's real property;
+      `groundEntities` and `sheetRoles` are what let H4b and H5 judge anything at all. Declaring these is
+      not paperwork — it is the only reason the checks can run, and a scene that declared nothing is
+      refused rather than measured.
+
+      THE COST OF A CHECK FOLLOWS ITS RISK, so do not spend a look where arithmetic has already answered.
+      A declared `forbiddenZones` region that nothing intersects is settled by geometry: the gate passes it
+      with no crop and no artefact. Only when something really does overlap does the gate report the
+      position, the percentage of the zone and the opacity, print a ready-to-run 1:1 crop of that rectangle,
+      and require a look — because geometry is not occlusion, and whether a near-transparent crossing is a
+      deliberate treatment or an accident is not a question a rule can answer. Look at the crop before
+      acting on it: if the zone is legible and unobstructed, the failure is the geometry being conservative.
 
       6 · STOP AT THE BOUNDARY A MEASUREMENT CANNOT REACH, AND SAY SO.
       Whether a metaphor is apt, whether a character suits its audience, whether a composition genuinely

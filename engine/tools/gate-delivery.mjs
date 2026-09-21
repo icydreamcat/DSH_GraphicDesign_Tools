@@ -258,12 +258,65 @@ if (zones === null || zones.length === 0) {
       const overlapW = Math.max(0, Math.min(lx2, zx2) - Math.max(x, z.x))
       const overlapH = Math.max(0, Math.min(ly2, zy2) - Math.max(y, z.y))
       if (overlapW > 0 && overlapH > 0) {
-        hits.push(`${l.id} overlaps ${z.name || 'zone'} by ${Math.round(overlapW)}×${Math.round(overlapH)}px`)
+        const area = overlapW * overlapH
+        const zoneArea = Math.max(1, z.w * z.h)
+        hits.push({
+          layer: String(l.id || '(unnamed)'),
+          zone: z.name || 'zone',
+          rectangle: {
+            x: Math.round(Math.max(x, z.x)),
+            y: Math.round(Math.max(y, z.y)),
+            w: Math.round(overlapW),
+            h: Math.round(overlapH),
+          },
+          shareOfZone: area / zoneArea,
+          opacity: typeof l.opacity === 'number' ? l.opacity : 1,
+          text: `${l.id} overlaps ${z.name || 'zone'} by ${Math.round(overlapW)}×${Math.round(overlapH)}px — ` +
+            `${(area / zoneArea * 100).toFixed(0)}% of the zone`,
+        })
       }
     }
   }
-  if (hits.length === 0) pass.push({ id: 'H4b', what: 'nothing sits inside a forbidden zone' })
-  else fail.push({ id: 'H4b', what: 'nothing sits inside a forbidden zone', detail: `${hits.length} overlap(s)`, items: hits.slice(0, 14) })
+
+  if (hits.length === 0) {
+    // THE CHEAP ANSWER IS THE PROOF. A declared zone that nothing intersects is settled by
+    // arithmetic — no crop, no look, no artefact, no cost. That is the whole point of weighing the
+    // price against the risk: demanding a picture here would charge every deliverable for a
+    // question the geometry already answered.
+    pass.push({ id: 'H4b', what: 'nothing sits inside a forbidden zone (checked by geometry; no look needed)' })
+  } else {
+    /**
+     * There IS a geometric intersection, and geometry is not the same question as occlusion. A
+     * near-transparent texture crossing a face is a legitimate design; an opaque plate over it is an
+     * accident. The gate can settle the first half for free and cannot settle the second at all —
+     * so it does the free half, states the numbers, and hands over a look that costs one crop rather
+     * than asking for a verdict it cannot reach.
+     *
+     * The crop command is printed ready to run, against the PNG the caller actually passed, because
+     * "go and look at the region where X and Y intersect" is an instruction someone has to translate
+     * into coordinates — and that translation is exactly the step that gets skipped when a session is
+     * tired. The gate knows the rectangle; printing it removes the excuse.
+     */
+    const worst = [...hits].sort((a, b) => b.shareOfZone - a.shareOfZone)[0]
+    const r = worst.rectangle
+    const crop = pngArg === null
+      ? 'pass --png <render.png> and the gate will print a crop command for the region'
+      : `node tools/crop-view.mjs "${abs(pngArg)}" "${abs(pngArg).replace(/\.png$/i, '')}-forbidden-zone.png" ` +
+        `${r.x} ${r.y} ${r.w} ${r.h} 1`
+    fail.push({
+      id: 'H4b',
+      what: 'nothing sits inside a forbidden zone',
+      detail:
+        `${hits.length} overlap(s). Geometry is not occlusion: a near-transparent layer crossing the zone ` +
+        `is a legitimate design and an opaque one is an accident, and only a look can tell them apart. ` +
+        `Largest overlap is ${worst.layer} over "${worst.zone}" at ${(worst.shareOfZone * 100).toFixed(0)}% of the zone, opacity ${worst.opacity}.`,
+      items: hits.slice(0, 14).map((h) => h.text),
+      crop,
+      caveat:
+        'LOOK AT THE CROP BEFORE ACTING. The gate cannot see, and it will not guess: if the crop shows the ' +
+        'zone legible and unobstructed, this failure is the geometry being conservative, not a defect.',
+    })
+  }
 }
 
 /* ── H5  no declared sheet is semi-transparent ───────────────────────────── */
@@ -433,6 +486,7 @@ if (asJson) {
     console.log(`  FAIL  ${f.id.padEnd(4)} ${f.what}`)
     console.log(`        ${f.detail}`)
     for (const it of f.items || []) console.log(`          · ${String(it).slice(0, 150)}`)
+    if (f.crop) console.log(`        LOOK: ${f.crop}`)
     if (f.caveat) console.log(`        ${f.caveat}`)
   }
   console.log('')

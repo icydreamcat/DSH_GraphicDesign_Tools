@@ -36,6 +36,20 @@ function scene(overrides = {}) {
       layers: ['bg', 'fg'],
       drawingRule: 'two rectangles, each stated as its own layer',
       accentBand: [0, 0.05],
+      // The decision order, stated in order. An array entry IS the step at its position.
+      sequence: [
+        'two rectangles: a full-bleed ground and one square',
+        'not a reference-driven piece — this is a fixture, so no reference language applies',
+        'the square, then nothing else',
+        'no depicted light; the fixture is flat on purpose',
+        'one ink, one paper — no tonal banding to decide',
+        'the square is the subject; the ground is the field it stands on',
+        'one black accent on white, inside accentBand',
+        'one material family, so nothing to interleave',
+        'rectangles only, placed as declared',
+        'no effects on this fixture',
+        'no texture: the fixture exists to test the gate, not to look like anything',
+      ],
     },
     layers: [
       { id: 'bg', shape: 'rect', x: 0, y: 0, w: 1, h: 1, paint: '#FFFFFF' },
@@ -46,6 +60,9 @@ function scene(overrides = {}) {
   if (overrides.gates === undefined && overrides.gates !== null) merged.gates = base.gates
   return merged
 }
+
+/** The valid gates from `scene()`, for building single-change violations. */
+const goodGates = () => JSON.parse(JSON.stringify(scene().gates))
 
 function write(name, obj) {
   const p = join(tmp, `${name}.json`)
@@ -78,21 +95,49 @@ console.log('\n放行组 —— 正确声明的场景必须通过')
 
 console.log('\n拒绝组 · 渲染 —— gates 的各种残次品都必须挡住')
 {
+  // Every case derives from the VALID declaration and changes ONE thing, so a failure names the
+  // thing under test rather than "and also it had no sequence" — a test that fails for two reasons
+  // stops telling you which one it is testing.
+  const mutate = (fn) => { const g = goodGates(); fn(g); return scene({ gates: g }) }
   const cases = [
     ['无 gates 块', scene({ gates: null }), null],
     ['gates 是数组', scene({ gates: [] }), null],
-    ['缺 focus', scene({ gates: { lightAxis: 'x', layers: ['bg', 'fg'], drawingRule: 'y', accentBand: [0, 0.05] } }), 'focus'],
-    ['focus 是空串', scene({ gates: { focus: '   ', lightAxis: 'x', layers: ['bg', 'fg'], drawingRule: 'y', accentBand: [0, 0.05] } }), 'focus'],
-    ['layers 只有一个（表达不了顺序）', scene({ gates: { focus: 'a', lightAxis: 'x', layers: ['bg'], drawingRule: 'y', accentBand: [0, 0.05] } }), 'two'],
-    ['accentBand 不是两个数', scene({ gates: { focus: 'a', lightAxis: 'x', layers: ['bg', 'fg'], drawingRule: 'y', accentBand: [0.05] } }), 'accentBand'],
-    ['accentBand 倒置', scene({ gates: { focus: 'a', lightAxis: 'x', layers: ['bg', 'fg'], drawingRule: 'y', accentBand: [0.5, 0.05] } }), 'accentBand'],
-    ['缺 drawingRule', scene({ gates: { focus: 'a', lightAxis: 'x', layers: ['bg', 'fg'], accentBand: [0, 0.05] } }), 'drawingRule'],
+    ['缺 focus', mutate((g) => { delete g.focus }), 'focus'],
+    ['focus 是空串', mutate((g) => { g.focus = '   ' }), 'focus'],
+    ['layers 只有一个（表达不了顺序）', mutate((g) => { g.layers = ['bg'] }), 'two'],
+    ['accentBand 不是两个数', mutate((g) => { g.accentBand = [0.05] }), 'accentBand'],
+    ['accentBand 倒置', mutate((g) => { g.accentBand = [0.5, 0.05] }), 'accentBand'],
+    ['缺 drawingRule', mutate((g) => { delete g.drawingRule }), 'drawingRule'],
+    // The decision order, which is the newest part of the contract and the easiest to skip.
+    ['缺 sequence', mutate((g) => { delete g.sequence }), 'sequence'],
+    ['sequence 少两步', mutate((g) => { g.sequence = g.sequence.slice(0, 9) }), 'does not account for step'],
+    ['sequence 多一条', mutate((g) => { g.sequence = [...g.sequence, 'an extra thing'] }), 'more entries'],
+    ['sequence 标不适用但没原因', mutate((g) => { g.sequence[6] = {} }), 'without a reason'],
+    ['sequence 把不可跳的一步标不适用', mutate((g) => { g.sequence[0] = { why: 'skipped it' } }), 'cannot be skipped'],
+    ['sequence 是空数组', mutate((g) => { g.sequence = [] }), 'empty'],
   ]
   for (const [label, obj, needle] of cases) {
     const r = render(`bad-${cases.findIndex((c) => c[0] === label)}`, obj)
     const ok = r.status !== 0 && !existsSync(r.png) && (needle === null || r.stderr.includes(needle))
-    check(label, ok, `exit ${r.status}${needle === null ? '' : r.stderr.includes(needle) ? '' : `（信息里没有 "${needle}"）`}`)
+    check(label, ok, `exit ${r.status}${needle === null || r.stderr.includes(needle) ? '' : `（信息里没有 "${needle}"）`}`)
   }
+
+  // The order can only be checked where names are explicit — the object form. The array form's
+  // meaning IS the sequence, so reordering it is not a detectable error, it is a different order.
+  console.log('  — 顺序本身：对象形式里指名才查得到')
+  const outOfOrder = goodGates()
+  const keys = ['inventory', 'language', 'sightline', 'tonalBands', 'roles', 'saturation', 'interleave', 'form', 'effects', 'texture', 'lightAxis']
+  const named = {}
+  for (const k of keys) named[k] = 'stated'
+  const r2 = render('bad-order', scene({ gates: { ...goodGates(), sequence: named } }))
+  check('对象形式把光轴挪到最后 → 拦住', r2.status !== 0 && r2.stderr.includes('out of order'),
+    `exit ${r2.status}`)
+
+  // And the valid declaration must still pass in the object form, or the check would be unusable.
+  const objFine = {}
+  for (const k of ['inventory', 'language', 'sightline', 'lightAxis', 'tonalBands', 'roles', 'saturation', 'interleave', 'form', 'effects', 'texture']) objFine[k] = 'stated'
+  const r3 = render('ok-object-form', scene({ gates: { ...goodGates(), sequence: objFine } }))
+  check('对象形式按序声明 → 放行', r3.status === 0 && existsSync(r3.png), `exit ${r3.status}`)
 }
 
 console.log('\n拒绝组 · 交付闸门 —— 声明齐全但内容违规时也必须挡住')
@@ -115,6 +160,39 @@ console.log('\n拒绝组 · 交付闸门 —— 声明齐全但内容违规时�
   zoneOk.gates.groundEntities = ['fg']
   const g3 = gate('h4b-ok', zoneOk)
   check('H4b：声明 groundEntities 之后放行（豁免真的生效）', g3.status === 0, `exit ${g3.status}`)
+
+  // H4b 的代价与风险挂钩：不相交时零代价，相交时给出位置、比例与一条能直接跑的裁切命令。
+  const noTouch = scene()
+  noTouch.gates.forbiddenZones = [{ name: 'face', x: 200, y: 120, w: 80, h: 70 }]
+  const g3b = gate('h4b-notouch', noTouch)
+  check('H4b：声明了禁区但几何上不相交 → 放行，且明说不需要看图',
+    g3b.status === 0 && /no look needed/.test(g3b.out), `exit ${g3b.status}`)
+  check('H4b：不相交时不要求任何物证，也不打印裁切命令',
+    !/LOOK:/.test(g3b.out), '未相交却要了图就是无谓开销')
+
+  // 相交那一路：渲染出 PNG，把 --png 给闸门，裁切命令必须带真实坐标且可直接执行。
+  const touched = scene()
+  touched.gates.forbiddenZones = [{ name: 'face', x: 60, y: 60, w: 120, h: 100 }]
+  const rendered = render('h4b-touch', touched)
+  const g3c = spawnSync(process.execPath,
+    [DESIGN, 'gate-delivery', write('h4b-touch-gate', touched), '--png', rendered.png],
+    { encoding: 'utf8', cwd: ENGINE })
+  const out3c = `${g3c.stdout ?? ''}${g3c.stderr ?? ''}`
+  const lookLine = out3c.split('\n').find((l) => /LOOK:/.test(l)) ?? ''
+  const coords = /(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+1\s*$/.exec(lookLine.replace(/\r$/, ''))
+  check('H4b：相交时报出比例与位置', g3c.status !== 0 && /\d+% of the zone/.test(out3c), `${out3c.split('\n').find((l) => /overlaps/.test(l)) ?? '无'}`.trim().slice(0, 80))
+  check('H4b：相交时打印一条可直接执行的裁切命令', lookLine !== '' && coords !== null,
+    lookLine === '' ? '没有 LOOK 行' : `坐标 ${coords === null ? '缺失' : coords.slice(1).join(' ')}`)
+  check('H4b：明说几何不等于遮挡，裁决要靠看', /Geometry is not occlusion/.test(out3c))
+  if (coords !== null) {
+    // 命令必须真的能跑 —— 一句不能执行的指示等于没给。
+    const crop = spawnSync(process.execPath,
+      [join(ENGINE, 'tools', 'crop-view.mjs'), rendered.png, join(tmp, 'zone-look.png'),
+        coords[1], coords[2], coords[3], coords[4], '1'],
+      { encoding: 'utf8', cwd: ENGINE })
+    check('H4b：那条裁切命令真的跑得通', crop.status === 0 && existsSync(join(tmp, 'zone-look.png')),
+      `exit ${crop.status}`)
+  }
 
   // H5：声明为 sheet 的图层半透明
   const semi = scene()
