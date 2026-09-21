@@ -33,6 +33,10 @@ const SUITES = [
   // Also walks the document size up to find where the backend refuses, since that boundary is
   // machine-dependent and hard-coding it would make the suite lie on a bigger machine.
   'supersample.mjs',
+  // The paired failure to "not enough detail" is "the same detail N times", and it passes every
+  // other count in the suite: high element count, low opacity, local detail. Thirteen copies of one
+  // card satisfy all of them, which is exactly what happened.
+  'homogeneity.mjs',
   // Cheap, and it is the gate that says whether the harness is loading the preset this
   // repository describes — so it runs before anything that spends time on pixels.
   'deploy-drift.mjs',

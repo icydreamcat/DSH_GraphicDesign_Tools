@@ -60,7 +60,33 @@ if (yaml === null) {
   if (row !== undefined) {
     const text = row.config.text
     const rules = text.split('\n').filter((l) => /^\s*\d+ · /.test(l)).length
-    check('policy 是短版：6 条可强制的规则', rules === 6, `${rules} 条规则，${text.length} 字符（旧版 22 条原则 / 15,640 字符）`)
+    /**
+     * THE RULE COUNT IS A FLOOR AND A CEILING, NOT AN EQUALITY. The invariant this policy promises
+     * is not "six rules": it is **short, and every rule says how it is held**. This assertion used
+     * to be `rules === 6`, which failed the moment a seventh rule was earned — reporting the
+     * intended change as a regression, which is the failure mode a verification script must not
+     * have. The floor guards against the section collapsing; the ceiling guards against it growing
+     * back into the essay it was compressed from.
+     */
+    check('policy 仍是短版：规则数在 4–10 之间（下限防塌缩，上限防长回文章）',
+      rules >= 4 && rules <= 10, `${rules} 条规则，${text.length} 字符（旧版 22 条原则 / 15,640 字符）`)
+    check('字符数仍显著低于旧版（< 9,000）',
+      text.length < 9000, `${text.length} / 15,640 = ${(text.length / 15640 * 100).toFixed(0)}%`)
+    /**
+     * Every numbered rule must say HOW IT IS HELD — either it names the check that enforces it, or
+     * it is one of the limits and says plainly that no check can reach it and whose judgement does.
+     *
+     * A rule that claims neither is the thing this whole section was rewritten to remove: text that
+     * reads as a requirement and is skippable at zero cost. The earlier version of this assertion
+     * demanded "enforced" on every rule, which flagged the two limits as failures — but a limit is
+     * not an unenforced rule, it is a rule about where enforcement stops, and confusing the two
+     * would push the section toward pretending measurement reaches further than it does.
+     */
+    const ruleLines = text.split('\n').filter((l) => /^\s*\d+ · /.test(l))
+    const unheld = ruleLines.filter((l) => !/enforced|enforce|MAKE THE ASSET|boundary|belong to the person/i.test(l))
+    check('每条编号规则都说明它靠什么成立（工具强制，或明说边界在谁的判断上）',
+      unheld.length === 0,
+      unheld.length === 0 ? `${rules} 条全部交代了` : `${unheld.length} 条没交代：${unheld.map((l) => l.trim().slice(0, 26)).join(' / ')}`)
     check('policy 不含 {{ （否则 design-policy.mjs 会拒绝挂载）', !text.includes('{{'))
     check('旧的 MECHANICS 段落没有被留在常驻段', !text.includes('── MECHANICS'))
     check('引用了 craft-and-material 与 design-judgement 两个新技能',

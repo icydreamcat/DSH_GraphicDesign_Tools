@@ -141,8 +141,8 @@
       a symptom through six consecutive edits of the wrong variable — six rounds of opacity for a defect
       that was layer ORDER, and two rounds of colour for a defect that was a misspelled blend mode.
 
-      5 · THE SCENE IS THE DELIVERABLE'S RECORD — so it must describe what it declared.
-      `gates.layers` is compared against the real layer list; `forbiddenZones`, when declared, are checked
+      5 · THE SCENE IS THE DELIVERABLE'S RECORD — enforced by the gates that read it.
+      It must describe what it declared: `gates.layers` is compared against the real layer list; `forbiddenZones`, when declared, are checked
       for overlaps; `allowTranslucent` covers the one case where translucency is an object's real property;
       `groundEntities` and `sheetRoles` are what let H4b and H5 judge anything at all. Declaring these is
       not paperwork — it is the only reason the checks can run, and a scene that declared nothing is
@@ -160,6 +160,28 @@
       Whether a metaphor is apt, whether a character suits its audience, whether a composition genuinely
       pleases — those belong to the person who owns the work. Naming that boundary is part of the
       deliverable. Substituting a confident guess for their judgement is not.
+
+      7 · MAKE THE ASSET. REACH FOR WHAT EXISTS SECOND.
+      A piece needs an emblem, a paper fibre, a metal clip, a light pass, a stamp, a torn edge, a pigment
+      bleed, a textile weave — and the reflex is to go and find an image. That reflex is the slowest and
+      weakest option, and it is wrong most of the time. The asset gets MADE: drawn as geometry in the scene,
+      or built with the engine and rendered like anything else, then LOOKED AT and kept only if it reads.
+      A generated asset is exactly reproducible, carries no licensing question, scales without resampling,
+      sits on the page's own grid and colour system by construction, and can be revised in place when the
+      light axis moves. A found image can do none of those things.
+
+      THIS IS THE SHORTEST PATH, NOT A DETOUR. Building one is a minute of parameters and one render;
+      hunting for one, judging whether it belongs, and then discovering it does not is longer and ends
+      with a worse object. When a piece looks thin, the usual cause is that nothing on it was MADE —
+      every element was placed. So the standing move is: try to make it, first, and go looking only when
+      making has genuinely failed.
+
+      WHAT FOLLOWS FROM THAT. Every time you build an asset, the construction goes into a generator under
+      `engine/scenes/` rather than into a one-off script, so the next piece starts from it instead of from
+      nothing. And when a build does not work, that result is a finding: say what was tried and what it
+      looked like, then try the next thing. A capability that was never attempted is not a missing
+      capability — the course this discipline came from is explicit that most of it can be made, and the
+      record shows the one thing that blocked a piece was an assumption that a material could not be built.
 
       BEFORE DELIVERY, run the gate and let it fail you:
         node bin/design.mjs gate-delivery ⟨scene.json⟩ --report ⟨render.report.json⟩

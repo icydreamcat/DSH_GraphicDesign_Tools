@@ -478,6 +478,41 @@ if (command === 'render') {
 
   const verification = verifyScene(scene)
 
+  /**
+   * PIXEL-BASED CHECKS, RUN HERE SO THAT `H7` CAN EVER FIRE.
+   *
+   * `verifyScene` reads the scene and nothing else, so its metrics are all declarations. But the
+   * delivery gate's accent check compares the accent's FLAT SHARE — a property of the rendered
+   * pixels — against the band the scene declared, and it read that from
+   * `report.verification.metrics.accentFlatShare`. Nothing wrote that key. `H7` therefore skipped
+   * on every delivery, printing "report carries no accentFlatShare", which reads like a finding
+   * about the scene but was really a hole in the toolchain: the one remaining silent pass.
+   *
+   * `verifyRender` already computes exactly those numbers and was already exported — it was simply
+   * never called from this path. The image is in memory at this point, so this costs one analysis
+   * pass (≈1.3 s on a 2400×1180 sheet) and buys a gate that actually runs.
+   *
+   * `--no-verify` skips it for throwaway probes, where the time matters more than the checks.
+   */
+  let pixelMetrics = null
+  if (values['no-verify'] !== true) {
+    try {
+      const analysis = await analyseReference(pngPath, { maxSide: 1400 })
+      // `verification.spec` is the one verifyScene derived from the scene — the same wiring the
+      // `verify` subcommand uses, so both paths judge against one spec rather than two.
+      pixelMetrics = verifyRender(analysis, verification.spec).metrics
+    } catch (error) {
+      // A failed measurement is reported, never swallowed: a metric that quietly
+      // becomes absent is how the gate above ended up skipping in the first place.
+      verification.issues.push({
+        kind: 'warning',
+        code: 'verify.pixelPassFailed',
+        message: `the pixel pass did not run (${error.message}), so accent/detail metrics are absent and the gate will SKIP those checks rather than pass them`,
+      })
+    }
+  }
+  if (pixelMetrics !== null) Object.assign(verification.metrics, pixelMetrics)
+
   let psdPath = null
   let psdInfo = null
   if (wantsPsd) {

@@ -123,8 +123,12 @@ const BANDS = [
 function marks(id, x, y, w, spec) {
   if (spec === undefined) return
   const { kind, n } = spec
-  const PAL = { mark: HAIR, rule: HAIR, tally: SIGNAL }
-  const ink = PAL[kind] ?? HAIR
+  // 记号用强调色，不用发丝灰。
+  //
+  // 第一版全部用 HAIR 灰，结果是 accent.almostNone：大块平涂 **0%**，落在合法区间
+  // （0.4–5%）之外——一张"几乎没上色"的图读成省了颜色，而不是克制。
+  // 记号是这张图真正的细节层，细节层就该是强调色出现的地方。
+  const ink = SIGNAL
   if (kind === 'rule') {
     // 分隔线：横向发丝线，条数＝件数
     for (let i = 0; i < n; i++) bar(`${id}-r${i}`, x, y + i * 7, w * 0.42, 2, ink, 0.9)
@@ -134,17 +138,17 @@ function marks(id, x, y, w, spec) {
     // 计数条：一条＝一件，成行排列；超过 8 后换行
     const perRow = 8
     for (let i = 0; i < n; i++) {
-      const cx = x + (i % perRow) * 13
-      const cy = y + Math.floor(i / perRow) * 9
-      bar(`${id}-t${i}`, cx, cy, 8, 3, ink, 0.95)
+      const cx = x + (i % perRow) * 14
+      const cy = y + Math.floor(i / perRow) * 10
+      bar(`${id}-t${i}`, cx, cy, 9, 4, ink, 0.95)
     }
     return
   }
   // mark：小方块阵列，代表"一组同类的东西"
   for (let i = 0; i < n; i++) {
-    const cx = x + (i % 10) * 11
-    const cy = y + Math.floor(i / 10) * 11
-    bar(`${id}-m${i}`, cx, cy, 5, 5, ink, 0.85)
+    const cx = x + (i % 10) * 13
+    const cy = y + Math.floor(i / 10) * 13
+    bar(`${id}-m${i}`, cx, cy, 7, 7, ink, 0.88)
   }
 }
 

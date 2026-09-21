@@ -249,6 +249,55 @@ export function verifyScene(scene) {
       `only ${visible.length} visible elements — the reference language gets its richness from many marks, not from a few large ones`,
       { count: visible.length })
   }
+
+  /**
+   * HOMOGENEITY — how much of this scene is the same element repeated.
+   *
+   * The paired failure to "not enough detail" is "the same detail N times", and it is the one that
+   * looks like success on every count this file already took: the element count is high, the
+   * opacity is low, the detail is local. Thirteen copies of one card pass all of them.
+   *
+   * Measured from the SCENE rather than the pixels, because it is a claim about repetition and the
+   * scene knows exactly what repeated. A pixel measure cannot tell "twenty marks that differ" from
+   * "twenty marks that do not" at small sizes — which is the same resolution limit that made the
+   * ratio-based detail criterion useless, so this does not repeat that mistake.
+   *
+   * The signature is shape + quantised size, not id: ids are unique by construction and would
+   * always report a maximum-entropy scene.
+   */
+  const sig = (l) => {
+    const q = (v) => (v === undefined ? '·' : String(Math.round(Number(v) * 4) / 4))
+    return [l.shape ?? 'rect', q(l.w), q(l.h), q(l.r ?? l.radius)].join('|')
+  }
+  const groups = new Map()
+  for (const e of visible) {
+    const k = sig(e.layer)
+    const g = groups.get(k) ?? { n: 0, sample: String(e.layer.id ?? ''), shape: e.layer.shape ?? 'rect' }
+    g.n++
+    groups.set(k, g)
+  }
+  const ranked = [...groups.values()].sort((a, b) => b.n - a.n)
+  const biggest = ranked[0] ?? { n: 0, sample: '', shape: '' }
+  const distinctSignatures = groups.size
+  const largestShare = visible.length === 0 ? 0 : biggest.n / visible.length
+  f.metrics.distinctElementSignatures = distinctSignatures
+  f.metrics.largestRepeatedGroup = biggest.n
+  f.metrics.largestRepeatedShare = round(largestShare)
+
+  if (visible.length >= 12 && largestShare > 0.5 && distinctSignatures <= 4) {
+    f.error('density.homogeneous',
+      `${biggest.n} of ${visible.length} elements are the same signature (${biggest.shape}, "${biggest.sample}") and the whole scene has only ${distinctSignatures} distinct signatures. That is one element repeated, not a system: its information content is one element's. Vary the group along the axes a reader actually reads — which form, how many, how heavy.`,
+      { repeated: biggest.n, of: visible.length, signatures: distinctSignatures })
+  } else if (visible.length >= 12 && largestShare > 0.35) {
+    f.warn('density.repetitive',
+      `${biggest.n} of ${visible.length} elements (${round(largestShare * 100)}%) share one signature, across ${distinctSignatures} signatures — much of the surface is repetition. Check whether each copy carries its own information.`,
+      { repeated: biggest.n, of: visible.length, signatures: distinctSignatures })
+  } else if (visible.length >= 12) {
+    f.note('density.varied',
+      `${distinctSignatures} distinct signatures across ${visible.length} elements; the largest group is ${biggest.n} (${round(largestShare * 100)}%)`,
+      { signatures: distinctSignatures, largest: biggest.n })
+  }
+
   if (heavyShare > 0.6 && visible.length < 25) {
     f.warn('density.everythingHeavy',
       `${round(heavyShare * 100)}% of elements are at 85%+ opacity with only ${visible.length} elements total — this is the "few elements, each heavy" signature that reads as clumsy. Raise the count and lower the weight.`,
@@ -425,6 +474,24 @@ export function verifyRender(analysis, spec) {
   f.metrics.measuredElements = analysis.structure.elementCount
   if (analysis.structure.elementCount < 6) {
     f.warn('composition.sparse', `only ${analysis.structure.elementCount} distinct regions were resolved — the layout may be too sparse for this language`, { count: analysis.structure.elementCount })
+  }
+
+  /**
+   * THE ACCENT BUDGET, SURFACED HERE BECAUSE THIS IS WHERE THE PIXELS ARE ALREADY BEING READ.
+   *
+   * `H7` in the delivery gate compares the accent's flat share against the band the scene declared.
+   * It read `report.verification.metrics.accentFlatShare`, and **that key was never written by
+   * anything** — so the check skipped on every delivery while printing a reason that read like a
+   * judgement about the scene ("report carries no accentFlatShare") rather than a hole in the
+   * toolchain. A gate that skips for a reason it invented is the silent pass this whole system
+   * exists to remove; it was the one remaining instance of it.
+   *
+   * The analysis is already running two hundred lines above, so the fix is to publish what it
+   * already knows rather than to measure twice.
+   */
+  if (analysis.accent !== undefined) {
+    if (typeof analysis.accent.flatShare === 'number') f.metrics.accentFlatShare = analysis.accent.flatShare
+    if (typeof analysis.accent.share === 'number') f.metrics.accentHueShare = analysis.accent.share
   }
 
   return { issues: f.issues, metrics: f.metrics }

@@ -24,6 +24,62 @@ things can be made, with a shared set of operations: `filter gallery`,
 **ways of processing existing material**, and the skill is choosing which chain to
 run, not which preset to apply.
 
+## Make it first — the default is to build, not to fetch
+
+**This is the standing move, not an option.** When a piece needs a mark, a surface
+or a fastener, the reflex is to go and find an image. That reflex is wrong most of
+the time, and it is the slowest of the available paths.
+
+| | Built | Found |
+|---|---|---|
+| Reproducible | exactly — it is geometry or a seeded render | no |
+| Licensing | none | a question every time |
+| Scales | re-render at any size | resampling, and it shows |
+| Fits the page | on the grid, in the palette, by construction | by luck, then by hand |
+| Revises when the light axis moves | change the parameter | start over |
+| Time | one build, one look | search, judge, discover it does not belong |
+
+**So: try to make it. Go looking only when making has genuinely failed.**
+
+### How "made" is done here
+
+1. **As geometry in the scene** — the fastest path, and the one that keeps the
+   asset inside the page's own system. A mark is rectangles and ellipses on the
+   declared grid; an array of them is a loop with a rule.
+2. **As a generator** — when the asset has its own internal structure (a crest, a
+   paper surface, a metal clip, a light pass), write it as a generator and render
+   it. **It goes under a generator directory rather than into a one-off script**, so
+   the next piece starts from it instead of from nothing. This is how a library
+   accumulates: by building, not by collecting.
+3. **Look at it before keeping it.** A build that has not been seen is not an
+   asset yet. Render it, view it at 1:1, and keep it only if it reads as the thing
+   it stands for.
+
+### What is worth building rather than finding
+
+| Need | Build it as |
+|---|---|
+| Crest / badge / stamp | outline family + inner field + mark + double stroke + toothing |
+| Paper surface | fibre + cockle relief + torn edge + pigment bleed, each its own layer |
+| Fastener / clip / eyelet | rectangle + bevel + paired inner shadow + a pressed slot |
+| Light | a white-plus-source-colour plate on black, screen-blended; direction stated |
+| Tape / band | texture + directional gradient + lit and shaded edges + end caps |
+| Ink / pigment | radial bleed + a darker pressed rim + one layer of deliberate imperfection |
+
+### When a build does not work
+
+Report it as a finding, not as a dead end: **say what was tried and what it looked
+like**, then try the next construction. Two rules about this, both learned the hard
+way:
+
+- **A capability that was never attempted is not a missing capability.** The one
+  thing that actually blocked a delivered piece was an assumption — that a
+  watercolour treatment could not be built — and it was false. Before recording a
+  limit as real, ask whether it is the medium's or the method's.
+- **"I cannot make this" is a claim that needs a build behind it.** Otherwise it is
+  the same shape of error as reporting a pass nobody measured.
+
+
 Two recorded corrections from a real session, both from the person who owns the
 work, both pointing at the same mistake:
 
