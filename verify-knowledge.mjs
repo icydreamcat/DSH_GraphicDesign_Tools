@@ -31,14 +31,24 @@ const LIB = join(WS, 'knowledge')
 const PAIRS = [
   ['tooling/设计方法原理-给agent.md', 'docs/设计方法原理-给agent.md'],
   ['tooling/设计问题与技术问题-给agent.md', 'docs/设计问题与技术问题-给agent.md'],
-  // The 终末地 breakdown is a PROJECT document — its home is the deck it was written for — so
-  // the repository copy was removed and this pair now guards the project copy instead. The
-  // library keeps a general copy under reference/, because the vocabulary it establishes is
-  // reusable beyond that one deck; the project keeps the one that belongs to it.
-  ['reference/终末地-设计语言拆解.md', '../projects/2026-09-16-endfield-language-deck/终末地设计语言拆解.md'],
-  // 视频测量 and the retrospectives exist ONLY in the library. They are process material, so a
-  // clone does not get them; the repository keeps the two methodology documents, which the
-  // depth-and-structure skill cites and which let a fresh checkout read the rules at all.
+  // The breakdown is paired with its REPOSITORY copy, because the repository copy is the
+  // authoritative one: the `depth-and-structure` skill cites it from `docs/`, and a fresh clone
+  // has to be able to read it. The library copy is the local reading copy of the same text.
+  //
+  // The project's own copy is deliberately NOT paired to it. That copy is a historical record of
+  // what was delivered — it must be able to differ, because the conclusion document keeps being
+  // corrected while the delivered artefact does not change. Pairing them meant every correction
+  // to the specification registered as "drift", which is the opposite of what a drift check is
+  // for. A record of what was delivered is not a copy of the current specification.
+  ['reference/终末地-设计语言拆解.md', 'docs/终末地设计语言拆解.md'],
+  ['tooling/视频测量-录像要求与工具.md', 'docs/视频测量-录像要求与工具.md'],
+  ['reference/设计参考与方法-总纲.md', 'docs/reference/设计参考与方法-总纲.md'],
+  ['reference/prior-设计语言.md', 'docs/reference/prior-设计语言.md'],
+  ['reference/官方原图提炼的设计原理.md', 'docs/reference/官方原图提炼的设计原理.md'],
+  ['reference/timeline-KV-拆解.md', 'docs/reference/timeline-KV-拆解.md'],
+  ['reference/合成设计方法总纲-四门课合并.md', 'docs/reference/合成设计方法总纲-四门课合并.md'],
+  ['reference/清点先于测量.md', 'docs/reference/清点先于测量.md'],
+  ['tooling/遮罩溶解-只能单块整盒alpha.md', 'docs/reference/遮罩溶解-只能单块整盒alpha.md'],
 ]
 
 /**
