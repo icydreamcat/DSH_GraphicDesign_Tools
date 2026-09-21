@@ -12,14 +12,18 @@ composing anything; apply §5 before adding a single element.
 
 ## What this skill is for
 
-Sources: four measured studies of a shipped design language, in `docs/`:
+Sources: the repository's rule set, in `docs/rules/` — plus two methodology documents in `docs/`:
 
 | File | What it is |
 |---|---|
+| `docs/rules/深色界面-完整做法.md` | The specification, as rules: surfaces, colour and accent budget, type, form, depth, density, layout, prohibitions. |
+| `docs/rules/测量与清点.md` | The order that precedes measuring, and what only video can decide (alpha, motion). |
 | `docs/设计方法原理-给agent.md` | The method. Four ordering layers, depth axis, the fill-vs-organisation rule. |
 | `docs/设计问题与技术问题-给agent.md` | A real delivery's failure list, with the numbers. |
-| `docs/终末地设计语言拆解.md` | The specification and the measurement boundary. |
-| `docs/视频测量-录像要求与工具.md` | What only video can decide (alpha, motion). |
+
+The case studies behind these — the full breakdowns, the measurements, the claims that were
+overturned — are **not shipped**. They are local reading material: this skill cites them by
+name in its prose, and a fresh clone gets the rules rather than the cases.
 
 Every threshold below is a **measured anchor from one design language**, not a target to
 reproduce. They are calibration, and they are the difference between a number and a guess.

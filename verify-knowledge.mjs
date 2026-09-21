@@ -31,24 +31,21 @@ const LIB = join(WS, 'knowledge')
 const PAIRS = [
   ['tooling/设计方法原理-给agent.md', 'docs/设计方法原理-给agent.md'],
   ['tooling/设计问题与技术问题-给agent.md', 'docs/设计问题与技术问题-给agent.md'],
-  // The breakdown is paired with its REPOSITORY copy, because the repository copy is the
-  // authoritative one: the `depth-and-structure` skill cites it from `docs/`, and a fresh clone
-  // has to be able to read it. The library copy is the local reading copy of the same text.
+  // WHY ONLY TWO, AND WHERE THE CASE MATERIAL WENT
+  // ----------------------------------------------
+  // The repository ships RULES, not cases. Everything a reader can act on directly lives in
+  // `docs/rules/`, and the case material behind it — the breakdowns, the measured studies, the
+  // course notes — stays in the local library, because it records what happened and whose work
+  // was measured rather than what to do.
   //
-  // The project's own copy is deliberately NOT paired to it. That copy is a historical record of
-  // what was delivered — it must be able to differ, because the conclusion document keeps being
-  // corrected while the delivered artefact does not change. Pairing them meant every correction
-  // to the specification registered as "drift", which is the opposite of what a drift check is
-  // for. A record of what was delivered is not a copy of the current specification.
-  ['reference/终末地-设计语言拆解.md', 'docs/终末地设计语言拆解.md'],
-  ['tooling/视频测量-录像要求与工具.md', 'docs/视频测量-录像要求与工具.md'],
-  ['reference/设计参考与方法-总纲.md', 'docs/reference/设计参考与方法-总纲.md'],
-  ['reference/prior-设计语言.md', 'docs/reference/prior-设计语言.md'],
-  ['reference/官方原图提炼的设计原理.md', 'docs/reference/官方原图提炼的设计原理.md'],
-  ['reference/timeline-KV-拆解.md', 'docs/reference/timeline-KV-拆解.md'],
-  ['reference/合成设计方法总纲-四门课合并.md', 'docs/reference/合成设计方法总纲-四门课合并.md'],
-  ['reference/清点先于测量.md', 'docs/reference/清点先于测量.md'],
-  ['tooling/遮罩溶解-只能单块整盒alpha.md', 'docs/reference/遮罩溶解-只能单块整盒alpha.md'],
+  // So there is nothing left to pair for those documents: a pair asserts "these two files must
+  // hold the same content", and a document with no repository counterpart has no such claim to
+  // check. The two above are the exception because a fresh clone has to be able to read the
+  // methodology at all, and the `depth-and-structure` skill cites them.
+  //
+  // NOT PAIRED, deliberately: the project's own copy of the breakdown. It is a record of what was
+  // delivered and must be free to differ from any later corrected version — pairing it meant every
+  // correction registered as "drift", which is the opposite of what a drift check is for.
 ]
 
 /**
