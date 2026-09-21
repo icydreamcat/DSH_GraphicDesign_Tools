@@ -25,6 +25,14 @@ const SUITES = [
   'analyze-flatness.mjs',
   'check-render.mjs',
   'workspace-layout.mjs',
+  // Both-ways gate self-test: a gate that only refuses gets switched off, and one that only
+  // admits is decoration, so this suite drives every failure mode AND the passes it must allow.
+  'gate-both-ways.mjs',
+  // Measures coverage error against the ANALYTIC area of a circle rather than counting blend
+  // pixels — counting them would assert something false on this rasteriser (see the suite header).
+  // Also walks the document size up to find where the backend refuses, since that boundary is
+  // machine-dependent and hard-coding it would make the suite lie on a bigger machine.
+  'supersample.mjs',
   // Cheap, and it is the gate that says whether the harness is loading the preset this
   // repository describes — so it runs before anything that spends time on pixels.
   'deploy-drift.mjs',

@@ -91,6 +91,24 @@
  * with an explicit radius of 1 or less is not multiplied. At that size the blur
  * is under one device pixel and is a no-op at any factor, so the boundary is
  * stated rather than worked around.
+ *
+ * WHAT IT COSTS
+ * -------------
+ * Memory, and quadratically in the factor, because every buffer in this renderer is
+ * full-canvas: the composite, the layer being drawn, and a scratch buffer per mask or
+ * effect. For a 2420x1336 document (the storyboard fixture) one full-canvas buffer is
+ *
+ *   1x    13 MB      2420x1336
+ *   2x    52 MB      4840x2672
+ *   3x   116 MB      7260x4008
+ *   4x   207 MB      9680x5344
+ *
+ * and several are alive at once, so a 3x render of that document peaks in the
+ * hundreds of MB. `renderScene` prints that arithmetic when an allocation fails and
+ * REFUSES the render; it does not fall back to 1x, because a supersample request
+ * that quietly does nothing is the silent failure this codebase keeps paying for.
+ * `SUPERSAMPLE_LIMIT` is 4 for the same reason: beyond it the cost is no longer
+ * something a caller can be surprised by safely.
  */
 
 /** Largest accepted factor. */
@@ -105,7 +123,7 @@ export const SUPERSAMPLE_LIMIT = 4
 const FRACTIONAL_KEYS = ['x', 'y', 'w', 'h', 'x1', 'y1', 'x2', 'y2', 'originX', 'originY', 'lineHeight', 'radius', 'cx', 'cy', 'r', 'r0']
 
 /** Keys that are pixels whatever their value: stroke widths, blur radii, offsets. */
-const PIXEL_KEYS = ['width', 'size', 'cell', 'blur', 'spread', 'distance', 'choke', 'dx', 'dy']
+const PIXEL_KEYS = ['width', 'height', 'size', 'cell', 'blur', 'spread', 'distance', 'choke', 'dx', 'dy']
 
 /** Arrays whose members are pixels, whole-list. */
 const PIXEL_ARRAYS = ['dash', 'rampOrigin', 'rampSize']
@@ -133,8 +151,9 @@ export function resolveSupersample(value) {
     // Layer buffers are full-canvas, and the renderer holds several at once: for a
     // 2400x1350 document one buffer is 13 MB at 1x, 116 MB at 3x, and 207 MB at 4x.
     throw new Error(
-      `supersample ${value} is above the limit of ${SUPERSAMPLE_LIMIT}. Every layer buffer is full-canvas `
-      + `and is held at the supersampled size: a 2400x1350 document needs 116 MB per buffer at 3x and 207 MB at 4x.`,
+      `supersample ${value} is above the limit of ${SUPERSAMPLE_LIMIT}. Every buffer this renderer holds is `
+      + `full-canvas and is held at the supersampled size, so the cost is the whole document multiplied by the `
+      + `factor squared (a 2400x1350 document needs 116 MB per buffer at 3x and 207 MB at 4x), several times over.`,
     )
   }
   return value
@@ -155,7 +174,21 @@ export function resolveSupersample(value) {
  */
 export function inflateScene(scene, factor) {
   if (factor === 1) return scene
-  return scaleValue(scene, factor, new WeakMap(), null)
+  const out = scaleValue(scene, factor, new WeakMap(), null)
+  // The canvas is rounded to whole delivered pixels FIRST and then multiplied, so the
+  // copy declares exactly the canvas the renderer will size — the same arithmetic
+  // `renderScene` uses, and the reason it takes the delivered size from the caller's
+  // declaration and not from this copy. A scene declaring 800.4 already rounds to 800
+  // today, and at 3x has to be 2400 rather than 2401: a canvas that is not a whole
+  // number of blocks would need a partial block at its right edge, and the reduction
+  // refuses one rather than silently averaging a short block.
+  if (out.canvas !== null && typeof out.canvas === 'object') {
+    out.canvas = {
+      width: Math.round(scene.canvas.width) * factor,
+      height: Math.round(scene.canvas.height) * factor,
+    }
+  }
+  return out
 }
 
 /**

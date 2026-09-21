@@ -249,28 +249,53 @@ export async function renderScene(scene, options = {}) {
   // default — nothing is copied and nothing is multiplied: `target` IS the caller's
   // scene object, so the default path is the path it has always been, and the
   // delivered PNG is byte-identical to what it was before this option existed.
-  const ss = resolveSupersample(options.supersample)
-  const target = ss === 1 ? scene : inflateScene(scene, ss)
-
-  const doc = target.canvas
-  if (doc === null || typeof doc !== 'object') {
+  //
+  // THE DELIVERED SIZE COMES FROM THE CALLER'S DECLARATION, and the internal size
+  // from it, never the other way round. Reading the delivered size back out of the
+  // inflated scene is how this went wrong once: the copy carries a canvas three
+  // times larger, so `Math.round(doc.width)` returned 7260 for a 2420-wide scene and
+  // the renderer then drew THAT at 3x too — 21780x4008, nine times the intended
+  // memory, which died inside Skia on a real document. One number, one source.
+  const declared = scene.canvas
+  if (declared === null || typeof declared !== 'object') {
     throw new Error('scene.canvas is required, e.g. {"width":2400,"height":1350}')
   }
-  // The DELIVERED size is what the scene declares and what the report states; the
-  // internal canvas is an exact multiple of it, so every reduction block is whole.
-  // A width of 800.4 already rounds to 800 today, and at 3x it has to round to 2400
-  // rather than to 2401, or the last block would be short and the delivered size
-  // would drift away from the declared one.
-  const outW = Math.round(doc.width)
-  const outH = Math.round(doc.height)
-  if (!(outW > 0 && outH > 0)) throw new Error(`scene.canvas needs positive width and height, got ${doc.width}x${doc.height}`)
+  // The internal canvas is an exact multiple of the delivered one, so every reduction
+  // block is whole. A width of 800.4 already rounds to 800 today, and at 3x it has to
+  // round to 2400 rather than to 2401, or the last block would be short and the
+  // delivered size would drift away from the declared one.
+  const outW = Math.round(declared.width)
+  const outH = Math.round(declared.height)
+  if (!(outW > 0 && outH > 0)) throw new Error(`scene.canvas needs positive width and height, got ${declared.width}x${declared.height}`)
+  const ss = resolveSupersample(options.supersample)
+  const target = ss === 1 ? scene : inflateScene(scene, ss)
+  const doc = target.canvas
   const W = outW * ss
   const H = outH * ss
 
-  const canvas = createCanvas(W, H)
+  // A supersampled render is a memory decision as much as an image-quality one: every
+  // full-canvas buffer is held at the internal size, and the renderer keeps several
+  // alive (the composite, the layer being drawn, and one scratch buffer per effect or
+  // mask). So the allocation is the one place a request can fail for a reason the
+  // caller can do something about, and it fails with the arithmetic rather than with
+  // a raw backend error. `test/supersample.mjs` pins the message.
+  //
+  // The wrapper comes FIRST and the backend's own reason last. The raw reason is
+  // information — "Create skia canvas failed" is what tells an engine developer this
+  // was the allocation and not, say, a read-back — but it can never be the whole
+  // message, because it names nothing the caller can change. It is also attached as
+  // `cause`, so a stack trace shows it without the message having to carry it.
+  let canvas
+  try {
+    canvas = createCanvas(W, H)
+  } catch (error) {
+    throw new Error(
+      `cannot allocate the buffers to supersample a ${outW}x${outH} document at ${ss}x — it needs a ${W}x${H} canvas. ${supersampleCost(ss, outW, outH)} The backend reported: ${error.message}`,
+      { cause: error },
+    )
+  }
   const ctx = canvas.getContext('2d')
   const dpr = 1
-
   // Ground: a flat colour or a gradient, always fully opaque so the document
   // has no accidental transparency that a later blend mode would treat as
   // black. An unset ground defaults to opaque white, which is what a print
@@ -322,7 +347,23 @@ export async function renderScene(scene, options = {}) {
   // then blended at the supersampled resolution, so the edge where two of them meet
   // is resolved as finely as a single layer's own edge. Reducing each layer first
   // would throw that away and cost a downsample per layer as well.
-  const delivered = ss === 1 ? canvas : reduceCanvas(canvas, ss)
+  //
+  // REFUSED, NEVER SILENTLY DROPPED. If the reduction cannot be done, this throws.
+  // Rendering at 1x and returning it as though it were supersampled would be the
+  // exact failure class this engine keeps paying for — a clean report describing a
+  // render that did not happen — so there is no fallback path here.
+  let delivered = canvas
+  if (ss > 1) {
+    try {
+      delivered = reduceCanvas(canvas, ss)
+    } catch (error) {
+      // The wrapper first, the backend's reason last, same as the allocation above.
+      throw new Error(
+        `the ${ss}x render was drawn but its ${W}x${H} canvas could not be read back and reduced to ${outW}x${outH}. ${supersampleCost(ss, outW, outH)} The backend reported: ${error.message}`,
+        { cause: error },
+      )
+    }
+  }
 
   const report = {
     canvas: { width: outW, height: outH },
@@ -341,11 +382,54 @@ export async function renderScene(scene, options = {}) {
   return { canvas: delivered, report, layers: captured }
 }
 
-/** Reduce a supersampled canvas to the delivered size, by area average. */
+/**
+ * What a supersample request costs, in the terms a caller can act on.
+ *
+ * Every buffer in this renderer is full-canvas, so the cost of drawing at N× is the
+ * whole document's memory multiplied by N² — a fact that is invisible until a render
+ * dies on a large document, which is why it is printed alongside the failure and
+ * stated in `src/supersample.mjs` rather than discovered.
+ */
+function supersampleCost(ss, outW, outH) {
+  const mb = (w, h) => Math.round((w * h * 4) / 1048576)
+  const base = mb(outW, outH)
+  return `At ${ss}x every full-canvas buffer is ${outW * ss}x${outH * ss} — ${mb(outW * ss, outH * ss)} MB against `
+    + `${base} MB at 1x, and this renderer holds several at once (the composite, the layer being drawn, and a `
+    + `scratch buffer per mask or effect). Render a smaller canvas with --scale, or a lower factor.`
+}
+
+/**
+ * Reduce a supersampled canvas to the delivered size, by area average.
+ *
+ * READ IN BANDS, NOT IN ONE PIECE. A full read of the internal canvas is a second
+ * copy of the whole thing in memory at the moment the render is already holding its
+ * largest buffers — 111 MB for a 2420x1336 document at 3x, on top of the 111 MB
+ * canvas itself — and that is the allocation that fails first on a big document.
+ * Reading 512 device rows at a time costs 15 MB instead and produces byte-identical
+ * output, so there is no reason to pay it. (Measured: reading a 7260x4008 canvas
+ * back is fine in isolation even at 200 Mpx, so the failure this guards against is
+ * memory pressure during a real render, not a hard size limit in Skia.)
+ */
+const REDUCE_BAND_ROWS = 512
+
 function reduceCanvas(canvas, factor) {
-  const reduced = downsampleRGBA(readBuffer(canvas), factor)
-  const out = createCanvas(reduced.width, reduced.height)
-  writeBuffer(out, reduced)
+  const ctx = canvas.getContext('2d')
+  const outW = canvas.width / factor
+  const outH = canvas.height / factor
+  const out = createCanvas(outW, outH)
+  const outCtx = out.getContext('2d')
+  // Whole blocks per band, so each band starts on a block boundary and the last band
+  // is a whole number of blocks too — `downsampleRGBA` refuses a partial one.
+  const band = Math.max(factor, Math.floor(REDUCE_BAND_ROWS / factor) * factor)
+
+  for (let y = 0; y < canvas.height; y += band) {
+    const rows = Math.min(band, canvas.height - y)
+    const strip = ctx.getImageData(0, y, canvas.width, rows)
+    const reduced = downsampleRGBA({ width: canvas.width, height: rows, data: strip.data }, factor)
+    const id = outCtx.createImageData(reduced.width, reduced.height)
+    id.data.set(reduced.data)
+    outCtx.putImageData(id, 0, y / factor)
+  }
   return out
 }
 
