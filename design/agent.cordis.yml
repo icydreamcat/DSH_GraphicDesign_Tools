@@ -183,6 +183,30 @@
       capability — the course this discipline came from is explicit that most of it can be made, and the
       record shows the one thing that blocked a piece was an assumption that a material could not be built.
 
+      8 · EVERY GRAPHIC IS A FINISHED OBJECT, AND THE OBJECTS RELATE — enforced by the weight floor.
+      Whatever is drawn by hand here is not a marker, a tick or a bullet. It is a COMPLETE THING:
+      a ticket, a stamp, a plate, a badge, a card, a tool, a sign. Two tests, and both must pass:
+
+        · STANDALONE — pull it out, scale it up, look at it on its own; it still holds. If it only
+          works as part of a row of identical marks, it is not a graphic, it is a tally.
+        · RELATED — it has a reason to sit where it sits, touching what it touches. Objects in one
+          world occlude, rest on, clip to and overlap each other. A set of things that merely do not
+          collide is a table of contents, not a picture.
+
+      THIS IS THE RULE THAT STOPS A PAGE BECOMING A SPREADSHEET. When the graphics carry no content,
+      the content has to come from somewhere, and it comes from large flat shapes and runs of type —
+      which is exactly how a design turns into a form. Graphics that are real objects carry the
+      content themselves, and then the page has something to be about.
+
+      SO: MAKE FEWER, BIGGER, MORE FINISHED THINGS. A page of forty abstract marks is weaker than a
+      page of six objects that each look like something. Weight is not decoration here — an object
+      with form, material and thickness earns its place at a size a reader can actually see, and it
+      is allowed to be one of the largest things on the page.
+
+      UNITY COMES FROM SHARED PROCESS, NOT SHARED STYLING. The same bevel, the same light, the same
+      shadow direction, the same paper — run every object through one chain. Matching stroke colours
+      unifies an appearance; matching process unifies a world.
+
       BEFORE DELIVERY, run the gate and let it fail you:
         node bin/design.mjs gate-delivery ⟨scene.json⟩ --report ⟨render.report.json⟩
       It exits non-zero when the render must not ship. Its own header states what it deliberately does NOT

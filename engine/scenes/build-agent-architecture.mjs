@@ -79,77 +79,151 @@ const BANDS = [
   {
     name: '宿主面', en: 'HOST PLANE', note: '进程唯一，跨会话共享',
     items: [
-      ['注册表', 'tools / systemPrompt / agents / sessions', { kind: 'mark', n: 4 }],
-      ['沙箱与审批', '文件策略、命令策略', { kind: 'rule', n: 2 }],
-      ['持久化与模型路由', '会话存储、凭据、模型选择', { kind: 'mark', n: 3 }],
+      ['注册表', 'tools / systemPrompt / agents / sessions', { glyph: 'table', n: 4 }],
+      ['沙箱与审批', '文件策略、命令策略', { glyph: 'clause', n: 2 }],
+      ['持久化与模型路由', '会话存储、凭据、模型选择', { glyph: 'stack', n: 3 }],
     ],
   },
   {
     name: 'Agent 面', en: 'AGENT PRESET · 19 行', note: '一个会话一份，随会话卸载',
     items: [
-      ['persona', '身份：平面设计师', { kind: 'rule', n: 1 }],
-      ['design-policy', '常驻纪律：6 条可强制的规则', { kind: 'tally', n: 6 }],
-      ['design-tools', '8 个工具，全部子进程调用引擎', { kind: 'mark', n: 8 }],
-      ['skill-filesystem', '9 个技能，preset 自带目录', { kind: 'mark', n: 9 }],
+      ['persona', '身份：平面设计师', { glyph: 'ledger', n: 1 }],
+      ['design-policy', '常驻纪律：可强制的规则', { glyph: 'clause', n: 7 }],
+      ['design-tools', '工具，全部子进程调用引擎', { glyph: 'tool', n: 8 }],
+      ['skill-filesystem', '技能，preset 自带目录', { glyph: 'drill', n: 9 }],
     ],
   },
   {
     name: '工具面', en: 'ENGINE · CLI', note: '不 vendor 进 preset，终端里也能独立用',
     items: [
-      ['bin/design.mjs', '11 个子命令：render analyze verify gate-delivery …', { kind: 'tally', n: 11 }],
-      ['src/', '渲染、效果、调色、分析、闸门判据', { kind: 'rule', n: 3 }],
-      ['tools/', '29 个会话工具，名册自动读取', { kind: 'mark', n: 29 }],
+      ['bin/design.mjs', '子命令：render analyze verify gate-delivery …', { glyph: 'tool', n: 11 }],
+      ['src/', '渲染、效果、调色、分析、闸门判据', { glyph: 'ledger', n: 3 }],
+      ['tools/', '会话工具，名册自动读取', { glyph: 'tool', n: 29 }],
     ],
   },
   {
     name: '知识与规则', en: 'DOCS + KNOWLEDGE', note: '规则进仓库，案例留本地',
     items: [
-      ['docs/rules/', '9 份纯规则：判断、测量、排版、色彩、版式、材质、交付', { kind: 'mark', n: 9 }],
-      ['knowledge/', '19 份案例与过程记录，不进仓库', { kind: 'mark', n: 19 }],
+      ['docs/rules/', '份纯规则：判断、测量、排版、色彩、版式、材质、交付', { glyph: 'clause', n: 9 }],
+      ['knowledge/', '份案例与过程记录，不进仓库', { glyph: 'stack', n: 19 }],
     ],
   },
 ]
 
 /**
- * 一张卡的量记号。
+ * 图元 —— 按课程规则做，不是按数量做。
  *
- * 为什么要它：第一版把 13 张卡画成同一个构造复制十三遍——**那不是系统，是一次复制**，
- * 信息量等于 1 张。规则里正对着这一条：「一个基础图形＋复制是反例，不是方法」，
- * 正确形态是**一个基础单元 + 多沿"哪个形 / 多少个 / 多重"变化的变体**。
+ * 参考：那份拆解的 §5.5–5.7。四条规则直接约束这个函数：
  *
- * 这里每一个记号都**代表一个真实的量**（4 个注册表、6 条常驻规则、29 个工具、19 份案例），
- * 所以它同时满足"每一处都承担职务"与"删掉它信息量会变"。
+ *   1 · **几何拼装。** 「每个图元由矩形、圆、菱形三种基元拼成，且基元的角点、圆心落在方格网
+ *       的交点上。」这是生成规则，不是手工摆放——所以先定 G 网格，再把基元吸附上去。
+ *   2 · **每个图元是一个可以独立存在的符号**，不是一个点。拿一列 5px 方块去表示"8 个工具"，
+ *       读者读到的是噪点；读者要能认出"这是一个图鉴条目"。
+ *   3 · **记号必须远小于字标（≤1:7）**，否则它们变成小竞争对手——23px 的字标对应图元 ≤ 20px。
+ *   4 · **任何图元都不得是"铺底的小点"**：要么是内容层上的符号，要么什么都不是。
+ *
+ * 第一版犯的正是反例：104 个 5–7px 的方块阵列，形式相同、无基元结构、只承载数量。
+ * 它是"铺底的看不清的小东西"，而且是同质化的——两个毛病都被规则说中了。
  */
-function marks(id, x, y, w, spec) {
-  if (spec === undefined) return
-  const { kind, n } = spec
-  // 记号用强调色，不用发丝灰。
-  //
-  // 第一版全部用 HAIR 灰，结果是 accent.almostNone：大块平涂 **0%**，落在合法区间
-  // （0.4–5%）之外——一张"几乎没上色"的图读成省了颜色，而不是克制。
-  // 记号是这张图真正的细节层，细节层就该是强调色出现的地方。
-  const ink = SIGNAL
-  if (kind === 'rule') {
-    // 分隔线：横向发丝线，条数＝件数
-    for (let i = 0; i < n; i++) bar(`${id}-r${i}`, x, y + i * 7, w * 0.42, 2, ink, 0.9)
-    return
-  }
-  if (kind === 'tally') {
-    // 计数条：一条＝一件，成行排列；超过 8 后换行
-    const perRow = 8
-    for (let i = 0; i < n; i++) {
-      const cx = x + (i % perRow) * 14
-      const cy = y + Math.floor(i / perRow) * 10
-      bar(`${id}-t${i}`, cx, cy, 9, 4, ink, 0.95)
+const G = 4 // 网格模数：所有基元的角点与圆心都落在 4 的倍数上
+const snap = (v) => Math.round(v / G) * G
+
+/** 一个图元 = 基元列表。每个基元都吸附到 G 网格。坐标以图元左上角为原点、边长 20。 */
+const GLYPHS = {
+  /** 图鉴条目：外框 + 内部菱形（"一册"） */
+  ledger(ox, oy) {
+    const s = 20
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy), w: s, h: s },
+      { k: 'dia', x: snap(ox + s / 2), y: snap(oy + s / 2), r: 4 },
+    ]
+  },
+  /** 规则条目：外框 + 内部两条刻度（"条款"） */
+  clause(ox, oy) {
+    const s = 20
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy), w: s, h: s },
+      { k: 'hl', x: snap(ox + 4), y: snap(oy + 6), w: 12 },
+      { k: 'hl', x: snap(ox + 4), y: snap(oy + 12), w: 8 },
+    ]
+  },
+  /** 工具：外框 + 内部圆环 + 圆心（"器械"） */
+  tool(ox, oy) {
+    const s = 20
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy), w: s, h: s },
+      { k: 'ring', x: snap(ox + s / 2), y: snap(oy + s / 2), r: 5 },
+      { k: 'dot', x: snap(ox + s / 2), y: snap(oy + s / 2), r: 1 },
+    ]
+  },
+  /** 技能：外框 + 内部一个旋转 45° 的方（"训练"） */
+  drill(ox, oy) {
+    const s = 20
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy), w: s, h: s },
+      { k: 'dia', x: snap(ox + s / 2), y: snap(oy + s / 2), r: 6 },
+      { k: 'dia', x: snap(ox + s / 2), y: snap(oy + s / 2), r: 3 },
+    ]
+  },
+  /** 案例：无外框，两片叠错的方（"一叠"） */
+  stack(ox, oy) {
+    const s = 14
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy + 6), w: s, h: s },
+      { k: 'rect', x: snap(ox + 6), y: snap(oy), w: s, h: s },
+    ]
+  },
+  /** 注册表：外框 + 三条并列刻度（"一张表"） */
+  table(ox, oy) {
+    const s = 20
+    return [
+      { k: 'rect', x: snap(ox), y: snap(oy), w: s, h: s },
+      { k: 'vt', x: snap(ox + 7), y: snap(oy + 3), h: 14 },
+      { k: 'vt', x: snap(ox + 13), y: snap(oy + 3), h: 14 },
+    ]
+  },
+}
+
+/**
+ * 画一个图元。**每个图元只画一次**，尺寸与字标成 1:7 以下。
+ * `kind` 决定用哪个符号——这才是"图元"与"数量点阵"的区别：
+ * 一个符号说"这是一类东西"，一串点只说"这里有八个"。
+ */
+function glyph(id, x, y, kind, tint) {
+  const parts = (GLYPHS[kind] ?? GLYPHS.ledger)(x, y)
+  parts.forEach((p, i) => {
+    const pid = `${id}-${kind}-${i}`
+    const ink = tint ?? INK_2
+    if (p.k === 'rect') {
+      add({
+        id: pid, shape: 'rect', x: p.x, y: p.y, w: p.w, h: p.h, paint: 'transparent', opacity: 0,
+        effects: [{ type: 'stroke', color: ink, size: 2, position: 'inside', opacity: 1 }],
+      })
+    } else if (p.k === 'dia') {
+      add({ id: pid, shape: 'polygon', points: [[p.x, p.y - p.r], [p.x + p.r, p.y], [p.x, p.y + p.r], [p.x - p.r, p.y]], paint: ink })
+    } else if (p.k === 'ring') {
+      add({
+        id: pid, shape: 'ellipse', x: p.x - p.r, y: p.y - p.r, w: p.r * 2, h: p.r * 2, paint: 'transparent', opacity: 0,
+        effects: [{ type: 'stroke', color: ink, size: 2, position: 'inside', opacity: 1 }],
+      })
+    } else if (p.k === 'dot') {
+      add({ id: pid, shape: 'ellipse', x: p.x - 2, y: p.y - 2, w: 4, h: 4, paint: ink })
+    } else if (p.k === 'hl') {
+      bar(pid, p.x, p.y, p.w, 2, ink, 0.9)
+    } else if (p.k === 'vt') {
+      bar(pid, p.x, p.y, 2, p.h, ink, 0.9)
     }
-    return
-  }
-  // mark：小方块阵列，代表"一组同类的东西"
-  for (let i = 0; i < n; i++) {
-    const cx = x + (i % 10) * 13
-    const cy = y + Math.floor(i / 10) * 13
-    bar(`${id}-m${i}`, cx, cy, 7, 7, ink, 0.88)
-  }
+  })
+}
+
+/**
+ * 数字的量，用一个**符号 + 数值**表达，不再用点阵。
+ *
+ * 点阵的问题是它把"数量"当成"形式"：读者数不清 29 个点，也不需要数。
+ * 「29 个会话工具」应当读作"一个图元 + 一个数"，读法立刻成立，而且不铺底。
+ */
+function countMark(id, x, y, n, tint) {
+  text(`${id}-n`, x + 24, y - 4, 60, String(n), 22, tint ?? INK, 700)
 }
 
 BANDS.forEach((b, i) => {
@@ -176,9 +250,12 @@ BANDS.forEach((b, i) => {
     bar(`27-accent-${i}-${j}`, x, y + 26, 3, 26, SIGNAL)
     text(`28-cardtitle-${i}-${j}`, x + 14, y + 44, cardW - 30, it[0], 23, INK, 700)
     text(`29-cardbody-${i}-${j}`, x + 14, y + 78, cardW - 30, it[1], 18, INK_2)
-    // 量记号：每张卡右下角，代表它自己那个数量。这是"细节不封顶"的落点——
-    // 加的是**它自己的量**，不是又一块内容。
-    marks(`30-mk-${i}-${j}`, x + 14, y + BAND_H - 44, cardW - 30, it[2])
+    // 图元 + 数值：一个符号说"这是一类东西"，一个数说"有多少"。
+    // 不再是点阵——点阵只承载数量，读者读不到符号，那就是铺底的噪点。
+    if (it[2] !== undefined) {
+      glyph(`31-gl-${i}-${j}`, x + 16, y + BAND_H - 52, it[2].glyph, SIGNAL)
+      countMark(`32-ct-${i}-${j}`, x + 16, y + BAND_H - 50, it[2].n, INK)
+    }
   })
 })
 

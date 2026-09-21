@@ -11,6 +11,35 @@ The failure it prevents has one shape: **a page whose elements are all correct a
 none of which touch each other.** Everything is measured, nothing is physically
 connected, and the result reads as a layout rather than as an object.
 
+### The rule everything below serves
+
+**Every graphic drawn by hand is a finished object, and the objects relate.**
+
+Two tests, and a graphic must pass both:
+
+- **STANDALONE** — pull it out of the page, scale it up, look at it on its own. It still holds.
+  If it only works as one entry in a row of identical marks, it is not a graphic, it is a tally.
+- **RELATED** — it has a reason to sit where it sits and to touch what it touches. Objects that
+  share a world occlude, rest on, clip to and overlap each other. A set of things that merely fail
+  to collide is a table of contents, not a picture.
+
+**Why this is the rule and not a preference.** When the graphics carry no content, content has to
+come from somewhere, and it comes from large flat shapes and long runs of type. That is the exact
+mechanism by which a design turns into a form. Real objects carry the content themselves, and then
+the page has something to be *about*.
+
+**And the consequence for size:** make **fewer, bigger, more finished** things. Forty abstract marks
+are weaker than six objects that each look like something. An object with form, material and
+thickness earns a size at which a reader can actually see it — it is allowed to be one of the
+largest things on the page. A 20px glyph is not a small graphic, it is a marker, and markers do not
+count as craft.
+
+**Unity comes from shared process, not shared styling.** Matching stroke colours unifies an
+*appearance*; running every object through one chain — the same bevel, the same light, the same
+shadow direction, the same paper — unifies a *world*. This is why the recipes below are chains
+rather than presets: two objects built through the same chain belong together even when they share
+no colour.
+
 That failure comes from treating material as a **library of recipes** — "leather
 is done like this, metal like that". Four courses' worth of production material
 says the opposite, and the correction is worth stating first because everything

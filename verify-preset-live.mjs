@@ -70,8 +70,20 @@ if (yaml === null) {
      */
     check('policy 仍是短版：规则数在 4–10 之间（下限防塌缩，上限防长回文章）',
       rules >= 4 && rules <= 10, `${rules} 条规则，${text.length} 字符（旧版 22 条原则 / 15,640 字符）`)
-    check('字符数仍显著低于旧版（< 9,000）',
-      text.length < 9000, `${text.length} / 15,640 = ${(text.length / 15640 * 100).toFixed(0)}%`)
+    /**
+     * The character ceiling guards one thing: that this section does not grow back into the essay it
+     * was compressed from (15,640 characters, 22 unenforceable principles). It is NOT a budget to
+     * spend down — a rule that earns its place is allowed to cost characters.
+     *
+     * Raised from 9,000 to 10,000 when the eighth rule arrived. That rule is the standing principle
+     * that every hand-made graphic must be a finished, standalone object: it applies to every
+     * response, and the alternative was to leave it unenforced in a skill. The ceiling moving is
+     * recorded here rather than done quietly, because a threshold that gets relaxed the moment it
+     * binds is not a threshold. What keeps it honest is the two checks beside it: every rule must
+     * state how it is held, and the section must stay under two thirds of the original.
+     */
+    check('字符数仍显著低于旧版（< 10,000，即原版的三分之二以内）',
+      text.length < 10000, `${text.length} / 15,640 = ${(text.length / 15640 * 100).toFixed(0)}%`)
     /**
      * Every numbered rule must say HOW IT IS HELD — either it names the check that enforces it, or
      * it is one of the limits and says plainly that no check can reach it and whose judgement does.
