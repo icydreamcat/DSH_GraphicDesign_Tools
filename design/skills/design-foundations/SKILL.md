@@ -63,6 +63,33 @@ Note what is absent. Not one entry is about a colour being wrong or a shape
 being poorly drawn. **When your work looks amateur, look at the relationships
 first — almost always before you look at the elements.**
 
+## Four ways this goes wrong that are not about the levels
+
+These came from a live session, each stated by the person who owns the work, and each is a trap that
+sits *before* the four levels — you can get all four levels right and still fail at any of them.
+
+**1 · Count before you measure.** *"You can quantify an image, but often you have not established what is
+actually in it, and you blindly measure the share of different elements — the result is numerically
+identical while the picture has no logic and is nothing like the reference."* Establish what is on the
+page, in words, first. A ratio measured over the wrong contents is a precise answer to a question
+nobody asked.
+
+**2 · Do not use a reference as a source of content.** *"The reference and the thing I asked you to make
+are actually not the same style — compare their complexity and their technique, then think separately
+about what YOUR image needs. Not copy it over."* Borrow the **complexity and the technique**; never the
+information, and never the subject.
+
+**3 · Not everything goes through one process.** *"Stop — the style is wrong, and not all of the content
+should be done with the same process. Sort out the logic first, then do them one at a time."* A single
+pipeline applied uniformly is how a page becomes a template, and a template is the failure this whole
+preset exists to avoid.
+
+**4 · Build it at the start; do not tune it afterwards.** *"Your last suggestion is still just fiddling
+with parameters. Design should be built up at the start and then carried out a little at a time."* If you
+are moving values to make something read better, ask which declared decision is wrong — because if none
+of them is wrong, you have not found the problem, only its symptom. The extreme form of this failure is
+recorded verbatim: *"the whole image gets uglier the more you change it."*
+
 ## The one rule worth memorising
 
 The review found this and called it more useful than ten reference images. It is

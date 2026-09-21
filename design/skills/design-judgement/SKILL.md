@@ -143,6 +143,91 @@ varied along the three axes the eye actually reads — **which form, how many, h
 heavy** — plus density by position. Say the rule that generates the set, and let
 the count follow from the rule rather than from a target number.
 
+## Design is built at the start, not tuned after
+
+The single most expensive habit in this discipline, named directly by the person who owns the work:
+
+> "Your last suggestion is essentially still just fiddling with parameters. Design should be built up at
+> the start and then carried out a little at a time."
+
+**"凑参数" — parameter-fiddling — is not a slower route to the same place.** It is a different activity
+that produces a different object. A page tuned into shape keeps the structure it started with and gets
+its numbers moved around; a page designed at the start has a structure that the numbers express. From
+the outside, after enough rounds, the two look similar in a thumbnail and completely different in
+person — and only one of them survives being changed.
+
+The same complaint, in its most extreme form: *"the whole image gets uglier the more you change it."*
+That is the signature of tuning: every local fix is locally correct and the whole drifts.
+
+**Rule:** when you notice you are adjusting values to make something read better, stop and ask which
+of the declared decisions is wrong. If nothing in `gates` is wrong, you have not found the problem
+yet — you have found its symptom.
+
+## Measure to falsify, never to confirm
+
+This resolves the apparent contradiction between "measure, do not estimate" and "don't only quantify
+and compare pixels". Both are instructions, and they are not in conflict because measurement has one
+direction:
+
+> "You can't just measure. You have to actually understand the design logic and why a single operation
+> is done, and when it should be done. That is the general method."
+
+**A measurement can tell you a page is wrong. It can never tell you a page is right.** Ratios, shares
+and colour counts are falsifiers. When one is inside its band, that establishes the absence of one
+particular defect and nothing at all about whether the page works. The moment a number is offered as
+evidence that something IS right, it has been misused — and that is the misuse the owner kept catching:
+
+> "You're still fitting basic text and basic shapes to pixel proportions."
+
+Two rules that follow, and both are checkable by you before anyone else sees the work:
+
+1. **Before measuring anything, establish what is actually ON the page.** *"You can quantify an image,
+   but often you have not established what is actually in it, and you blindly measure the share of
+   different elements — the result is numerically identical and the picture has no logic and is nothing
+   like the reference."* Counting first, measuring second. A proportion measured over the wrong
+   contents is a confident answer to a question nobody asked.
+2. **Do not add something whose only effect is on a number.** Gradients and opacity were added to raise
+   complexity, and the verdict was: *"this is not composite design at all, it is still measuring pixels
+   so the data looks better."* If the reason for an element is a metric, the element is not a design
+   decision.
+
+## Recognise a style; do not summarise it into a rule
+
+The course material is explicit about this and it is easy to reverse: *"don't try to summarise what
+style it is"*, *"you don't need to make it that complicated"*, *"first find references — what elements
+does this style use most? — then make small differentiations"*.
+
+Two failure modes sit on either side of the correct path, and both were hit:
+
+- **Defining the style first**, then building to the definition. The page is measurable against a
+  definition it invented and fails the only test that matters: does it belong to the same family as
+  the reference.
+- **Copying the reference's content** rather than borrowing its complexity. *"You are using flat,
+  straightforward information or screenshots to fill the frame... the reference uses shapes, or
+  material you designed and processed yourself."* And: *"the reference and the thing I asked you to
+  make are actually not the same style. You should compare their complexity and their technique, then
+  think separately about what YOUR image needs — not copy it over."*
+
+So: borrow the **complexity and the technique**; do not copy the **information and the content**. And
+**not every part of a piece goes through the same process** — *"you should sort out the logic first,
+then do them one at a time"*. One pipeline applied to every element is how a page becomes a template.
+
+## When your own notes do not save you
+
+Named as the root cause, by the owner, at the end of the session:
+
+> "This agent has already summarised a lot and written it into rules and skills — and you still forget
+> it. **That is the root problem.**"
+
+**Writing something down is not the same as having it.** A rule that is present in context and not
+acted on is indistinguishable from a rule that was never written, and a skill that is loaded and
+misread is worse, because it supplies vocabulary for repeating the mistake confidently.
+
+This is why the working policy is short and every line in it is attached to a check that fails: the
+test of a rule is not whether it can be quoted, but whether ignoring it stops the work. When you find
+yourself able to recite a principle and unable to apply it, you have found the thing this file exists
+for — and the fix is not to write it down again.
+
 ## Where the honest limit is
 
 Three things were never solved in the session this file comes from, and naming

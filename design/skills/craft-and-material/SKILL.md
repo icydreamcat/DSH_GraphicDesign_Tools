@@ -37,6 +37,43 @@ The first correction is about capability (it was believed to be missing and was
 not). The second is about form: after the first correction the work became a
 materials catalogue, which is the same error wearing better clothes.
 
+## The core lesson is not the operations
+
+Four courses' worth of material, and the thing the owner said was the most important part of all of it
+is not any of the techniques:
+
+> "The most core thing I wanted you to learn from that course is not how to do the operations — it is
+> that so many of these things can be **made by ourselves**. You have to learn the basic design
+> principles and ONE unified practice method, not memorise materials one by one and copy them. And you
+> even wrote them down and still couldn't use them, and ended up fiddling with parameters."
+
+So the deliverable of this skill is **a method, not a library**. Two consequences, both of which were
+learned by failing at them:
+
+**A recipe you cannot apply is not knowledge.** The failure was not that the material recipes were
+wrong; it was that they were *recorded and then not used*, and the session ended up adjusting numbers
+anyway. If this file's practical sections are being read as a menu to select from, it is being read
+wrong — the point is that the chain is yours to build.
+
+**Do not mistake a capability gap for a real one.** The owner's correction on this is worth keeping
+verbatim: *"You don't need to hand-draw — you can take other material and process it into that
+hand-drawn quality."* It had been recorded as "I cannot change the watercolour brushstrokes", which is
+a statement about a limit that did not exist. **Before accepting a limit, ask whether it is a limit of
+the medium or of your method** — most of the ones that look like the first are the second.
+
+## Repetition is not a system
+
+*"A base shape plus a copy"* is a failure, not a method. It appears in the course material as something
+the demonstrator does while working, and it was adopted as a technique for building a set — which
+produced *"a heap of base shapes with no texture and no relation between them"*.
+
+The distinction is the one in `design-judgement`: **reuse the CONTENT and the COMPLEXITY, do not copy
+the form.** In practice that means one construction and many derivatives of it, varied along the axes
+the eye actually reads (which form, how many, how heavy), plus density by position — not the same shape
+placed repeatedly at different sizes. The owner's line on the reverse error is exact: *"you should
+compare their complexity and their technique, then think separately about what YOUR image needs — not
+copy it over."*
+
 ## Where complexity actually comes from
 
 Not from gradients. Not from opacity. A composite gets its complexity from
