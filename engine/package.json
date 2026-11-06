@@ -1,0 +1,22 @@
+{
+  "name": "dsh-design",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Design engine for the DSH design agent: a real renderer, a measurement/analysis toolchain, and a layered PSD writer.",
+  "main": "src/index.mjs",
+  "bin": {
+    "design": "bin/design.mjs"
+  },
+  "scripts": {
+    "render": "node bin/design.mjs render",
+    "test": "node test/run-all.mjs",
+    "test:scale": "node test/scale.mjs",
+    "selftest": "node test/selftest.mjs",
+    "psd": "node test/psd-roundtrip.mjs",
+    "schemas": "node test/tool-schemas.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.0.9"
+  }
+}
